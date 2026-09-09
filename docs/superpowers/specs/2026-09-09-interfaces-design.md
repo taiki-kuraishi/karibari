@@ -34,6 +34,8 @@
 ### 公開API versions（合意済み）
 - `GET /api/projects/:id/versions`（版一覧）
 - `POST /api/projects/:id/versions`（新規版追加、HTML実体つき）
+  - 入力：HTML必須
+  - 出力：新版id＋表示URL（`/p/:id?v=:vid`）
 - `GET /api/projects/:id/versions/:vid`（版meta取得）
 - `GET /api/projects/:id/versions/:vid/content`（HTML実体取得、R2経由）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR）。Viewerの`?v`なし=最新はApi側でmeta用D1を見て最新解決
