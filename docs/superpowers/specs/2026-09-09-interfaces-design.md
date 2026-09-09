@@ -79,6 +79,11 @@
 - 入力：`projectId`＋任意で`versionId`、`session`（Cookie/OAuth由来）、`exp`・`sig`（`invite`はApi側判定のためAuthに送らない）
 - 出力：本人性・署名正当性を種類別に返す（単一`ok`ではない。Apiが招待・所有関係とOR結合する。理由の詳細は返さずサーバログ側に残す）
 
+### Cookie・登録方針（合意済み）
+- Cookieは`httpOnly`・`Secure`・`SameSite=Lax`
+- サインアップは開放せず招待制・管理者作成のみ
+- ログイン手段にOAuthを追加
+
 ## 横断
 
 ### 署名付きURL形式（合意済み）
