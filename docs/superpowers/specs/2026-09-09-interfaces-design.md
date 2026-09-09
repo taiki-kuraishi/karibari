@@ -69,3 +69,7 @@
 ### 検証口（合意済み）
 - `POST /verify-access`（Auth Worker、外部非公開、Api→Auth専用）
 - 自分だけ/招待/署名の3種判定（内容は変えず、pathのみ`/internal/verify-access`から変更）
+
+### 検証口の入出力（合意済み）
+- 入力：`projectId`＋任意で`versionId`、`session`（Cookie/OAuth由来）、`invite`、`exp`・`sig`
+- 出力：`ok`の真偽のみ（理由は返さずサーバログ側に残す。Apiは`false`なら一律404に寄せる）
