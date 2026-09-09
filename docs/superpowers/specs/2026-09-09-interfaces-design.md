@@ -49,3 +49,7 @@
 ### 内部API（合意済み：持たない）
 - `/internal/*`は持たない（overall-archの内部API集約からの変更点）
 - MCPも公開`/api/*`を利用する
+
+### MCP認証（合意済み）
+- MCPは利用者のOAuthアクセストークンを`Authorization: Bearer`でApiに転送する
+- ApiはAuthに検証させる
