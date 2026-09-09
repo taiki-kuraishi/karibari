@@ -7,6 +7,9 @@
 - `docs/superpowers/specs/2026-09-09-overall-arch-design.md`
 - `docs/superpowers/specs/2026-09-09-interfaces-design.md`
 
+## 言語・モノレポ基盤（合意済み）
+- TypeScript＋bunワークスペース（`packages/viewer`・`packages/api`・`packages/mcp`・`packages/auth`）＋Vite（viewer用）
+
 ## Api枠組み
 
 ### ルータ（合意済み）
