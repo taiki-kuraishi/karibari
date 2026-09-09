@@ -105,3 +105,6 @@
 - auth用D1：Auth専用
 - R2：Api経由のみ（直接公開なし）
 - MCP：D1/R2直接なし（Api経由のみ）
+
+### R2キー形式（合意済み）
+- `projects/{id}/versions/{v}/`（単一バケット＋prefix、latestエイリアスなし）
