@@ -18,3 +18,8 @@
 ### ORM・運用（合意済み）
 - drizzle-orm 0.45系（安定版、v1 RCは見送り）
 - `drizzle-kit generate`→`wrangler d1 migrations apply`運用
+
+## Auth
+
+### 基盤（合意済み）
+- better-auth 1.7.3＋D1バインディング直接渡し（カスタムアダプタなし）
