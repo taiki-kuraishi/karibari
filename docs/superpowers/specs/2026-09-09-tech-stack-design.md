@@ -23,3 +23,6 @@
 
 ### 基盤（合意済み）
 - better-auth 1.7.3＋drizzle経由でDBを渡す（スキーマもdrizzle管理）
+
+### 招待制ガード（合意済み）
+- `disableSignUp`＋`databaseHooks`でのユーザー作成ガード（OAuth経由の新規作成も招待者のみ）
