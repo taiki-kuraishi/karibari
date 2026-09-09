@@ -72,6 +72,9 @@
 - コメント取得 → `GET /api/projects/:id/comments?v=:vid`
 - 公開URL取得 → `GET /api/projects/:id`＋shares状態から表示用URL（`/p/:id`＋`?v=`/`?invite=`/`?exp=&sig=`）を組み立て
 
+### 入出力スキーマ（合意済み）
+- 対応Apiに準拠（入稿・編集・コメント保存・取得は対応Apiと同一、公開URL取得の出力は表示URL）
+
 ## Auth
 
 ### 検証口（合意済み）
