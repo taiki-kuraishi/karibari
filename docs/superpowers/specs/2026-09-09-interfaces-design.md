@@ -63,3 +63,9 @@
 - コメント保存 → `POST /api/projects/:id/comments`
 - コメント取得 → `GET /api/projects/:id/comments?v=:vid`
 - 公開URL取得 → `GET /api/projects/:id`＋shares状態から表示用URL（`/p/:id`＋`?v=`/`?invite=`/`?exp=&sig=`）を組み立て
+
+## Auth
+
+### 検証口（合意済み）
+- `POST /verify-access`（Auth Worker、外部非公開、Api→Auth専用）
+- 自分だけ/招待/署名の3種判定（内容は変えず、pathのみ`/internal/verify-access`から変更）
