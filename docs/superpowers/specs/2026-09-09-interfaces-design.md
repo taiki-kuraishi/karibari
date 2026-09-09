@@ -9,7 +9,8 @@
 ## Static Viewer
 
 ### SPAルート（合意済み）
-- `GET /` → 一覧/案内
+- `GET /` → 一覧/案内（未ログイン時はログイン画面へ遷移）
+- ログイン画面はAuth側で集約（Viewer内に`/login`は持たない）
 - `GET /p/:projectId` → Viewer本体
   - `?v=<versionId>` 任意（なし=最新）
   - `?invite=<token>` 任意
