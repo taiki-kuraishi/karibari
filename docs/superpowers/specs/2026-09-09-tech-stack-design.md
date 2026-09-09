@@ -34,3 +34,6 @@
 
 ### 基盤（合意済み）
 - `@modelcontextprotocol/server` v2系をHonoに載せる（`app.all('/mcp', ...)`＋`requireBearerAuth`、`allowedHosts`設定）
+
+### トークン方針（合意済み）
+- Bearer転送維持＋audience検証（Authはaudにapiを含むトークンを発行、Api側でもaud検証。confused deputy回避の条件）

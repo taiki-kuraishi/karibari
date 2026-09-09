@@ -62,6 +62,7 @@
 ### MCP認証（合意済み）
 - MCPは利用者のOAuthアクセストークンを`Authorization: Bearer`でApiに転送する
 - ApiはAuthに検証させる
+- 転送維持の条件：Authはaudにapiを含むトークンを発行し、Api側でもaud検証する（confused deputy回避）
 
 ## MCP
 
