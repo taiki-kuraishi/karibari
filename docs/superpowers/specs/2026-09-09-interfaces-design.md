@@ -54,3 +54,12 @@
 ### MCP認証（合意済み）
 - MCPは利用者のOAuthアクセストークンを`Authorization: Bearer`でApiに転送する
 - ApiはAuthに検証させる
+
+## MCP
+
+### ツール一覧（合意済み）
+- 入稿 → `POST /api/projects`（＋初期版）
+- 編集 → `POST /api/projects/:id/versions`（新version追加、不変版維持）
+- コメント保存 → `POST /api/projects/:id/comments`
+- コメント取得 → `GET /api/projects/:id/comments?v=:vid`
+- 公開URL取得 → `GET /api/projects/:id`＋shares状態から表示用URL（`/p/:id`＋`?v=`/`?invite=`/`?exp=&sig=`）を組み立て
