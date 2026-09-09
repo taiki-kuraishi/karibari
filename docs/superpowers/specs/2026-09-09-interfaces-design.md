@@ -79,3 +79,6 @@
 ### 署名付きURL形式（合意済み）
 - クエリ：`?exp=<unix秒>&sig=<hmac>`
 - HMAC対象文字列：`projectId`＋`versionId`＋`exp`（鍵本体はSecrets管理、shares側は鍵IDのみ）
+
+### 招待トークン形式（合意済み）
+- 不透明なランダム文字列（推測不可、sharesに保存、失効・再発行可）
