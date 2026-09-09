@@ -26,3 +26,6 @@
 
 ### 招待制ガード（合意済み）
 - `disableSignUp`＋`databaseHooks`でのユーザー作成ガード（OAuth経由の新規作成も招待者のみ）
+
+### 検証口の実装位置（合意済み）
+- `POST /verify-access`はauth.handler外の素のWorkerルートとして実装（オリジン検査回避、判定内容は変更なし）
