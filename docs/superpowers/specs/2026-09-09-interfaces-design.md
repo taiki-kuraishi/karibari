@@ -51,6 +51,8 @@
 ### 公開API shares（合意済み）
 - `GET /api/projects/:id/shares`（公開設定一覧、要セッション・所有者のみ）
 - `POST /api/projects/:id/shares`（公開範囲設定・招待発行・署名発行、要セッション・所有者のみ）
+  - 入力：種別（公開範囲設定／招待発行／署名発行のいずれか）＋対象指定
+  - 出力：共有id＋招待ならトークン付きURL（`?invite=`）、署名なら署名付きURL（`?exp=&sig=`）
 - `DELETE /api/projects/:id/shares/:sid`（失効、要セッション・所有者のみ）
 
 ### 内部API（合意済み：持たない）
