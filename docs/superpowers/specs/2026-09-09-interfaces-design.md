@@ -23,3 +23,8 @@
 ### 公開APIの資源分割（合意済み）
 - `projects` / `versions` / `comments` / `shares` を別URLの資源に分ける
 - R2取得（HTML実体）はApi経由のみ（R2直接公開なし）
+
+### 公開API projects（合意済み）
+- `GET /api/projects`（自分の案件一覧、要セッション）
+- `POST /api/projects`（新規作成、要セッション）
+- `GET /api/projects/:id`（単体取得、公開範囲判定あり：セッション/招待/署名のOR）
