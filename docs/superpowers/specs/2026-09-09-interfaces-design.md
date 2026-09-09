@@ -45,3 +45,7 @@
 - `GET /api/projects/:id/shares`（公開設定一覧、要セッション・所有者のみ）
 - `POST /api/projects/:id/shares`（公開範囲設定・招待発行・署名発行、要セッション・所有者のみ）
 - `DELETE /api/projects/:id/shares/:sid`（失効、要セッション・所有者のみ）
+
+### 内部API（合意済み：持たない）
+- `/internal/*`は持たない（overall-archの内部API集約からの変更点）
+- MCPも公開`/api/*`を利用する
