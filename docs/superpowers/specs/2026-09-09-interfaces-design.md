@@ -35,6 +35,7 @@
 - `GET /api/projects/:id/versions/:vid`（版meta取得）
 - `GET /api/projects/:id/versions/:vid/content`（HTML実体取得、R2経由）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR）。Viewerの`?v`なし=最新はApi側でmeta用D1を見て最新解決
+- 編集は上書きせず新version追加（HTML不変版を維持）
 
 ### 公開API comments（合意済み）
 - `GET /api/projects/:id/comments?v=:vid`（指定版のコメント一覧）
