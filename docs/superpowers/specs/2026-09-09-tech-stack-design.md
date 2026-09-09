@@ -22,4 +22,4 @@
 ## Auth
 
 ### 基盤（合意済み）
-- better-auth 1.7.3＋D1バインディング直接渡し（カスタムアダプタなし）
+- better-auth 1.7.3＋drizzle経由でDBを渡す（スキーマもdrizzle管理）
