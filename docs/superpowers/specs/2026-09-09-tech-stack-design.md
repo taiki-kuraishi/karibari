@@ -29,3 +29,8 @@
 
 ### 検証口の実装位置（合意済み）
 - `POST /verify-access`はauth.handler外の素のWorkerルートとして実装（オリジン検査回避、判定内容は変更なし）
+
+## MCP
+
+### 基盤（合意済み）
+- `@modelcontextprotocol/server` v2系をHonoに載せる（`app.all('/mcp', ...)`＋`requireBearerAuth`、`allowedHosts`設定）
