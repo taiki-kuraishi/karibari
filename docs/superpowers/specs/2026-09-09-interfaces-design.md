@@ -68,11 +68,16 @@
 
 ### 検証口（合意済み）
 - `POST /verify-access`（Auth Worker、外部非公開、Api→Auth専用）
-- 自分だけ/招待/署名の3種判定（内容は変えず、pathのみ`/internal/verify-access`から変更）
+- pathのみ`/internal/verify-access`から変更。判定分担はB案（次項）
 
-### 検証口の入出力（合意済み）
-- 入力：`projectId`＋任意で`versionId`、`session`（Cookie/OAuth由来）、`invite`、`exp`・`sig`
-- 出力：`ok`の真偽のみ（理由は返さずサーバログ側に残す。Apiは`false`なら一律404に寄せる）
+### 判定分担（合意済み：B案）
+- meta用D1は共有しない（Api専用）
+- Authは本人性・署名正当性のみ返す（auth用D1＋Secretsのみ参照、meta用D1は見ない）
+- 招待の有効性・所有関係などmeta判定はApi側で行う（overall-archのAuth集約からの変更点）
+
+### 検証口の入出力（合意済み：B案対応）
+- 入力：`projectId`＋任意で`versionId`、`session`（Cookie/OAuth由来）、`exp`・`sig`（`invite`はApi側判定のためAuthに送らない）
+- 出力：本人性・署名正当性を種類別に返す（単一`ok`ではない。Apiが招待・所有関係とOR結合する。理由の詳細は返さずサーバログ側に残す）
 
 ## 横断
 
@@ -86,3 +91,9 @@
 ### エラーレスポンス形状（合意済み）
 - HTTPは一律`404`、ボディは汎用文固定（理由の区別なし）
 - 内訳（`not_found`／`forbidden`／`expired`／`invalid_sig`／`r2_missing`／`auth_unavailable`）はサーバログのみに残す
+
+### D1/R2バインド（合意済み）
+- meta用D1：Api専用（共有しない。projects/versions/comments/shares）
+- auth用D1：Auth専用
+- R2：Api経由のみ（直接公開なし）
+- MCP：D1/R2直接なし（Api経由のみ）
