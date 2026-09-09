@@ -73,3 +73,9 @@
 ### 検証口の入出力（合意済み）
 - 入力：`projectId`＋任意で`versionId`、`session`（Cookie/OAuth由来）、`invite`、`exp`・`sig`
 - 出力：`ok`の真偽のみ（理由は返さずサーバログ側に残す。Apiは`false`なら一律404に寄せる）
+
+## 横断
+
+### 署名付きURL形式（合意済み）
+- クエリ：`?exp=<unix秒>&sig=<hmac>`
+- HMAC対象文字列：`projectId`＋`versionId`＋`exp`（鍵本体はSecrets管理、shares側は鍵IDのみ）
