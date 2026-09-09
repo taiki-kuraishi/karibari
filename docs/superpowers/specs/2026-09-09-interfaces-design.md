@@ -40,3 +40,8 @@
 - `GET /api/projects/:id/comments?v=:vid`（指定版のコメント一覧）
 - `POST /api/projects/:id/comments`（要素単位コメントの保存、対象版＋要素指定つき）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR）
+
+### 公開API shares（合意済み）
+- `GET /api/projects/:id/shares`（公開設定一覧、要セッション・所有者のみ）
+- `POST /api/projects/:id/shares`（公開範囲設定・招待発行・署名発行、要セッション・所有者のみ）
+- `DELETE /api/projects/:id/shares/:sid`（失効、要セッション・所有者のみ）
