@@ -12,3 +12,9 @@
 ### ルータ（合意済み）
 - Hono v4.13.7（`^4.13.7`でpin）
 - SPA同居は`assets.not_found_handling: "single-page-application"`＋`run_worker_first: ["/api/*"]`
+
+## DB
+
+### ORM・運用（合意済み）
+- drizzle-orm 0.45系（安定版、v1 RCは見送り）
+- `drizzle-kit generate`→`wrangler d1 migrations apply`運用
