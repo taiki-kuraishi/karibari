@@ -27,6 +27,8 @@
 ### 公開API projects（合意済み）
 - `GET /api/projects`（自分の案件一覧、要セッション）
 - `POST /api/projects`（新規作成、要セッション）
+  - 入力：HTML必須＋名前任意
+  - 出力：案件id＋初期版id＋表示URL（`/p/:id`）
 - `GET /api/projects/:id`（単体取得、公開範囲判定あり：セッション/招待/署名のOR）
 
 ### 公開API versions（合意済み）
