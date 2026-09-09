@@ -44,6 +44,8 @@
 ### 公開API comments（合意済み）
 - `GET /api/projects/:id/comments?v=:vid`（指定版のコメント一覧）
 - `POST /api/projects/:id/comments`（要素単位コメントの保存、対象版＋要素指定つき）
+  - 入力：対象版id＋要素指定＋本文必須
+  - 出力：コメントid
 - いずれも公開範囲判定あり（セッション/招待/署名のOR）
 
 ### 公開API shares（合意済み）
