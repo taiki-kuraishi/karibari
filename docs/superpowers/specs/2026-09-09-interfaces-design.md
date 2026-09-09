@@ -35,3 +35,8 @@
 - `GET /api/projects/:id/versions/:vid`（版meta取得）
 - `GET /api/projects/:id/versions/:vid/content`（HTML実体取得、R2経由）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR）。Viewerの`?v`なし=最新はApi側でmeta用D1を見て最新解決
+
+### 公開API comments（合意済み）
+- `GET /api/projects/:id/comments?v=:vid`（指定版のコメント一覧）
+- `POST /api/projects/:id/comments`（要素単位コメントの保存、対象版＋要素指定つき）
+- いずれも公開範囲判定あり（セッション/招待/署名のOR）
