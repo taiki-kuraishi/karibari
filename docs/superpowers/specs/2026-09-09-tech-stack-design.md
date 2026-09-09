@@ -42,3 +42,6 @@
 
 ### E2E（合意済み）
 - `createTestHarness()`でApi／MCP／Authの3 Worker同時起動
+
+### ユニット（合意済み）
+- `@cloudflare/vitest-plugin`（workerd実行、D1/R2直接参照）
