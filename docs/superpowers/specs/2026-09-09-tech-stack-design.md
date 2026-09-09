@@ -37,3 +37,8 @@
 
 ### トークン方針（合意済み）
 - Bearer転送維持＋audience検証（Authはaudにapiを含むトークンを発行、Api側でもaud検証。confused deputy回避の条件）
+
+## テスト
+
+### E2E（合意済み）
+- `createTestHarness()`でApi／MCP／Authの3 Worker同時起動
