@@ -82,3 +82,7 @@
 
 ### 招待トークン形式（合意済み）
 - 不透明なランダム文字列（推測不可、sharesに保存、失効・再発行可）
+
+### エラーレスポンス形状（合意済み）
+- HTTPは一律`404`、ボディは汎用文固定（理由の区別なし）
+- 内訳（`not_found`／`forbidden`／`expired`／`invalid_sig`／`r2_missing`／`auth_unavailable`）はサーバログのみに残す
