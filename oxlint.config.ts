@@ -15,6 +15,7 @@ export default defineConfig({
     // Generated files are not lint targets; regenerating must never fight the linter.
     "packages/better-auth/src/auth-schema.ts",
     "packages/better-auth/src/migrations",
+    "packages/db/src/migrations",
   ],
   options: {
     typeAware: true,

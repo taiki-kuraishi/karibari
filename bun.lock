@@ -59,6 +59,18 @@
         "typescript": "catalog:",
       },
     },
+    "packages/db": {
+      "name": "@karibari/db",
+      "dependencies": {
+        "drizzle-orm": "catalog:",
+      },
+      "devDependencies": {
+        "drizzle-kit": "catalog:",
+      },
+      "peerDependencies": {
+        "typescript": "catalog:",
+      },
+    },
     "packages/mcp": {
       "name": "@karibari/mcp",
       "dependencies": {
@@ -261,6 +273,8 @@
     "@karibari/auth": ["@karibari/auth@workspace:packages/auth"],
 
     "@karibari/better-auth": ["@karibari/better-auth@workspace:packages/better-auth"],
+
+    "@karibari/db": ["@karibari/db@workspace:packages/db"],
 
     "@karibari/mcp": ["@karibari/mcp@workspace:packages/mcp"],
 
