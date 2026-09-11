@@ -14,5 +14,6 @@ export default {
     // `cloudflare:workers` reads as a dependency literally named `cloudflare`.
     "packages/mcp": { ignoreDependencies: ["cloudflare"] },
     "packages/api": { ignoreDependencies: ["cloudflare"] },
+    "packages/auth": { ignoreDependencies: ["cloudflare"] },
   },
 } satisfies KnipConfig;

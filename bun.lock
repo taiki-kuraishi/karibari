@@ -31,6 +31,20 @@
         "typescript": "catalog:",
       },
     },
+    "packages/auth": {
+      "name": "@karibari/auth",
+      "dependencies": {
+        "hono": "catalog:",
+      },
+      "devDependencies": {
+        "@cloudflare/vitest-plugin": "catalog:",
+        "vitest": "catalog:",
+        "wrangler": "catalog:",
+      },
+      "peerDependencies": {
+        "typescript": "catalog:",
+      },
+    },
     "packages/mcp": {
       "name": "@karibari/mcp",
       "dependencies": {
@@ -201,6 +215,8 @@
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.9", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.0.3", "@jridgewell/sourcemap-codec": "^1.4.10" } }, "sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ=="],
 
     "@karibari/api": ["@karibari/api@workspace:packages/api"],
+
+    "@karibari/auth": ["@karibari/auth@workspace:packages/auth"],
 
     "@karibari/mcp": ["@karibari/mcp@workspace:packages/mcp"],
 

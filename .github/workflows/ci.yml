@@ -64,6 +64,8 @@ jobs:
             path: packages/mcp
           - name: api
             path: packages/api
+          - name: auth
+            path: packages/auth
     name: test (${{ matrix.name }})
     steps:
       - uses: actions/checkout@v7
