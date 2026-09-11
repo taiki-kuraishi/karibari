@@ -118,8 +118,9 @@ each other's cache.
 - **Don't loop CI through the task runner to "keep it in sync".** The three-place sync rule
   (`.claude/rules/mise-tasks.md`) is what keeps them aligned, not indirection.
 - Generated-file drift is checked with the generator's own `--check` where it has one
-  (`cf-typegen --check`). `mise.lock` has no such flag, so it is caught by regenerating and
-  running `git diff --exit-code` — the one place the gate writes to the tree. The `test` job
+  (`cf-typegen --check`). `mise.lock` and the committed drizzle migrations have no such
+  flag, so both are caught by regenerating and running `git diff --exit-code` — the two
+  places the gate writes to the tree. The `test` job
   runs the `cf-typegen --check` step **before** the tests, so a stale committed
   `worker-configuration.d.ts` fails the job instead of silently type-checking against it.
 
