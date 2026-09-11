@@ -63,8 +63,9 @@ lefthook and CI are deliberately asymmetric:
   `cf-typegen` is also absent for its own reason: `wrangler types` truncates
   `worker-configuration.d.ts` before writing it, so a parallel reader sees an empty file.
 - **CI-only steps** (no `.mise-tasks/` counterpart, by design):
-  `bun dedupe --check`, `git diff --exit-code -- mise.lock`, `cf-typegen --check`, and
-  `wrangler deploy --dry-run`. They exist to catch a dirty tree or an undeployable bundle on
+  `bun dedupe --check`, `git diff --exit-code -- mise.lock`, `cf-typegen --check`,
+  `wrangler deploy --dry-run`, and the drizzle migration drift check
+  (`generate:migration` + `git diff --exit-code`) in the `lint` job. They exist to catch a dirty tree or an undeployable bundle on
   a runner, which is not a local concern. `cf-typegen --check` is the drift check for the
   committed `packages/*/worker-configuration.d.ts`; the `cf-typegen` task itself rewrites.
 - **Not in CI:** `lint:lockfile`. `setup-bun` already runs

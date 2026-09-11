@@ -28,8 +28,9 @@ Adding a package is not just a directory. Follow every item that applies:
    is keyed per workspace and each job runs `bun run --cwd ${{ matrix.path }} ...`, so a
    workspace missing from the matrix has **its tests silently never run**. The matrix calls
    the workspace's `test` and `cf-typegen` scripts, and the `lint` job's
-   `vp run -r type-check` calls its `type-check` script, so a workspace has to define all
-   three.
+   `vp run -r type-check` calls its `type-check` script, so define the scripts the jobs need:
+   `test` only for workspaces that have tests (ones without stay out of the matrix, like
+   `packages/better-auth`); `type-check` for every workspace.
 4. **`.mise-tasks/`** — if the package needs a task no other workspace has (a generator, a
    special test suite), add one and sync it to lefthook and CI
    (→ `.claude/rules/mise-tasks.md`).
