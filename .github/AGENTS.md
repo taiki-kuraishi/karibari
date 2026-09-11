@@ -4,9 +4,9 @@ Conventions for `.github/workflows/` and `.github/actions/`.
 
 ## Layout
 
-- `ci.yml` — the JS/TS quality gate: `lint`, `knip`, and the `test` matrix with its
-  `test-ok` aggregate. Add a matrix entry per workspace; see
-  `.claude/rules/workspace-packages.md`.
+- `ci.yml` — the JS/TS quality gate: `changes`, `lint`, `db-drift` (path-gated),
+  `knip`, and the `test` matrix with its `test-ok` aggregate. Add a matrix entry
+  per workspace; see `.claude/rules/workspace-packages.md`.
 
 **Split a workflow by runtime or domain, and don't invent a new granularity on your own —
 ask.** Composite actions go in `.github/actions/<name>` and are called with
