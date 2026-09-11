@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#MISE description="Type-check the root package and every workspace"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# `-r` covers the root package too, not just the workspaces: vite task lists the task as
+# `<root-package-name>#type-check` in its execution summary. Running `vp run type-check`
+# first would only make tsc emit the same thing twice.
+bunx vp run -r type-check

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Lint all code"
+#MISE depends=["lint:lockfile", "lint:oxlint", "lint:oxfmt", "lint:type-check", "lint:knip"]

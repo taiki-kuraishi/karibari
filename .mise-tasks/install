@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#MISE description="Setup project environment"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# `mise install` also (re)generates mise.lock, which is committed — CI fails on a dirty diff.
+mise install
+bun install --frozen-lockfile --no-progress --no-summary
+lefthook install

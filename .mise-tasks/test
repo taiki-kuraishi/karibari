@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#MISE description="Run all tests"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# `-r` runs the `test` script of every workspace package that defines one, in
+# dependency order. The root package also defines `test` (a recursive
+# `vp run -r test`); Vite Task prunes that self-reference, so this does not recurse.
+bunx vp run -r test

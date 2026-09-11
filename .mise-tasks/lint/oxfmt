@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Check TS/JS formatting (oxfmt)"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# Check only; `mise run format` is the fixing side. Exclusions live in
+# oxfmt.config.ts's ignorePatterns.
+bunx vp run oxfmt --check

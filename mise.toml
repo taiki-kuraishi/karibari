@@ -1,0 +1,11 @@
+[tools]
+bun = "1.4.0"
+lefthook = "2.1.10"
+# Not optional: node_modules/.bin/{vp,oxfmt,oxlint,knip,tsc} are `#!/usr/bin/env node`
+# shims, so without node `mise run lint` dies with "env: node: No such file or directory".
+# CI's install_args stays "bun" — the hosted runner already ships node.
+node = "24"
+
+[settings]
+npm.bun = true
+lockfile = true

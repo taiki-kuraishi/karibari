@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+# github.workflow must lead the group: concurrency groups share one repo-wide namespace,
+# so without it this run could cancel a different workflow's run. github.head_ref is only
+# set for pull_request; the run_id fallback makes push/dispatch runs unique, so main never
+# cancels its own earlier runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      # Composites are called from the job, never from inside another composite:
+      # setup-mise installs bun, setup-bun caches + installs deps.
+      - uses: ./.github/actions/setup-mise
+        with:
+          install_args: "bun"
+      # mise rewrites mise.lock in place whenever the committed entries no longer satisfy
+      # the install (a bumped mise.toml, a platform it has to resolve itself). A clean diff
+      # here is the proof the lockfile is actually pinning the toolchain instead of being
+      # regenerated from the network every run.
+      - run: git diff --exit-code -- mise.lock
+      - uses: ./.github/actions/setup-bun
+      - uses: ./.github/actions/cache-vp-tasks
+      - run: bun dedupe --check
+      # Raw commands, not `mise run`: per-step timing is the reason. --fix is never used
+      # here, or a violation would be rewritten into a green run.
+      - run: bunx vp run oxlint --deny-warnings --format=github
+      - run: bunx vp run oxfmt --check
+      # `-r` covers the root package as well, so this is the only type-check step needed.
+      - run: bunx vp run -r type-check
+
+  # knip runs on ubuntu-latest, not ubuntu-slim: it parses with oxc-parser, which
+  # pre-allocates a fixed multi-GB ArrayBuffer that fails on ubuntu-slim's ~4.9 GB
+  # ("RangeError: Array buffer allocation failed"). oxlint/oxfmt above are native binaries
+  # and do not hit this, so only knip needs the larger runner.
+  #
+  # No cache-vp-tasks step: knip is never run through `vp run`, because it rewrites its
+  # own inputs while scanning and therefore never caches.
+  knip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with:
+          install_args: "bun"
+      - uses: ./.github/actions/setup-bun
+      - run: bun run knip

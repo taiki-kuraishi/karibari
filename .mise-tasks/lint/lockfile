@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Check bun.lock is in sync with package.json"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+bun install --frozen-lockfile --dry-run --no-progress --no-summary

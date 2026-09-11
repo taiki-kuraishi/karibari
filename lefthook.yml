@@ -1,0 +1,23 @@
+# Success stays silent; only failures print diagnostics.
+# Command names are identical to the .mise-tasks/ task names — .mise-tasks/ is the
+# source of truth. See .claude/rules/mise-tasks.md.
+output: [failure]
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:lockfile:
+      run: mise run lint:lockfile
+    # The rewriting side: oxfmt + `oxlint --fix`. Errors that oxlint cannot fix still exit
+    # non-zero here, so a broken commit is still caught.
+    #
+    # `lint:oxfmt` and `lint:oxlint` are deliberately absent: their `--check` runs would race
+    # this rewrite under `parallel: true` and fail on a file that is about to be fixed.
+    # Warning-level enforcement is CI's `--deny-warnings`. See .claude/rules/mise-tasks.md.
+    format:
+      stage_fixed: true
+      run: mise run format
+    lint:type-check:
+      run: mise run lint:type-check
+    lint:knip:
+      run: mise run lint:knip

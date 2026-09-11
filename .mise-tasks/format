@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#MISE description="Format all code (oxfmt, oxlint --fix)"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# The rewriting side of the quality gate. `lint:*` stays check-only so that an
+# automatic rewrite can never turn a violation green at commit time.
+#
+# `bunx` (not a bare `vp`): vp is a node_modules/.bin shim, not a mise-managed tool,
+# so it is not on PATH inside a mise task.
+bunx vp run oxfmt
+
+# Fix whatever oxlint can fix. Errors it cannot fix still exit non-zero here, so a
+# broken commit is caught before it lands; warnings are CI's `--deny-warnings`.
+bunx vp run oxlint --fix

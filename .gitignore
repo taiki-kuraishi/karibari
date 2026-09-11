@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+# vite-plus's `vp run` task cache lives at node_modules/.vite/task-cache,
+# already covered by the node_modules/ rule above.
+
+# build output
+dist/
+
+# wrangler / cloudflare
+.wrangler/
+
+# secrets
+.dev.vars
+.env
+
+# logs
+*.log

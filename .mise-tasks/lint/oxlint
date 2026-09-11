@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Lint TS/JS code (oxlint)"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# No `--fix` here: rewriting violations silently would stop the rules from being
+# enforced. `mise run format` is the fixing side; `--deny-warnings` fails warnings too.
+bunx vp run oxlint --deny-warnings

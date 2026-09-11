@@ -1,0 +1,23 @@
+name: Setup mise
+description: Install mise-managed tools, caching the tool directory on hosted runners.
+
+inputs:
+  install_args:
+    description: >
+      Tools to install, passed through to mise-action's install_args. List only the tools
+      the job actually runs: mise.toml holds the whole toolchain and omitting this installs
+      all of it.
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # mise-action's built-in cache, not a hand-rolled actions/cache step: its default key
+    # template already contains a hash of install_args, so jobs installing different tool
+    # sets cannot share (and clobber) each other's entry. The one thing it does not give us
+    # is a restore-keys prefix fallback on an exact key miss (mise.toml changed); that does
+    # not justify keeping a second, duplicated cache step in front of it.
+    - uses: jdx/mise-action@v4
+      with:
+        install_args: ${{ inputs.install_args }}
+        cache: true

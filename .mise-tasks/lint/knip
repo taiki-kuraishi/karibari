@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Detect unused files, exports and dependencies (knip)"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# Deliberately not `vp run knip`: knip rewrites its own inputs while scanning, so it
+# never caches and caching it would be wrong. CI does the same.
+bun run knip
