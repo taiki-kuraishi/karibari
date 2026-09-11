@@ -4,9 +4,9 @@ Conventions for `.github/workflows/` and `.github/actions/`.
 
 ## Layout
 
-- `ci.yml` — the JS/TS quality gate: `lint`, `knip`, and the `test` matrix with its
-  `test-ok` aggregate. Add a matrix entry per workspace; see
-  `.claude/rules/workspace-packages.md`.
+- `ci.yml` — the JS/TS quality gate: `changes`, `lint`, `db-drift` (path-gated),
+  `knip`, and the `test` matrix with its `test-ok` aggregate. Add a matrix entry
+  per workspace; see `.claude/rules/workspace-packages.md`.
 
 **Split a workflow by runtime or domain, and don't invent a new granularity on your own —
 ask.** Composite actions go in `.github/actions/<name>` and are called with
@@ -53,6 +53,9 @@ Two traps to carry forward:
 - `dorny/paths-filter` negation is not exclusion. Under the default
   `predicate-quantifier: some` each pattern is OR-ed, so `!apps/foo/**` matches every file
   *outside* `apps/foo` — a docs-only PR turns the gate on.
+
+Generator drift checks that only need to run when their package changes go in a dedicated
+job gated by the `changes` job (precedent: `db-drift` for `packages/db/**`), not in `lint`.
 
 ## Matrix jobs need an aggregate job
 
@@ -118,8 +121,9 @@ each other's cache.
 - **Don't loop CI through the task runner to "keep it in sync".** The three-place sync rule
   (`.claude/rules/mise-tasks.md`) is what keeps them aligned, not indirection.
 - Generated-file drift is checked with the generator's own `--check` where it has one
-  (`cf-typegen --check`). `mise.lock` has no such flag, so it is caught by regenerating and
-  running `git diff --exit-code` — the one place the gate writes to the tree. The `test` job
+  (`cf-typegen --check`). `mise.lock` and the committed drizzle migrations have no such
+  flag, so both are caught by regenerating and running `git diff --exit-code` — the two
+  places the gate writes to the tree. The `test` job
   runs the `cf-typegen --check` step **before** the tests, so a stale committed
   `worker-configuration.d.ts` fails the job instead of silently type-checking against it.
 

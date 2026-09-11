@@ -19,6 +19,30 @@ permissions:
   contents: read
 
 jobs:
+  # Leading gate for the path-filtered jobs. It is a job, not `on.pull_request.paths:`, so a
+  # non-matching path still reports a Check Run — see .github/AGENTS.md "Path gating".
+  # `pull-requests: read` is required on top of the workflow-level `contents: read`:
+  # paths-filter reads the changed file list through the API and fails with
+  # "Resource not accessible by integration" without it.
+  changes:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      db: ${{ steps.filter.outputs.db }}
+    steps:
+      - uses: actions/checkout@v7
+      # Inclusion-only filters: negation is OR-ed, not subtraction, under the default
+      # `predicate-quantifier: some`.
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            db:
+              - 'packages/db/**'
+
   lint:
     runs-on: ubuntu-slim
     timeout-minutes: 10
@@ -102,3 +126,22 @@ jobs:
           install_args: "bun"
       - uses: ./.github/actions/setup-bun
       - run: bun run knip
+
+  # Path-gated: the drift gate only matters when `packages/db` changed, so it stays out of
+  # `lint`. Regenerating and diffing is how a committed generator output is checked when the
+  # generator has no `--check` flag — same shape as the `mise.lock` step. The last step also
+  # catches a new, still-untracked migration file that `git diff` cannot see.
+  db-drift:
+    needs: [changes]
+    if: needs.changes.outputs.db == 'true'
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with:
+          install_args: "bun"
+      - uses: ./.github/actions/setup-bun
+      - run: bun run --cwd packages/db generate:migration
+      - run: git diff --exit-code -- packages/db/src/migrations
+      - run: test -z "$(git status --porcelain -- packages/db/src/migrations)"

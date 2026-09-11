@@ -65,7 +65,7 @@ lefthook and CI are deliberately asymmetric:
 - **CI-only steps** (no `.mise-tasks/` counterpart, by design):
   `bun dedupe --check`, `git diff --exit-code -- mise.lock`, `cf-typegen --check`,
   `wrangler deploy --dry-run`, and the drizzle migration drift check
-  (`generate:migration` + `git diff --exit-code`) in the `lint` job. They exist to catch a dirty tree or an undeployable bundle on
+  (`generate:migration` + `git diff --exit-code`) in a dedicated path-gated `db-drift` job. They exist to catch a dirty tree or an undeployable bundle on
   a runner, which is not a local concern. `cf-typegen --check` is the drift check for the
   committed `packages/*/worker-configuration.d.ts`; the `cf-typegen` task itself rewrites.
 - **Not in CI:** `lint:lockfile`. `setup-bun` already runs
