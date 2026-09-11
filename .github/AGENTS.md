@@ -54,6 +54,9 @@ Two traps to carry forward:
   `predicate-quantifier: some` each pattern is OR-ed, so `!apps/foo/**` matches every file
   *outside* `apps/foo` — a docs-only PR turns the gate on.
 
+Generator drift checks that only need to run when their package changes go in a dedicated
+job gated by the `changes` job (precedent: `db-drift` for `packages/db/**`), not in `lint`.
+
 ## Matrix jobs need an aggregate job
 
 A matrix job's expanded check names make a bad required status check: when the matrix is
