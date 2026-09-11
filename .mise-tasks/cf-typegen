@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Regenerate packages/*/worker-configuration.d.ts from wrangler.jsonc"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# Always rewrites, so vp never caches it. Kept out of lefthook: wrangler
+# truncates the file before writing, which races parallel readers.
+bunx vp run -r cf-typegen

@@ -1,0 +1,22 @@
+{
+  "name": "@karibari/mcp",
+  "type": "module",
+  "main": "./src/entry.ts",
+  "scripts": {
+    "cf-typegen": "wrangler types --strict-vars=false",
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "catalog:",
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "peerDependencies": {
+    "typescript": "catalog:"
+  }
+}

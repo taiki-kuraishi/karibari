@@ -3,3 +3,5 @@
 #
 # Entries are added as generators land; the file lives at the repo root and is
 # never duplicated in a subdirectory.
+
+packages/*/worker-configuration.d.ts linguist-generated=true

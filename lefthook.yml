@@ -21,3 +21,7 @@ pre-commit:
       run: mise run lint:type-check
     lint:knip:
       run: mise run lint:knip
+    # `cf-typegen` is deliberately absent. `wrangler types` truncates
+    # `worker-configuration.d.ts` before rewriting it, so under `parallel: true` another
+    # hook would read an empty file. Generated-file drift is CI's `cf-typegen --check`.
+    # See .claude/rules/mise-tasks.md.

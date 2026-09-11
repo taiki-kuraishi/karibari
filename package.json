@@ -9,7 +9,11 @@
     "catalog": {
       "oxfmt": "0.64.0",
       "oxlint": "1.79.0",
-      "typescript": "7.0.2"
+      "typescript": "7.0.2",
+      "@cloudflare/vitest-plugin": "1.1.2",
+      "hono": "4.13.7",
+      "vitest": "4.1.11",
+      "wrangler": "4.127.1"
     }
   },
   "type": "module",
