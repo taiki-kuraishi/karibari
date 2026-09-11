@@ -1,16 +1,16 @@
 # Workspace packages and the catalog
 
-Rules for adding, removing, or renaming a **Bun workspace package** (any `packages/*` with a
-`package.json`), and for the root `package.json`'s `workspaces.catalog`.
+Rules for adding, removing, or renaming a **Bun workspace package** (any `apps/*` or
+`packages/*` with a `package.json`), and for the root `package.json`'s `workspaces.catalog`.
 
 ## Layout
 
-- `packages/*` — every workspace. `api` / `mcp` / `auth` are thin deploy units, one
-  Cloudflare Worker each: wiring and routes, not reusable logic. The rest are source-only
-  internal packages named `@karibari/<name>`, whose `exports` points at `./src/*.ts` — they
-  are consumed as source and never bundled.
-- A `packages/*` that is itself a Worker holds a `wrangler.jsonc` with `main` and has no
-  `exports`; `exports` belongs to the packages consumed as source. `packages/viewer` is
+- `apps/*` — thin deploy units: `api` / `mcp` / `auth`, one
+  Cloudflare Worker each: wiring and routes, not reusable logic.
+- `packages/*` — source-only internal packages named `@karibari/<name>`, whose `exports`
+  points at `./src/*.ts` — they are consumed as source and never bundled.
+- An `apps/*` that is itself a Worker holds a `wrangler.jsonc` with `main` and has no
+  `exports`; `exports` belongs to the packages consumed as source. `apps/viewer` is
   neither: a Vite build unit whose `dist/` the api Worker serves as static assets, never
   deployed on its own.
 
@@ -38,7 +38,7 @@ Adding a package is not just a directory. Follow every item that applies:
 6. **`bun install`**, and commit `bun.lock` in the same change. There is one lockfile for
    the whole repo, so any workspace change moves it.
 7. **`.gitattributes` → `linguist-generated=true`** for every generated file the workspace
-   commits (`packages/*/worker-configuration.d.ts`). The registration goes in the root
+   commits (`apps/*/worker-configuration.d.ts`). The registration goes in the root
    `.gitattributes` only.
 8. **`AGENTS.md` → directory rules** if the new directory gets its own `AGENTS.md`.
 

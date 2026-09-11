@@ -49,9 +49,9 @@ Type-aware lint is `oxlint-tsgolint`, whose version tracks TypeScript's
 
 ## Workspaces
 
-`packages/*` holds every workspace. `api` / `mcp` / `auth` are thin deploy units, one
-Cloudflare Worker each; the rest are source-only internal packages (`@karibari/<name>`,
-`exports` pointing at `./src/*.ts`, consumed as source, never bundled). `packages/viewer` is
+`apps/*` holds deploy units (`api` / `mcp` / `auth`, one Cloudflare Worker each).
+`packages/*` holds source-only internal packages (`@karibari/<name>`,
+`exports` pointing at `./src/*.ts`, consumed as source, never bundled). `apps/viewer` is
 neither — a Vite build unit whose `dist/` the api Worker serves as static assets, never
 deployed on its own. Shared dependency versions live in `workspaces.catalog` and are
 referenced as `"catalog:"`.
@@ -90,7 +90,7 @@ same change that adds the workspace consuming it. See `.claude/rules/workspace-p
 
 Anything produced by a generator and committed must be registered in the root
 `.gitattributes` with `linguist-generated=true` and never hand-edited.
-`packages/*/worker-configuration.d.ts` is the first to land: `wrangler types`, run through
+`apps/*/worker-configuration.d.ts` is the first to land: `wrangler types`, run through
 `mise run cf-typegen`, and re-checked in CI by the `cf-typegen --check` step.
 
 ## Comments

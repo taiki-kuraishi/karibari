@@ -15,7 +15,7 @@ Current set:
 | `lint:oxfmt` | `bunx vp run oxfmt --check` |
 | `lint:type-check` | `bunx vp run -r type-check` — `-r` includes the root |
 | `lint:knip` | `bun run knip` |
-| `cf-typegen` | `bunx vp run -r cf-typegen` — rewrites `packages/*/worker-configuration.d.ts` |
+| `cf-typegen` | `bunx vp run -r cf-typegen` — rewrites `apps/*/worker-configuration.d.ts` |
 | `test` | `bunx vp run -r test` |
 
 ## Writing a task file
@@ -67,7 +67,7 @@ lefthook and CI are deliberately asymmetric:
   `wrangler deploy --dry-run`, and the drizzle migration drift check
   (`generate:migration` + `git diff --exit-code`) in a dedicated path-gated `db-drift` job. They exist to catch a dirty tree or an undeployable bundle on
   a runner, which is not a local concern. `cf-typegen --check` is the drift check for the
-  committed `packages/*/worker-configuration.d.ts`; the `cf-typegen` task itself rewrites.
+  committed `apps/*/worker-configuration.d.ts`; the `cf-typegen` task itself rewrites.
 - **Not in CI:** `lint:lockfile`. `setup-bun` already runs
   `bun install --frozen-lockfile`, which fails on the same drift; a second CI step would
   only repeat it.

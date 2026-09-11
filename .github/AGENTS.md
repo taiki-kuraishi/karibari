@@ -135,7 +135,7 @@ each other's cache.
 - run: bun run --filter @karibari/mcp test
 
 # ✅
-- run: bun run --cwd packages/mcp test
+- run: bun run --cwd apps/mcp test
 ```
 
 This includes every matrix job. `bun install --filter` is a different flag and unaffected.

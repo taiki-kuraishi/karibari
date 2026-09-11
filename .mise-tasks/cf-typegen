@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#MISE description="Regenerate packages/*/worker-configuration.d.ts from wrangler.jsonc"
+#MISE description="Regenerate apps/*/worker-configuration.d.ts from wrangler.jsonc"
 #MISE dir="{{config_root}}"
 
 set -euo pipefail
