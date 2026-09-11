@@ -13,5 +13,6 @@ export default {
     // Knip only special-cases the `node:` protocol, so a Worker importing
     // `cloudflare:workers` reads as a dependency literally named `cloudflare`.
     "packages/mcp": { ignoreDependencies: ["cloudflare"] },
+    "packages/api": { ignoreDependencies: ["cloudflare"] },
   },
 } satisfies KnipConfig;
