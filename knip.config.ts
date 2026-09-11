@@ -19,5 +19,6 @@ export default {
     // (`generate:schema --config='./src/auth.ts'`), so knip must treat its exports as used.
     // `src/index.ts` is inferred from this package's `exports` field.
     "packages/better-auth": { entry: ["src/auth.ts"] },
+    "packages/db": {},
   },
 } satisfies KnipConfig;
