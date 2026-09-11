@@ -5,3 +5,7 @@
 # never duplicated in a subdirectory.
 
 packages/*/worker-configuration.d.ts linguist-generated=true
+
+# better-auth CLI schema + drizzle-kit migrations.
+packages/better-auth/src/auth-schema.ts linguist-generated=true
+packages/better-auth/src/migrations/** linguist-generated=true

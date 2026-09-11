@@ -1,0 +1,26 @@
+{
+  "name": "@karibari/better-auth",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "generate:migration": "drizzle-kit generate --config='./drizzle.config.ts'",
+    "generate:schema": "bun x auth@1.7.3 generate --config='./src/auth.ts' --output='./src/auth-schema.ts' --yes"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "catalog:",
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "drizzle-kit": "catalog:"
+  },
+  "peerDependencies": {
+    "better-auth": "catalog:",
+    "typescript": "catalog:"
+  }
+}

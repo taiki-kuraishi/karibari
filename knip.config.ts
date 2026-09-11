@@ -15,5 +15,9 @@ export default {
     "packages/mcp": { ignoreDependencies: ["cloudflare"] },
     "packages/api": { ignoreDependencies: ["cloudflare"] },
     "packages/auth": { ignoreDependencies: ["cloudflare"] },
+    // `src/auth.ts` is a real program entry: the better-auth CLI loads it by path
+    // (`generate:schema --config='./src/auth.ts'`), so knip must treat its exports as used.
+    // `src/index.ts` is inferred from this package's `exports` field.
+    "packages/better-auth": { entry: ["src/auth.ts"] },
   },
 } satisfies KnipConfig;

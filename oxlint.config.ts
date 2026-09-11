@@ -8,8 +8,14 @@ export default defineConfig({
     style: "error",
     suspicious: "error",
   },
-  // Generated: `wrangler types` output. See AGENTS.md "Generated code".
-  ignorePatterns: ["**/worker-configuration.d.ts"],
+  // Generated: `wrangler types`, the better-auth CLI, and drizzle-kit. See AGENTS.md "Generated code".
+  ignorePatterns: [
+    "**/worker-configuration.d.ts",
+    // The generator emits one `const` per table, which `one-var` rejects.
+    // Generated files are not lint targets; regenerating must never fight the linter.
+    "packages/better-auth/src/auth-schema.ts",
+    "packages/better-auth/src/migrations",
+  ],
   options: {
     typeAware: true,
     typeCheck: true,
