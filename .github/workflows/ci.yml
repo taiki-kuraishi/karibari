@@ -85,11 +85,11 @@ jobs:
       matrix:
         include:
           - name: mcp
-            path: packages/mcp
+            path: apps/mcp
           - name: api
-            path: packages/api
+            path: apps/api
           - name: auth
-            path: packages/auth
+            path: apps/auth
     name: test (${{ matrix.name }})
     steps:
       - uses: actions/checkout@v7

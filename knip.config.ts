@@ -12,9 +12,9 @@ export default {
     ".": {},
     // Knip only special-cases the `node:` protocol, so a Worker importing
     // `cloudflare:workers` reads as a dependency literally named `cloudflare`.
-    "packages/mcp": { ignoreDependencies: ["cloudflare"] },
-    "packages/api": { ignoreDependencies: ["cloudflare"] },
-    "packages/auth": { ignoreDependencies: ["cloudflare"] },
+    "apps/mcp": { ignoreDependencies: ["cloudflare"] },
+    "apps/api": { ignoreDependencies: ["cloudflare"] },
+    "apps/auth": { ignoreDependencies: ["cloudflare"] },
     // `src/auth.ts` is a real program entry: the better-auth CLI loads it by path
     // (`generate:schema --config='./src/auth.ts'`), so knip must treat its exports as used.
     // `src/index.ts` is inferred from this package's `exports` field.
