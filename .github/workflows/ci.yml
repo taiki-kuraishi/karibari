@@ -43,6 +43,8 @@ jobs:
       - run: bunx vp run oxfmt --check
       # `-r` covers the root package as well, so this is the only type-check step needed.
       - run: bunx vp run -r type-check
+      - run: bun run --cwd packages/db generate:migration
+      - run: git diff --exit-code -- packages/db/src/migrations
 
   # One matrix entry per workspace that has a `test` script, so a new workspace is
   # picked up by adding a single entry. Each job stays in its own package directory
