@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1789126187681,
+      "tag": "20260911112947_same_ezekiel",
+      "breakpoints": true
+    }
+  ]
+}
