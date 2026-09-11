@@ -49,10 +49,12 @@ Type-aware lint is `oxlint-tsgolint`, whose version tracks TypeScript's
 
 ## Workspaces
 
-`apps/*` are thin deploy units (one Cloudflare Worker each). `packages/*` are source-only
-internal packages (`@karibari/<name>`, `exports` pointing at `./src/*.ts`, consumed as source,
-never bundled). Shared dependency versions live in `workspaces.catalog` and are referenced
-as `"catalog:"`.
+`packages/*` holds every workspace. `api` / `mcp` / `auth` are thin deploy units, one
+Cloudflare Worker each; the rest are source-only internal packages (`@karibari/<name>`,
+`exports` pointing at `./src/*.ts`, consumed as source, never bundled). `packages/viewer` is
+neither — a Vite build unit whose `dist/` the api Worker serves as static assets, never
+deployed on its own. Shared dependency versions live in `workspaces.catalog` and are
+referenced as `"catalog:"`.
 
 **A catalog entry that nothing references fails knip.** Add the version to `catalog` in the
 same change that adds the workspace consuming it. See `.claude/rules/workspace-packages.md`.
@@ -87,8 +89,9 @@ same change that adds the workspace consuming it. See `.claude/rules/workspace-p
 ## Generated code
 
 Anything produced by a generator and committed must be registered in the root
-`.gitattributes` with `linguist-generated=true` and never hand-edited. Currently none;
-`apps/*/worker-configuration.d.ts` (`wrangler types`) is the first to land.
+`.gitattributes` with `linguist-generated=true` and never hand-edited.
+`packages/*/worker-configuration.d.ts` is the first to land: `wrangler types`, run through
+`mise run cf-typegen`, and re-checked in CI by the `cf-typegen --check` step.
 
 ## Comments
 

@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "karibari-mcp",
+  "main": "./src/entry.ts",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Declared empty on purpose: `wrangler types` then stops inferring secrets from
+  // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
+  "secrets": { "required": [] },
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "preview_urls": false,
+  "upload_source_maps": true,
+}

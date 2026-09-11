@@ -15,6 +15,7 @@ Current set:
 | `lint:oxfmt` | `bunx vp run oxfmt --check` |
 | `lint:type-check` | `bunx vp run -r type-check` — `-r` includes the root |
 | `lint:knip` | `bun run knip` |
+| `cf-typegen` | `bunx vp run -r cf-typegen` — rewrites `packages/*/worker-configuration.d.ts` |
 | `test` | `bunx vp run -r test` |
 
 ## Writing a task file
@@ -59,10 +60,13 @@ lefthook and CI are deliberately asymmetric:
   failure. `format` catches errors by exiting non-zero; warnings are CI's `--deny-warnings`.
 - **Not in lefthook:** generated-file drift detection. Locally the right move is to run the
   generator with `stage_fixed: true` and stage the output. `git diff --exit-code` is CI's job.
+  `cf-typegen` is also absent for its own reason: `wrangler types` truncates
+  `worker-configuration.d.ts` before writing it, so a parallel reader sees an empty file.
 - **CI-only steps** (no `.mise-tasks/` counterpart, by design):
-  `bun dedupe --check`, `git diff --exit-code -- mise.lock`, `wrangler types --check`, and
+  `bun dedupe --check`, `git diff --exit-code -- mise.lock`, `cf-typegen --check`, and
   `wrangler deploy --dry-run`. They exist to catch a dirty tree or an undeployable bundle on
-  a runner, which is not a local concern.
+  a runner, which is not a local concern. `cf-typegen --check` is the drift check for the
+  committed `packages/*/worker-configuration.d.ts`; the `cf-typegen` task itself rewrites.
 - **Not in CI:** `lint:lockfile`. `setup-bun` already runs
   `bun install --frozen-lockfile`, which fails on the same drift; a second CI step would
   only repeat it.

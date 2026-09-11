@@ -4,8 +4,9 @@ Conventions for `.github/workflows/` and `.github/actions/`.
 
 ## Layout
 
-- `ci.yml` — the JS/TS quality gate. In Wave 1 it has `lint` and `knip`; the `test` job
-  joins them when the first Worker lands.
+- `ci.yml` — the JS/TS quality gate: `lint`, `knip`, and the `test` matrix with its
+  `test-ok` aggregate. Add a matrix entry per workspace; see
+  `.claude/rules/workspace-packages.md`.
 
 **Split a workflow by runtime or domain, and don't invent a new granularity on your own —
 ask.** Composite actions go in `.github/actions/<name>` and are called with
@@ -82,8 +83,9 @@ See `.claude/rules/workspace-packages.md` for the full follow-up list.
   which pre-allocates a multi-GB `ArrayBuffer` that fails on `ubuntu-slim`'s ~4.9 GB with
   `RangeError: Array buffer allocation failed`. `oxlint` and `oxfmt` are native binaries and
   do not hit this, so only knip needs the larger runner.
-- **`cache-vp-tasks` goes only on jobs where vp's cache can pay off** — `lint` and `test`.
-  Not on `knip`, which doesn't run through vp at all.
+- **`cache-vp-tasks` goes only on jobs that call `vp run`** — today only `lint`. Not on
+  `knip`, which doesn't run through vp at all, and not on `test`, whose every step is a
+  `bun run --cwd <path> <script>` call.
 - The cache action's key must **not** include source or lockfile hashes:
 
   ```yaml
@@ -104,7 +106,7 @@ See `.claude/rules/workspace-packages.md` for the full follow-up list.
 
 | Caller | `install_args` | Why |
 | --- | --- | --- |
-| `ci.yml` (`lint`, `knip`; `test` in Wave 2) | `bun` | vp, oxlint, oxfmt, tsc, knip, and wrangler all come from node_modules; the hosted runner already ships node |
+| `ci.yml` (`lint`, `knip`, `test`) | `bun` | vp, oxlint, oxfmt, tsc, knip, and wrangler all come from node_modules; the hosted runner already ships node |
 
 `install_args` is part of the mise cache key, so jobs with different tool sets never clobber
 each other's cache.
@@ -115,8 +117,11 @@ each other's cache.
   violation be rewritten into a green run.
 - **Don't loop CI through the task runner to "keep it in sync".** The three-place sync rule
   (`.claude/rules/mise-tasks.md`) is what keeps them aligned, not indirection.
-- Generated-file drift is checked by regenerating and running `git diff --exit-code` — this
-  is the one place the gate writes to the tree, and it cannot be done any other way.
+- Generated-file drift is checked with the generator's own `--check` where it has one
+  (`cf-typegen --check`). `mise.lock` has no such flag, so it is caught by regenerating and
+  running `git diff --exit-code` — the one place the gate writes to the tree. The `test` job
+  runs the `cf-typegen --check` step **before** the tests, so a stale committed
+  `worker-configuration.d.ts` fails the job instead of silently type-checking against it.
 
 ## Single-package steps use `--cwd`
 
@@ -126,7 +131,7 @@ each other's cache.
 - run: bun run --filter @karibari/mcp test
 
 # ✅
-- run: bun run --cwd apps/mcp test
+- run: bun run --cwd packages/mcp test
 ```
 
 This includes every matrix job. `bun install --filter` is a different flag and unaffected.

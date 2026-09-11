@@ -44,6 +44,43 @@ jobs:
       # `-r` covers the root package as well, so this is the only type-check step needed.
       - run: bunx vp run -r type-check
 
+  # One matrix entry per workspace that has a `test` script, so a new workspace is
+  # picked up by adding a single entry. Each job stays in its own package directory
+  # with `--cwd`, which is what keeps the deploy bundle and the test bundle identical.
+  #
+  # No cache-vp-tasks step: every step here runs a package script directly and never
+  # goes through `vp run`, so there is no task cache to restore.
+  #
+  # `test-ok` exists because an expanded matrix job is a bad required status check: when
+  # the matrix is empty the job never reports and the PR is blocked forever. Register
+  # only `test-ok` as required.
+  test:
+    runs-on: ubuntu-slim
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        include:
+          - name: mcp
+            path: packages/mcp
+    name: test (${{ matrix.name }})
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with: { install_args: "bun" }
+      - uses: ./.github/actions/setup-bun
+      - run: bun run --cwd ${{ matrix.path }} cf-typegen --check
+      - run: bun run --cwd ${{ matrix.path }} test
+      - run: bun run --cwd ${{ matrix.path }} wrangler deploy --dry-run --outdir "$RUNNER_TEMP/${{ matrix.name }}-dist"
+
+  test-ok:
+    needs: [test]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+
   # knip runs on ubuntu-latest, not ubuntu-slim: it parses with oxc-parser, which
   # pre-allocates a fixed multi-GB ArrayBuffer that fails on ubuntu-slim's ~4.9 GB
   # ("RangeError: Array buffer allocation failed"). oxlint/oxfmt above are native binaries

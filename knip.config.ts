@@ -10,5 +10,8 @@ export default {
   // See .claude/rules/workspace-packages.md.
   workspaces: {
     ".": {},
+    // Knip only special-cases the `node:` protocol, so a Worker importing
+    // `cloudflare:workers` reads as a dependency literally named `cloudflare`.
+    "packages/mcp": { ignoreDependencies: ["cloudflare"] },
   },
 } satisfies KnipConfig;
