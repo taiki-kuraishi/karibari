@@ -7,6 +7,25 @@
   // Declared empty on purpose: `wrangler types` then stops inferring secrets from
   // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
   "secrets": { "required": [] },
+  "vars": {
+    "BETTER_AUTH_URL": "https://karibari-auth.fan-communications-inc.workers.dev",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "karibari-auth-database",
+      // Placeholder: replace with the real D1 id at deploy time (`wrangler d1 create`).
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "../../packages/better-auth/src/migrations",
+    },
+  ],
+  "secrets_store_secrets": [
+    {
+      "binding": "BETTER_AUTH_SECRET",
+      "store_id": "f90e487ab9774cc7ac36d7cd088c0986",
+      "secret_name": "karibari-auth-secret",
+    },
+  ],
   "observability": { "enabled": true },
   "workers_dev": true,
   "preview_urls": false,

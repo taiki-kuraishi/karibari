@@ -9,6 +9,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@karibari/better-auth": "workspace:*",
+    "better-auth": "catalog:",
     "hono": "catalog:"
   },
   "devDependencies": {

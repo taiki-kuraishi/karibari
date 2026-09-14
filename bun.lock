@@ -34,6 +34,8 @@
     "apps/auth": {
       "name": "@karibari/auth",
       "dependencies": {
+        "@karibari/better-auth": "workspace:*",
+        "better-auth": "catalog:",
         "hono": "catalog:",
       },
       "devDependencies": {
