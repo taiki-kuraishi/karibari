@@ -1,5 +1,5 @@
 {
-  "name": "@karibari/mcp",
+  "name": "@karibari/remote-mcp",
   "type": "module",
   "main": "./src/entry.ts",
   "scripts": {

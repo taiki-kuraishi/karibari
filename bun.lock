@@ -47,8 +47,8 @@
         "typescript": "catalog:",
       },
     },
-    "apps/mcp": {
-      "name": "@karibari/mcp",
+    "apps/remote-mcp": {
+      "name": "@karibari/remote-mcp",
       "dependencies": {
         "hono": "catalog:",
       },
@@ -278,7 +278,7 @@
 
     "@karibari/db": ["@karibari/db@workspace:packages/db"],
 
-    "@karibari/mcp": ["@karibari/mcp@workspace:apps/mcp"],
+    "@karibari/remote-mcp": ["@karibari/remote-mcp@workspace:apps/remote-mcp"],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.2.4", "", { "dependencies": { "@tybys/wasm-util": "^0.10.3" }, "peerDependencies": { "@emnapi/core": "^1.7.1 || ^2.0.0-alpha.4", "@emnapi/runtime": "^1.7.1 || ^2.0.0-alpha.4" } }, "sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g=="],
 

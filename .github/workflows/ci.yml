@@ -84,8 +84,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: mcp
-            path: apps/mcp
+          - name: remote-mcp
+            path: apps/remote-mcp
           - name: api
             path: apps/api
           - name: auth

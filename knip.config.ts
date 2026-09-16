@@ -12,7 +12,7 @@ export default {
     ".": {},
     // Knip only special-cases the `node:` protocol, so a Worker importing
     // `cloudflare:workers` reads as a dependency literally named `cloudflare`.
-    "apps/mcp": { ignoreDependencies: ["cloudflare"] },
+    "apps/remote-mcp": { ignoreDependencies: ["cloudflare"] },
     "apps/api": { ignoreDependencies: ["cloudflare"] },
     "apps/auth": { ignoreDependencies: ["cloudflare"] },
     // `src/auth.ts` is a real program entry: the better-auth CLI loads it by path
