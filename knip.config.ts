@@ -20,5 +20,6 @@ export default {
     // `src/index.ts` is inferred from this package's `exports` field.
     "packages/better-auth": { entry: ["src/auth.ts"] },
     "packages/db": {},
+    "packages/mcp": {},
   },
 } satisfies KnipConfig;
