@@ -90,12 +90,16 @@ jobs:
             path: apps/api
           - name: auth
             path: apps/auth
+            # Builds dist/client for the assets binding before cf-typegen and dry-run.
+            build: true
     name: test (${{ matrix.name }})
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-mise
         with: { install_args: "bun" }
       - uses: ./.github/actions/setup-bun
+      - if: matrix.build
+        run: bun run --cwd ${{ matrix.path }} build
       - run: bun run --cwd ${{ matrix.path }} cf-typegen --check
       - run: bun run --cwd ${{ matrix.path }} test
       - run: bun run --cwd ${{ matrix.path }} wrangler deploy --dry-run --outdir "$RUNNER_TEMP/${{ matrix.name }}-dist"
