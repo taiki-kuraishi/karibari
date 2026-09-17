@@ -19,15 +19,14 @@
     {
       "binding": "DB",
       "database_name": "karibari-auth-database",
-      // Placeholder: replace with the real D1 id at deploy time (`wrangler d1 create`).
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "92e365c0-d1a0-4cfc-b211-9e0a6b23d31a",
       "migrations_dir": "../../packages/better-auth/src/migrations",
     },
   ],
   "secrets_store_secrets": [
     {
       "binding": "BETTER_AUTH_SECRET",
-      "store_id": "f90e487ab9774cc7ac36d7cd088c0986",
+      "store_id": "9a2d7bd458234f29b84bff50f66669d0",
       "secret_name": "karibari-auth-secret",
     },
     {
