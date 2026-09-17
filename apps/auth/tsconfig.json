@@ -7,5 +7,5 @@
     // Base sets `types: []`, so list worker globals explicitly here.
     "types": ["./worker-configuration.d.ts", "@cloudflare/vitest-plugin/types"]
   },
-  "include": ["src", "test", "./*.ts"]
+  "include": ["src", "test", "tests", "./*.ts"]
 }

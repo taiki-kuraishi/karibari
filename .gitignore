@@ -15,3 +15,8 @@ dist/
 
 # logs
 *.log
+
+# playwright
+test-results/
+playwright-report/
+playwright/.cache/

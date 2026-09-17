@@ -1,3 +1,6 @@
+import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
+import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs";
 import { useState } from "react";
 
 import { authClient } from "../lib/auth-client";
@@ -9,35 +12,38 @@ const SCOPE_DESCRIPTIONS: Record<string, string> = {
   profile: "公開プロフィール情報を読み取ります。",
 };
 
-function readSearchParams() {
-  const params = new URLSearchParams(globalThis.location.search);
-  return {
-    clientId: params.get("client_id") ?? "",
-    scopes: (params.get("scope") ?? "").split(" ").filter(Boolean),
-  };
-}
-
 export function ConsentPage() {
-  const [{ clientId, scopes }] = useState(readSearchParams),
+  const [{ client_id: clientId, scope: scopes }] = useQueryStates({
+      client_id: parseAsString.withDefault(""),
+      scope: parseAsArrayOf(parseAsString, " ").withDefault([]),
+    }),
     [error, setError] = useState<string | undefined>(undefined),
-    [pending, setPending] = useState(false),
-    respond = async (accept: boolean) => {
-      setError(undefined);
-      setPending(true);
+    consentMutation = useMutation({
+      mutationFn: async (accept: boolean) => {
+        const { data, error: consentError } = await authClient.oauth2.consent({ accept });
+        if (consentError) {
+          throw new Error("consent failed");
+        }
 
-      const { data, error: consentError } = await authClient.oauth2.consent({ accept });
-
-      setPending(false);
-
-      if (consentError) {
+        return data;
+      },
+      onError: () => {
         setError("リクエストを処理できませんでした。アプリケーションからやり直してください。");
-        return;
-      }
-
-      if (data?.url) {
-        globalThis.location.href = data.url;
-      }
-    };
+      },
+      onSuccess: (data) => {
+        if (data?.url) {
+          globalThis.location.href = data.url;
+        }
+      },
+    }),
+    form = useForm({
+      defaultValues: { decision: "none" as "none" | "approve" | "deny" },
+      onSubmit: ({ value }) => {
+        if (value.decision !== "none") {
+          consentMutation.mutate(value.decision === "approve");
+        }
+      },
+    });
 
   return (
     <main>
@@ -56,14 +62,32 @@ export function ConsentPage() {
         ))}
       </ul>
       {error !== undefined && <p>{error}</p>}
-      <div>
-        <button disabled={pending} onClick={async () => respond(false)} type="button">
-          許可しない
-        </button>
-        <button disabled={pending} onClick={async () => respond(true)} type="button">
-          許可する
-        </button>
-      </div>
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(submitting) => (
+          <div>
+            <button
+              disabled={submitting || consentMutation.isPending}
+              onClick={() => {
+                form.setFieldValue("decision", "deny");
+                void form.handleSubmit();
+              }}
+              type="button"
+            >
+              許可しない
+            </button>
+            <button
+              disabled={submitting || consentMutation.isPending}
+              onClick={() => {
+                form.setFieldValue("decision", "approve");
+                void form.handleSubmit();
+              }}
+              type="button"
+            >
+              許可する
+            </button>
+          </div>
+        )}
+      </form.Subscribe>
     </main>
   );
 }

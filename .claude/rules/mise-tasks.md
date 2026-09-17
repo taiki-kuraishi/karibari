@@ -17,6 +17,7 @@ Current set:
 | `lint:knip` | `bun run knip` |
 | `cf-typegen` | `bunx vp run -r cf-typegen` — rewrites `apps/*/worker-configuration.d.ts` |
 | `test` | `bunx vp run -r test` |
+| `test:vrt` | auth client visual regression (`build` → `playwright test`) |
 
 ## Writing a task file
 

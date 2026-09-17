@@ -1,10 +1,15 @@
 import { Outlet, createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 
 import { ConsentPage } from "./routes/consent";
 import { SignInPage } from "./routes/sign-in";
 
 const rootRoute = createRootRoute({
-    component: Outlet,
+    component: () => (
+      <NuqsAdapter>
+        <Outlet />
+      </NuqsAdapter>
+    ),
   }),
   signInRoute = createRoute({
     getParentRoute: () => rootRoute,

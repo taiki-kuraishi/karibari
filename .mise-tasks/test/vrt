@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#MISE description="Visual regression tests for the auth client (Docker browser server)"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# Browsers run in Docker (octo-parity): the spec config refuses to run without
+# `PW_TEST_CONNECT_WS_ENDPOINT`, so local runs go through this task, never
+# `bun run --cwd apps/auth test:vrt` directly. Not in lefthook: too heavy.
+# The webServer in the spec config builds the client itself.
+PW_VERSION="1.62.1"
+IMAGE="mcr.microsoft.com/playwright:v${PW_VERSION}-noble"
+NAME="karibari-playwright-server"
+PORT="31042"
+
+docker run -d --rm --name "$NAME" -p "${PORT}:3000" "$IMAGE" npx -y "playwright@${PW_VERSION}" run-server --port 3000 --host 0.0.0.0 --path /playwright-server-ws
+trap 'docker stop "$NAME" >/dev/null 2>&1 || true' EXIT
+
+export PW_TEST_CONNECT_WS_ENDPOINT="ws://127.0.0.1:${PORT}/playwright-server-ws"
+bun run --cwd apps/auth test:vrt "$@"

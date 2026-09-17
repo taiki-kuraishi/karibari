@@ -101,13 +101,46 @@ jobs:
       - run: bun run --cwd ${{ matrix.path }} wrangler deploy --dry-run --outdir "$RUNNER_TEMP/${{ matrix.name }}-dist"
 
   test-ok:
-    needs: [test]
+    needs: [test, vrt]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
+
+  # Visual regression for the auth client (octo-parity: remote browser over
+  # WebSocket, real `vite preview` bundle under test). Raw commands, not
+  # `mise run test:vrt`: per-step timing, same reason as every other job.
+  # Baselines live in apps/auth/test/vrt/*-snapshots/; update them locally with
+  # `mise run test:vrt -- --update-snapshots` (never `--update-snapshots` here).
+  # Not in lefthook: browsers are too heavy for a commit hook.
+  vrt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      playwright:
+        image: mcr.microsoft.com/playwright:v1.62.1-noble
+        entrypoint: npx
+        command: >-
+          -y playwright@1.62.1 run-server
+          --port 3000 --host 0.0.0.0 --path /playwright-server-ws
+        ports:
+          - 31042:3000
+        options: >-
+          --health-cmd "bash -c 'echo > /dev/tcp/127.0.0.1/3000'"
+          --health-interval 1s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+      PW_TEST_CONNECT_WS_ENDPOINT: ws://127.0.0.1:31042/playwright-server-ws
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with: { install_args: "bun" }
+      - uses: ./.github/actions/setup-bun
+      - run: bun run --cwd apps/auth test:vrt
 
   # knip runs on ubuntu-latest, not ubuntu-slim: it parses with oxc-parser, which
   # pre-allocates a fixed multi-GB ArrayBuffer that fails on ubuntu-slim's ~4.9 GB

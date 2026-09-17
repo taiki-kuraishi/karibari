@@ -12,3 +12,6 @@ packages/better-auth/src/migrations/** linguist-generated=true
 
 # drizzle-kit migrations.
 packages/db/src/migrations/** linguist-generated=true
+
+# Playwright visual baselines.
+apps/auth/tests/visual/**/*.png linguist-generated=true
