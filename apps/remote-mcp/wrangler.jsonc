@@ -7,6 +7,12 @@
   // Declared empty on purpose: `wrangler types` then stops inferring secrets from
   // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
   "secrets": { "required": [] },
+  "kv_namespaces": [
+    {
+      "binding": "DPOP_REPLAY",
+      "id": "6b38ed9362e64378864a9ca2555a83a5",
+    },
+  ],
   "observability": { "enabled": true },
   "workers_dev": true,
   "preview_urls": false,

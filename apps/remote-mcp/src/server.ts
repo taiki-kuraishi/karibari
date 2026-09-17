@@ -5,7 +5,9 @@ import { mcpRoute } from "./routes/mcp";
 import { oauthProtectedResourceRoute } from "./routes/oauth-protected-resource";
 
 export interface HonoEnv {
-  Bindings: Cloudflare.Env;
+  Bindings: Cloudflare.Env & {
+    DPOP_REPLAY: KVNamespace;
+  };
 }
 
 // Single method chain: breaking it loses Hono's RPC type inference.
