@@ -1,19 +1,32 @@
-import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { oauthProvider } from "@better-auth/oauth-provider";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
+import { jwt } from "better-auth/plugins";
 
-import * as schema from "./auth-schema";
+import type { createAuthDatabase } from "./database";
 
 const baseConfig = {
   basePath: "",
-  baseURL: "",
+  // CLI-only placeholder: the worker overrides both with env values.
+  // `oauth-provider` parses this at init, so it must be a valid URL even here.
+  baseURL: "https://auth.karibari.tsar-bmb.org",
   // Overridden by the worker with Secrets. Never commit a real value here.
   secret: "",
-  // Real database is injected by the worker. CLI generate does not need a live DB.
-  database: drizzleAdapter({}, { provider: "sqlite", schema }),
   socialProviders: {
     // Real credentials come from the worker env. Empty here on purpose.
     github: { clientId: "", clientSecret: "" },
   },
+  plugins: [
+    jwt(),
+    oauthProvider({
+      allowDynamicClientRegistration: true,
+      allowUnauthenticatedClientRegistration: true,
+      // Provisional resource identifier until the production MCP URL is fixed.
+      clientRegistrationDefaultResources: ["https://mcp.karibari.tsar-bmb.org/mcp"],
+      consentPage: "/consent",
+      loginPage: "/sign-in",
+      resources: ["https://mcp.karibari.tsar-bmb.org/mcp"],
+    }),
+  ],
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
   advanced: {
     // Spec: Lax. httpOnly stays on (better-auth default).
@@ -29,7 +42,10 @@ export type AuthConfig = typeof baseConfig;
 export default betterAuth(baseConfig);
 
 // A function declaration, not a second module-scope const: `one-var` allows one per file.
-export function createBetterAuth(override: Partial<AuthConfig>) {
+// `database` is required: the worker always injects D1 here (base holds none for CLI use).
+export function createBetterAuth(
+  override: Partial<AuthConfig> & { database: ReturnType<typeof createAuthDatabase> },
+) {
   return betterAuth({ ...baseConfig, ...override });
 }
 

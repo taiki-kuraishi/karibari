@@ -8,6 +8,13 @@
       "when": 1789113316383,
       "tag": "20260911075516_nasty_swarm",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789540526080,
+      "tag": "20260916063526_rich_gorilla_man",
+      "breakpoints": true
     }
   ]
 }

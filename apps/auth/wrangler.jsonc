@@ -7,8 +7,13 @@
   // Declared empty on purpose: `wrangler types` then stops inferring secrets from
   // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
   "secrets": { "required": [] },
+  "assets": {
+    "directory": "./dist/client",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/.well-known/*", "/health"],
+  },
   "vars": {
-    "BETTER_AUTH_URL": "https://karibari-auth.fan-communications-inc.workers.dev",
+    "BETTER_AUTH_URL": "https://auth.karibari.tsar-bmb.org",
   },
   "d1_databases": [
     {
@@ -24,6 +29,16 @@
       "binding": "BETTER_AUTH_SECRET",
       "store_id": "f90e487ab9774cc7ac36d7cd088c0986",
       "secret_name": "karibari-auth-secret",
+    },
+    {
+      "binding": "GITHUB_CLIENT_ID",
+      "store_id": "9a2d7bd458234f29b84bff50f66669d0",
+      "secret_name": "karibari-github-client-id",
+    },
+    {
+      "binding": "GITHUB_CLIENT_SECRET",
+      "store_id": "9a2d7bd458234f29b84bff50f66669d0",
+      "secret_name": "karibari-github-client-secret",
     },
   ],
   "observability": { "enabled": true },

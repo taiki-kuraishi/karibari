@@ -9,7 +9,13 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "hono": "catalog:"
+    "@better-auth/mcp": "catalog:",
+    "@better-auth/oauth-provider": "catalog:",
+    "@karibari/mcp": "workspace:*",
+    "@modelcontextprotocol/sdk": "catalog:",
+    "better-auth": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "catalog:",

@@ -3,18 +3,28 @@
   "type": "module",
   "main": "./src/entry.ts",
   "scripts": {
+    "build": "vite build",
     "cf-typegen": "wrangler types --strict-vars=false",
     "dev": "wrangler dev",
     "test": "vitest run",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "catalog:",
     "@karibari/better-auth": "workspace:*",
+    "@tanstack/react-router": "catalog:",
     "better-auth": "catalog:",
-    "hono": "catalog:"
+    "hono": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
     "@cloudflare/vitest-plugin": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:",
     "wrangler": "catalog:"
   },
