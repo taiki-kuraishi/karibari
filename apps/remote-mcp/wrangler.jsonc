@@ -7,6 +7,7 @@
   // Declared empty on purpose: `wrangler types` then stops inferring secrets from
   // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
   "secrets": { "required": [] },
+  "routes": [{ "pattern": "mcp.karibari.tsar-bmb.org", "custom_domain": true }],
   "kv_namespaces": [
     {
       "binding": "DPOP_REPLAY",

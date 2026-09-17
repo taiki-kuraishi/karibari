@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "karibari-remote-mcp": {
+      "type": "http",
+      "url": "https://mcp.karibari.tsar-bmb.org/mcp",
+      "auth": "oauth"
+    },
+    "cloudflare-api": {
+      "type": "http",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "auth": "oauth"
+    },
+    "cloudflare-bindings": {
+      "type": "http",
+      "url": "https://bindings.mcp.cloudflare.com/mcp",
+      "auth": "oauth"
+    },
+    "cloudflare-builds": {
+      "type": "http",
+      "url": "https://builds.mcp.cloudflare.com/mcp",
+      "auth": "oauth"
+    },
+    "cloudflare-docs": {
+      "type": "http",
+      "url": "https://docs.mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-observability": {
+      "type": "http",
+      "url": "https://observability.mcp.cloudflare.com/mcp",
+      "auth": "oauth"
+    }
+  }
+}
