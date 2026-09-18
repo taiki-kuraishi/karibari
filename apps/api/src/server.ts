@@ -7,6 +7,7 @@ import type { ApiAuthClient } from "./middlewares/inject-middleware";
 
 import { injectMiddleware } from "./middlewares/inject-middleware";
 import { getHealth } from "./routes/health/index.get";
+import { getProject } from "./routes/projects/[project_id]/index.get";
 import { getProjects } from "./routes/projects/index.get";
 import { postProjects } from "./routes/projects/index.post";
 
@@ -23,5 +24,6 @@ export interface HonoEnv {
 export const app = new Hono<HonoEnv>()
   .use("/api/*", injectMiddleware)
   .route("/health", getHealth)
+  .route("/api/projects/:project_id", getProject)
   .route("/api/projects", getProjects)
   .route("/api/projects", postProjects);
