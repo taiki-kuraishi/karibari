@@ -1,14 +1,21 @@
 import type { projects, versions } from "@karibari/db";
 
+import { nowSeconds } from "./now-seconds";
+import { VersionFactory } from "./version-factory";
+
 export class ProjectFactory {
+  private readonly versionFactory: VersionFactory;
+
+  public constructor(versionFactory: VersionFactory = new VersionFactory()) {
+    this.versionFactory = versionFactory;
+  }
+
   public create(args: { name: string | null; owner: string }): {
     project: typeof projects.$inferInsert;
     version: typeof versions.$inferInsert;
   } {
     const projectId = crypto.randomUUID();
-    const versionId = crypto.randomUUID();
-    // Unix seconds, matching the `exp` unit used by signed URLs.
-    const createdAt = Math.floor(Date.now() / 1000);
+    const createdAt = nowSeconds();
 
     return {
       project: {
@@ -18,7 +25,7 @@ export class ProjectFactory {
         created_at: createdAt,
         updated_at: createdAt,
       },
-      version: { id: versionId, project_id: projectId, created_at: createdAt },
+      version: this.versionFactory.create({ projectId }),
     };
   }
 }

@@ -24,6 +24,7 @@
         "@karibari/db": "workspace:*",
         "better-auth": "catalog:",
         "better-result": "catalog:",
+        "drizzle-orm": "catalog:",
         "hono": "catalog:",
         "valibot": "catalog:",
       },
