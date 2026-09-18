@@ -86,12 +86,18 @@ jobs:
         include:
           - name: remote-mcp
             path: apps/remote-mcp
+            worker: true
           - name: api
             path: apps/api
+            worker: true
           - name: auth
             path: apps/auth
+            worker: true
             # Builds dist/client for the assets binding before cf-typegen and dry-run.
             build: true
+          - name: db-factory
+            path: packages/db-factory
+            worker: false
     name: test (${{ matrix.name }})
     steps:
       - uses: actions/checkout@v7
@@ -100,9 +106,11 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - if: matrix.build
         run: bun run --cwd ${{ matrix.path }} build
-      - run: bun run --cwd ${{ matrix.path }} cf-typegen --check
+      - if: matrix.worker
+        run: bun run --cwd ${{ matrix.path }} cf-typegen --check
       - run: bun run --cwd ${{ matrix.path }} test
-      - run: bun run --cwd ${{ matrix.path }} wrangler deploy --dry-run --outdir "$RUNNER_TEMP/${{ matrix.name }}-dist"
+      - if: matrix.worker
+        run: bun run --cwd ${{ matrix.path }} wrangler deploy --dry-run --outdir "$RUNNER_TEMP/${{ matrix.name }}-dist"
 
   test-ok:
     needs: [test, vrt]

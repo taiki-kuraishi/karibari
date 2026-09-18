@@ -19,6 +19,7 @@
   "devDependencies": {
     "@cloudflare/vitest-plugin": "catalog:",
     "@karibari/better-auth": "workspace:*",
+    "@karibari/db-factory": "workspace:*",
     "vitest": "catalog:",
     "wrangler": "catalog:"
   },

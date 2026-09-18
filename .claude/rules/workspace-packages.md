@@ -24,13 +24,13 @@ Adding a package is not just a directory. Follow every item that applies:
    protocol, so a Worker importing `cloudflare:workers` reads as a dependency literally
    named `cloudflare`; those workspaces need
    `ignoreDependencies: ["cloudflare"]`.
-3. **`.github/workflows/ci.yml` → the `test` job matrix** — add `{ name, path }`. The matrix
-   is keyed per workspace and each job runs `bun run --cwd ${{ matrix.path }} ...`, so a
-   workspace missing from the matrix has **its tests silently never run**. The matrix calls
-   the workspace's `test` and `cf-typegen` scripts, and the `lint` job's
-   `vp run -r type-check` calls its `type-check` script, so define the scripts the jobs need:
-   `test` only for workspaces that have tests (ones without stay out of the matrix, like
-   `packages/better-auth`); `type-check` for every workspace.
+3. **`.github/workflows/ci.yml` → the `test` job matrix** — add `{ name, path, worker }`.
+   The matrix is keyed per workspace and each job runs `bun run --cwd ${{ matrix.path }} ...`,
+   so a workspace missing from the matrix has **its tests silently never run**. Set
+   `worker: true` for deploy units (`cf-typegen --check` + test + Wrangler dry-run) and
+   `worker: false` for source packages (test only). Define `test` for workspaces in the
+   matrix and `type-check` for every workspace; the lint job's `vp run -r type-check`
+   discovers the latter automatically. Workspaces without tests stay out of the matrix.
 4. **`.mise-tasks/`** — if the package needs a task no other workspace has (a generator, a
    special test suite), add one and sync it to lefthook and CI
    (→ `.claude/rules/mise-tasks.md`).

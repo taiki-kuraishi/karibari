@@ -1,4 +1,7 @@
-import { createMetaDb, projects } from "@karibari/db";
+import type { FactoryReturn } from "@karibari/db-factory";
+
+import { createMetaDb } from "@karibari/db";
+import { createFactories } from "@karibari/db-factory";
 import { env, exports } from "cloudflare:workers";
 import { describe, expect } from "vitest";
 
@@ -6,36 +9,38 @@ import { authTest } from "../../helpers/auth-test";
 
 describe("GET /api/projects", () => {
   const db = createMetaDb(env.DB);
+  const factories = createFactories(db);
   const projectsTest = authTest({ path: "/api/projects", init: { method: "GET" } });
 
-  type Project = typeof projects.$inferSelect;
+  type Project = FactoryReturn<"projects">;
 
   projectsTest(
     "200: returns only the owner's projects by most recently updated",
     async ({ auth }) => {
       // Arrange
-      const older = {
-        id: crypto.randomUUID(),
-        name: "older",
-        owner: auth.userId,
-        created_at: 100,
-        updated_at: 100,
-      } satisfies Project;
-      const newer = {
-        id: crypto.randomUUID(),
-        name: "newer",
-        owner: auth.userId,
-        created_at: 200,
-        updated_at: 300,
-      } satisfies Project;
-      const foreign = {
-        id: crypto.randomUUID(),
-        name: "foreign",
-        owner: crypto.randomUUID(),
-        created_at: 400,
-        updated_at: 400,
-      } satisfies Project;
-      await db.insert(projects).values([older, newer, foreign]);
+      const older = await factories.projects
+        .props({
+          name: () => "older",
+          owner: () => auth.userId,
+          created_at: () => 100,
+          updated_at: () => 100,
+        })
+        .create();
+      const newer = await factories.projects
+        .props({
+          name: () => "newer",
+          owner: () => auth.userId,
+          created_at: () => 200,
+          updated_at: () => 300,
+        })
+        .create();
+      await factories.projects
+        .props({
+          name: () => "foreign",
+          created_at: () => 400,
+          updated_at: () => 400,
+        })
+        .create();
 
       // Act
       const response = await exports.default.fetch(

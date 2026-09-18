@@ -77,8 +77,9 @@ test-ok:
 Register **only the aggregate name** as a required status check.
 
 Matrix entries are per workspace, and each job runs
-`bun run --cwd ${{ matrix.path }} ...` so a second app is picked up by adding one entry.
-See `.claude/rules/workspace-packages.md` for the full follow-up list.
+`bun run --cwd ${{ matrix.path }} ...`. Set `worker: true` for deploy units and
+`worker: false` for tested source packages; only Worker entries run type generation and
+Wrangler dry-run. See `.claude/rules/workspace-packages.md` for the full follow-up list.
 
 ## Runner size and the vp task cache
 
