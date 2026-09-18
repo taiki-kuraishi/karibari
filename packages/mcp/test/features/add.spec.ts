@@ -8,9 +8,9 @@ import { connectClient } from "../helpers/client";
 
 describe("add tool", () => {
   // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
-  let server: McpServer,
-    // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
-    client: Client;
+  let server: McpServer;
+  // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
+  let client: Client;
 
   beforeAll(async () => {
     server = createMcpServer();

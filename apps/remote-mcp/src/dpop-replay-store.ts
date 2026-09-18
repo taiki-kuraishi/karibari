@@ -5,8 +5,8 @@ import type { DpopReplayStore } from "better-auth/oauth2";
 // Inside that window. Same-region replays are rejected immediately.
 export const createKvDpopReplayStore = (kv: KVNamespace): DpopReplayStore => ({
   reserve: async ({ expiresAt, key, now }) => {
-    const kvKey = `dpop-replay:${key}`,
-      ttl = Math.max(60, Math.ceil((expiresAt.getTime() - now.getTime()) / 1000));
+    const kvKey = `dpop-replay:${key}`;
+    const ttl = Math.max(60, Math.ceil((expiresAt.getTime() - now.getTime()) / 1000));
     if ((await kv.get(kvKey)) !== null) {
       return false;
     }

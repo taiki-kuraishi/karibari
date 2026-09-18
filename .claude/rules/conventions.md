@@ -53,9 +53,8 @@ must list them explicitly in its own `tsconfig.json`.
 - **`mise run format` rewrites; `mise run lint` only checks.** Never add `--fix` to a
   check-only path, and never branch a mise task on `CI`. Details and the lefthook/CI
   asymmetry: `.claude/rules/mise-tasks.md`.
-- Don't carve a function out only to satisfy a lint rule (`max-statements`,
-  `no-continue`, ...). Write the straight-line version and use a reasoned
-  `// oxlint-disable-next-line <rule> -- <why>` instead.
+- Don't carve a function out only to satisfy a lint rule. Write the straight-line version and
+  use a reasoned `// oxlint-disable-next-line <rule> -- <why>` instead.
 - All repo-wide checks: `mise run lint` / `mise run test`.
 
 ### Comments start with a capital

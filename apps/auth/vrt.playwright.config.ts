@@ -6,9 +6,8 @@ if (!process.env.PW_TEST_CONNECT_WS_ENDPOINT) {
   throw new Error("VRT must run via `mise run test:vrt` (uses the Docker browser server)");
 }
 
-// oxlint-disable-next-line one-var -- Cannot merge into the ambient process declaration above.
-const vrtPort = Number(process.env.KARIBARI_AUTH_VRT_PORT ?? 3100),
-  baseURL = `http://127.0.0.1:${vrtPort}`;
+const vrtPort = Number(process.env.KARIBARI_AUTH_VRT_PORT ?? 3100);
+const baseURL = `http://127.0.0.1:${vrtPort}`;
 
 export default defineConfig({
   reporter: "dot",

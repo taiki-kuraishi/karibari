@@ -4,49 +4,49 @@ import { useEffect, useState } from "react";
 import { authClient } from "../lib/auth-client";
 
 export function SignInPage() {
-  const [error, setError] = useState<string | undefined>(undefined),
-    sessionQuery = useQuery({
-      queryFn: async () => {
-        const session = await authClient.getSession();
+  const [error, setError] = useState<string | undefined>(undefined);
+  const sessionQuery = useQuery({
+    queryFn: async () => {
+      const session = await authClient.getSession();
 
-        return session.data;
-      },
-      queryKey: ["session"],
-    }),
-    continueMutation = useMutation({
-      mutationFn: async () => {
-        const { data, error: continueError } = await authClient.oauth2.continue({});
-        if (continueError) {
-          throw new Error("continue failed");
-        }
+      return session.data;
+    },
+    queryKey: ["session"],
+  });
+  const continueMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error: continueError } = await authClient.oauth2.continue({});
+      if (continueError) {
+        throw new Error("continue failed");
+      }
 
-        return data;
-      },
-      onError: () => {
+      return data;
+    },
+    onError: () => {
+      setError("リクエストを処理できませんでした。アプリケーションからやり直してください。");
+    },
+    onSuccess: (data) => {
+      if (data?.redirect) {
+        globalThis.location.href = data.url;
+      } else {
         setError("リクエストを処理できませんでした。アプリケーションからやり直してください。");
-      },
-      onSuccess: (data) => {
-        if (data?.redirect) {
-          globalThis.location.href = data.url;
-        } else {
-          setError("リクエストを処理できませんでした。アプリケーションからやり直してください。");
-        }
-      },
-    }),
-    signInMutation = useMutation({
-      mutationFn: async () => {
-        const { error: signInError } = await authClient.signIn.social({
-          callbackURL: `/sign-in${globalThis.location.search}`,
-          provider: "github",
-        });
-        if (signInError) {
-          throw new Error("sign-in failed");
-        }
-      },
-      onError: () => {
-        setError("ログインに失敗しました。時間をおいて再度お試しください。");
-      },
-    });
+      }
+    },
+  });
+  const signInMutation = useMutation({
+    mutationFn: async () => {
+      const { error: signInError } = await authClient.signIn.social({
+        callbackURL: `/sign-in${globalThis.location.search}`,
+        provider: "github",
+      });
+      if (signInError) {
+        throw new Error("sign-in failed");
+      }
+    },
+    onError: () => {
+      setError("ログインに失敗しました。時間をおいて再度お試しください。");
+    },
+  });
 
   useEffect(() => {
     if (sessionQuery.data && !continueMutation.isPending && !continueMutation.isSuccess) {

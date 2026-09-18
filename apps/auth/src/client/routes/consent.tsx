@@ -14,36 +14,36 @@ const SCOPE_DESCRIPTIONS: Record<string, string> = {
 
 export function ConsentPage() {
   const [{ client_id: clientId, scope: scopes }] = useQueryStates({
-      client_id: parseAsString.withDefault(""),
-      scope: parseAsArrayOf(parseAsString, " ").withDefault([]),
-    }),
-    [error, setError] = useState<string | undefined>(undefined),
-    consentMutation = useMutation({
-      mutationFn: async (accept: boolean) => {
-        const { data, error: consentError } = await authClient.oauth2.consent({ accept });
-        if (consentError) {
-          throw new Error("consent failed");
-        }
+    client_id: parseAsString.withDefault(""),
+    scope: parseAsArrayOf(parseAsString, " ").withDefault([]),
+  });
+  const [error, setError] = useState<string | undefined>(undefined);
+  const consentMutation = useMutation({
+    mutationFn: async (accept: boolean) => {
+      const { data, error: consentError } = await authClient.oauth2.consent({ accept });
+      if (consentError) {
+        throw new Error("consent failed");
+      }
 
-        return data;
-      },
-      onError: () => {
-        setError("リクエストを処理できませんでした。アプリケーションからやり直してください。");
-      },
-      onSuccess: (data) => {
-        if (data?.url) {
-          globalThis.location.href = data.url;
-        }
-      },
-    }),
-    form = useForm({
-      defaultValues: { decision: "none" as "none" | "approve" | "deny" },
-      onSubmit: ({ value }) => {
-        if (value.decision !== "none") {
-          consentMutation.mutate(value.decision === "approve");
-        }
-      },
-    });
+      return data;
+    },
+    onError: () => {
+      setError("リクエストを処理できませんでした。アプリケーションからやり直してください。");
+    },
+    onSuccess: (data) => {
+      if (data?.url) {
+        globalThis.location.href = data.url;
+      }
+    },
+  });
+  const form = useForm({
+    defaultValues: { decision: "none" as "none" | "approve" | "deny" },
+    onSubmit: ({ value }) => {
+      if (value.decision !== "none") {
+        consentMutation.mutate(value.decision === "approve");
+      }
+    },
+  });
 
   return (
     <main>

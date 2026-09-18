@@ -7,6 +7,16 @@
   // Declared empty on purpose: `wrangler types` then stops inferring secrets from
   // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
   "secrets": { "required": [] },
+  "vars": { "AUTH_BASE_URL": "https://auth.karibari.tsar-bmb.org/api/auth" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "karibari-meta-database",
+      "database_id": "a44bcdc0-fd54-49e5-8171-2ebc8f0b9f86",
+      "migrations_dir": "../../packages/db/src/migrations",
+    },
+  ],
+  "r2_buckets": [{ "binding": "HTML_BUCKET", "bucket_name": "karibari-html" }],
   "observability": { "enabled": true },
   "workers_dev": true,
   "preview_urls": false,

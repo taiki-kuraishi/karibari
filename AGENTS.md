@@ -74,6 +74,7 @@ same change that adds the workspace consuming it. See `.claude/rules/workspace-p
 
 ## Testing
 
+- Use `toStrictEqual` for exact object and array equality assertions.
 - Workers that touch real bindings: `vitest` + `@cloudflare/vitest-plugin` (the package
   formerly named `@cloudflare/vitest-pool-workers`), configured in the app's
   `vitest.config.ts` against the **same `wrangler.jsonc` used for `wrangler deploy`** —

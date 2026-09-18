@@ -9,10 +9,16 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "hono": "catalog:"
+    "@hono/valibot-validator": "catalog:",
+    "@karibari/db": "workspace:*",
+    "better-auth": "catalog:",
+    "better-result": "catalog:",
+    "hono": "catalog:",
+    "valibot": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "catalog:",
+    "@karibari/better-auth": "workspace:*",
     "vitest": "catalog:",
     "wrangler": "catalog:"
   },

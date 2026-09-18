@@ -5,8 +5,8 @@ import { createRoot } from "react-dom/client";
 
 import { router } from "./router";
 
-const queryClient = new QueryClient(),
-  rootElement = document.getElementById("root");
+const queryClient = new QueryClient();
+const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("missing #root element");
 }

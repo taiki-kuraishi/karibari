@@ -1,10 +1,25 @@
+import type { MetaDb } from "@karibari/db";
+
 import { Hono } from "hono";
 
-import { healthRoute } from "./routes/health";
+import type { ProjectFactory } from "./factories/project-factory";
+import type { ApiAuthClient } from "./middlewares/inject-middleware";
+
+import { injectMiddleware } from "./middlewares/inject-middleware";
+import { getHealth } from "./routes/health/index.get";
+import { postProjects } from "./routes/projects/index.post";
 
 export interface HonoEnv {
-  Bindings: Cloudflare.Env;
+  Bindings: Cloudflare.Env & {
+    authClient: ApiAuthClient;
+    db: MetaDb;
+    projectFactory: ProjectFactory;
+  };
+  Variables: { userId: string };
 }
 
 // Single method chain: breaking it loses Hono's RPC type inference.
-export const app = new Hono<HonoEnv>().route("/health", healthRoute);
+export const app = new Hono<HonoEnv>()
+  .use("/api/*", injectMiddleware)
+  .route("/health", getHealth)
+  .route("/api/projects", postProjects);

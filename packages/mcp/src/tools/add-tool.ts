@@ -15,7 +15,6 @@ export class AddTool extends AbstractTool {
     "caller has already resolved; the tool reads and writes nothing outside its arguments.";
   public readonly inputSchema = inputSchema;
 
-  // oxlint-disable-next-line class-methods-use-this -- abstract contract requires an instance method
   protected async execute(args: z.infer<z.ZodObject<typeof inputSchema>>): Promise<string> {
     const { a, b } = args;
 

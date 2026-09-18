@@ -8,11 +8,10 @@ export default defineConfig({
     style: "error",
     suspicious: "error",
   },
-  // Generated: `wrangler types`, the better-auth CLI, and drizzle-kit. See AGENTS.md "Generated code".
+  // Generated files are not lint targets; regenerating must never fight the linter.
+  // See AGENTS.md "Generated code".
   ignorePatterns: [
     "**/worker-configuration.d.ts",
-    // The generator emits one `const` per table, which `one-var` rejects.
-    // Generated files are not lint targets; regenerating must never fight the linter.
     "packages/better-auth/src/auth-schema.ts",
     "packages/better-auth/src/migrations",
     "packages/db/src/migrations",
@@ -31,17 +30,20 @@ export default defineConfig({
     },
   ],
   rules: {
+    "class-methods-use-this": "off",
     "eslint/no-unused-vars": "error",
     "eslint/sort-imports": "off",
     "func-names": "off",
     "func-style": "off",
     "id-length": "off",
     "max-params": "off",
+    "max-statements": "off",
     "no-console": "off",
     "no-duplicate-imports": "off",
     "no-empty-function": "off",
     "no-magic-numbers": "off",
     "no-ternary": "off",
+    "one-var": ["error", "never"],
     "no-undefined": "off",
     "no-void": "off",
     "oxc/no-async-await": "off",
