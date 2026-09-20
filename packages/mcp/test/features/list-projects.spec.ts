@@ -84,6 +84,7 @@ describe("list_projects tool", () => {
       "add_version",
       "save_comment",
       "list_comments",
+      "get_project_url",
       "list_projects",
     ]);
   });
