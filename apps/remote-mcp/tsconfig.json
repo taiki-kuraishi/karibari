@@ -1,9 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
+    // The api app type (pulled in through `@karibari/mcp`'s RPC client) spans
+    // both workspaces' sources, so no rootDir can hold the whole program.
     // Base sets `types: []`, so list worker globals explicitly here.
-    "types": ["./worker-configuration.d.ts", "@cloudflare/vitest-plugin/types"]
+    // The api app type is checked in this program too, so its worker's ambient
+    // bindings must merge in here.
+    "types": [
+      "./worker-configuration.d.ts",
+      "../../apps/api/worker-configuration.d.ts",
+      "@cloudflare/vitest-plugin/types"
+    ]
   },
   "include": ["src", "test", "./*.ts"]
 }

@@ -5,7 +5,6 @@ import * as v from "valibot";
 
 import type { HonoEnv } from "../../../../../server";
 
-import { authenticateSessionMiddleware } from "../../../../../middlewares/authenticate-session";
 import { validator } from "../../../../../validator";
 
 const paramSchema = v.object({
@@ -15,7 +14,6 @@ const paramSchema = v.object({
 
 export const deleteProjectShare = new Hono<HonoEnv>().delete(
   "",
-  authenticateSessionMiddleware,
   validator("param", paramSchema),
   async (c) => {
     const { project_id: projectId, share_id: shareId } = c.req.valid("param");

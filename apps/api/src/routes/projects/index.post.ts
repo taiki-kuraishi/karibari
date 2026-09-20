@@ -4,7 +4,6 @@ import * as v from "valibot";
 
 import type { HonoEnv } from "../../server";
 
-import { authenticateSessionMiddleware } from "../../middlewares/authenticate-session";
 import { validator } from "../../validator";
 
 const htmlKey = (projectId: string, versionId: string) =>
@@ -26,7 +25,6 @@ const bodySchema = v.object({
 
 export const postProjects = new Hono<HonoEnv>().post(
   "",
-  authenticateSessionMiddleware,
   validator("json", bodySchema),
   async (c) => {
     const { html, name = null } = c.req.valid("json");

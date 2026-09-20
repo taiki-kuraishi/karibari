@@ -1,5 +1,5 @@
 import { createMcpProtectedRequestHandler } from "@better-auth/mcp";
-import { createMcpServer } from "@karibari/mcp";
+import { createMcpServer, toMcpContext } from "@karibari/mcp";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { Hono } from "hono";
 
@@ -21,10 +21,14 @@ export const mcpRoute = new Hono<HonoEnv>().all("/", async (c) =>
       issuer: AUTH_ISSUER,
       jwksUrl: `${AUTH_ISSUER}/jwks`,
     },
-    async (request) => {
+    async (request, accessTokenClaims) => {
+      const context = toMcpContext(request, accessTokenClaims, c.env.API_BASE_URL);
+      if (!context) {
+        return c.json({ error: "unauthorized" }, 401);
+      }
       // The `@modelcontextprotocol/sdk` 1.30.0 stateless transport throws when reused
       // ("Stateless transport cannot be reused across requests"); build one per request.
-      const server = createMcpServer();
+      const server = createMcpServer(context);
       const transport = new WebStandardStreamableHTTPServerTransport({
         enableJsonResponse: true,
         sessionIdGenerator: undefined,

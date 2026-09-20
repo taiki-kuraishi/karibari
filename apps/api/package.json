@@ -2,6 +2,9 @@
   "name": "@karibari/api",
   "type": "module",
   "main": "./src/entry.ts",
+  "exports": {
+    "./server": "./src/server.ts"
+  },
   "scripts": {
     "cf-typegen": "wrangler types --strict-vars=false",
     "dev": "wrangler dev",
@@ -9,7 +12,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "catalog:",
     "@hono/valibot-validator": "catalog:",
+    "@karibari/better-auth": "workspace:*",
     "@karibari/db": "workspace:*",
     "better-auth": "catalog:",
     "better-result": "catalog:",
@@ -19,7 +24,6 @@
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "catalog:",
-    "@karibari/better-auth": "workspace:*",
     "@karibari/db-factory": "workspace:*",
     "vitest": "catalog:",
     "wrangler": "catalog:"

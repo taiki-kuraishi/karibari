@@ -3,7 +3,6 @@ import * as v from "valibot";
 
 import type { HonoEnv } from "../../../server";
 
-import { authenticateSessionMiddleware } from "../../../middlewares/authenticate-session";
 import { validator } from "../../../validator";
 
 const paramSchema = v.object({
@@ -12,7 +11,6 @@ const paramSchema = v.object({
 
 export const getProject = new Hono<HonoEnv>().get(
   "",
-  authenticateSessionMiddleware,
   validator("param", paramSchema),
   async (c) => {
     const { project_id: projectId } = c.req.valid("param");

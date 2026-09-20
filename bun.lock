@@ -20,7 +20,9 @@
     "apps/api": {
       "name": "@karibari/api",
       "dependencies": {
+        "@better-auth/oauth-provider": "catalog:",
         "@hono/valibot-validator": "catalog:",
+        "@karibari/better-auth": "workspace:*",
         "@karibari/db": "workspace:*",
         "better-auth": "catalog:",
         "better-result": "catalog:",
@@ -30,7 +32,6 @@
       },
       "devDependencies": {
         "@cloudflare/vitest-plugin": "catalog:",
-        "@karibari/better-auth": "workspace:*",
         "@karibari/db-factory": "workspace:*",
         "vitest": "catalog:",
         "wrangler": "catalog:",
@@ -135,9 +136,11 @@
       "name": "@karibari/mcp",
       "dependencies": {
         "@modelcontextprotocol/sdk": "catalog:",
+        "hono": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
+        "@karibari/api": "workspace:*",
         "vitest": "catalog:",
       },
       "peerDependencies": {

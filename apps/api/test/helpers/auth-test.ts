@@ -37,6 +37,27 @@ export const testWithAuth = test.extend<{ auth: AuthFixture }>({
   },
 });
 
+// Routes every fetch to the real test auth instance (including /jwks), so the
+// Middleware verifies against the issuer's actual keys.
+export const stubAuthFetch = () =>
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => await authDatabase.fetch(input, init),
+    ),
+  );
+
+// Mints a real OAuth access token for a dummy user via the full
+// Register → authorize → consent → token flow and wraps it as a Bearer header.
+export const createBearerHeaders = async (args: {
+  audience: string;
+  userId: string;
+}): Promise<Headers> => {
+  const token = await authDatabase.getBearerToken({ audience: args.audience, userId: args.userId });
+
+  return new Headers({ authorization: `Bearer ${token}` });
+};
+
 export function authTest(route: AuthRoute) {
   const routeTest = testWithAuth.extend<{ route: AuthRoute }>({ route });
 

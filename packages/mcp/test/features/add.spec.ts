@@ -13,7 +13,7 @@ describe("add tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer();
+    server = createMcpServer({ apiBaseUrl: "http://api", token: "test-token", userId: "user-1" });
     client = await connectClient(server);
   });
 
@@ -40,6 +40,6 @@ describe("add tool", () => {
     const { tools } = await client.listTools();
 
     // Assert
-    expect(tools.map((tool) => tool.name)).toStrictEqual(["add"]);
+    expect(tools.map((tool) => tool.name)).toStrictEqual(["add", "list_projects"]);
   });
 });
