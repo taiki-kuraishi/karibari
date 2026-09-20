@@ -6,10 +6,10 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest
 import { createMcpServer } from "../../src/index";
 import { connectClient } from "../helpers/client";
 
-describe("list_projects tool", () => {
+describe("add_version tool", () => {
   const apiBaseUrl = "http://api";
   const token = "test-token";
-  const projects = [{ id: "p1", name: "demo", owner: "user-1", created_at: 100, updated_at: 100 }];
+  const created = { url: "/p/p1?v=v2", versionId: "v2" };
 
   // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
   let server: McpServer;
@@ -30,9 +30,10 @@ describe("list_projects tool", () => {
     vi.unstubAllGlobals();
   });
 
-  it("calls the api with the bearer token and returns projects as JSON", async () => {
+  it("posts html to the version endpoint with the bearer token and returns the result as JSON", async () => {
     // Arrange
-    const seen: { url: string; authorization: string | null }[] = [];
+    const seen: { url: string; authorization: string | null; body: unknown; method?: string }[] =
+      [];
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -40,21 +41,34 @@ describe("list_projects tool", () => {
           throw new Error("expected a string URL");
         }
         const headers = new Headers(init?.headers);
-        seen.push({ url: input, authorization: headers.get("authorization") });
+        seen.push({
+          authorization: headers.get("authorization"),
+          body: typeof init?.body === "string" ? (JSON.parse(init.body) as unknown) : init?.body,
+          method: init?.method,
+          url: input,
+        });
 
-        return Response.json({ projects });
+        return Response.json(created, { status: 201 });
       }),
     );
 
     // Act
-    const res = await client.callTool({ arguments: {}, name: "list_projects" });
+    const res = await client.callTool({
+      arguments: { html: "<p>v2</p>", projectId: "p1" },
+      name: "add_version",
+    });
 
     // Assert
     expect(res.isError).toBeFalsy();
     expect(seen).toStrictEqual([
-      { url: "http://api/api/projects", authorization: "Bearer test-token" },
+      {
+        authorization: "Bearer test-token",
+        body: { html: "<p>v2</p>" },
+        method: "POST",
+        url: "http://api/api/projects/p1/versions",
+      },
     ]);
-    expect(res.content).toStrictEqual([{ text: JSON.stringify({ projects }), type: "text" }]);
+    expect(res.content).toStrictEqual([{ text: JSON.stringify(created), type: "text" }]);
   });
 
   it("reports an api failure as a tool error", async () => {
@@ -65,26 +79,12 @@ describe("list_projects tool", () => {
     );
 
     // Act
-    const res = await client.callTool({ arguments: {}, name: "list_projects" });
+    const res = await client.callTool({
+      arguments: { html: "<p>v2</p>", projectId: "missing" },
+      name: "add_version",
+    });
 
     // Assert
     expect(res.isError).toBe(true);
-  });
-
-  it("registers the list_projects tool", async () => {
-    // Arrange
-
-    // Act
-    const { tools } = await client.listTools();
-
-    // Assert
-    expect(tools.map((tool) => tool.name)).toStrictEqual([
-      "add",
-      "create_project",
-      "add_version",
-      "save_comment",
-      "list_comments",
-      "list_projects",
-    ]);
   });
 });

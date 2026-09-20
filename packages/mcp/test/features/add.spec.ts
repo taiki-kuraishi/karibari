@@ -40,6 +40,13 @@ describe("add tool", () => {
     const { tools } = await client.listTools();
 
     // Assert
-    expect(tools.map((tool) => tool.name)).toStrictEqual(["add", "list_projects"]);
+    expect(tools.map((tool) => tool.name)).toStrictEqual([
+      "add",
+      "create_project",
+      "add_version",
+      "save_comment",
+      "list_comments",
+      "list_projects",
+    ]);
   });
 });
