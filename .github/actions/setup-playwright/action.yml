@@ -1,0 +1,32 @@
+name: Setup Playwright
+description: >
+  Cache Playwright's Chromium download and install the browser plus its OS
+  dependencies. Requires dependencies to be already installed — call
+  ./.github/actions/setup-bun first in the job.
+
+inputs:
+  working-directory:
+    description: Workspace that owns the Playwright suites; resolves `bun run --cwd`.
+    required: false
+    default: apps/auth
+
+runs:
+  using: "composite"
+  steps:
+    # Bump together with the `@playwright/test` catalog entry and the VRT image tag.
+    # ~/.cache/ms-playwright is Playwright's default browser directory on Linux — the
+    # hosted runner never sets PLAYWRIGHT_BROWSERS_PATH.
+    - uses: actions/cache@v6
+      id: browser-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browser-${{ runner.os }}-1.62.1
+    # The OS packages --with-deps installs are not in the cached directory, so a hit still
+    # has to install them. Exact-key-only cache (no restore-keys) makes cache-hit reliable
+    # as the branch condition.
+    - if: steps.browser-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: bun run --cwd ${{ inputs.working-directory }} playwright install --with-deps chromium
+    - if: steps.browser-cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: bun run --cwd ${{ inputs.working-directory }} playwright install-deps chromium

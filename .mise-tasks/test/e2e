@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="E2E tests for the auth client (local Playwright browser)"
+#MISE dir="{{config_root}}"
+
+set -euo pipefail
+
+# URL-level assertions only, so the pixel-stable Docker browser server of
+# `test:vrt` is not needed; a locally installed Chromium is enough. Idempotent:
+# Playwright skips an already-installed browser. Not in lefthook: too heavy.
+# The webServer in the spec config builds the client itself.
+(cd apps/auth && bunx playwright install chromium)
+bun run --cwd apps/auth test:e2e "$@"

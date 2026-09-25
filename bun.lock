@@ -44,6 +44,7 @@
       "name": "@karibari/auth",
       "dependencies": {
         "@better-auth/oauth-provider": "catalog:",
+        "@hono/valibot-validator": "catalog:",
         "@karibari/better-auth": "workspace:*",
         "@tanstack/react-form": "catalog:",
         "@tanstack/react-query": "catalog:",
@@ -53,6 +54,7 @@
         "nuqs": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
+        "valibot": "catalog:",
       },
       "devDependencies": {
         "@cloudflare/vite-plugin": "catalog:",

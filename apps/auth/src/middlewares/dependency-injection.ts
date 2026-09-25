@@ -1,10 +1,11 @@
+import type { BetterAuth } from "@karibari/better-auth";
 import type { MiddlewareHandler } from "hono";
 
 import { createAuthDatabase, createBetterAuth } from "@karibari/better-auth";
 
 export interface HonoEnv {
   Bindings: Cloudflare.Env & {
-    auth: ReturnType<typeof createBetterAuth>;
+    auth: BetterAuth;
   };
 }
 

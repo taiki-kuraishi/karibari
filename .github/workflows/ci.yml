@@ -113,7 +113,7 @@ jobs:
         run: bun run --cwd ${{ matrix.path }} wrangler deploy --dry-run --outdir "$RUNNER_TEMP/${{ matrix.name }}-dist"
 
   test-ok:
-    needs: [test, vrt]
+    needs: [test, vrt, e2e]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -153,6 +153,22 @@ jobs:
         with: { install_args: "bun" }
       - uses: ./.github/actions/setup-bun
       - run: bun run --cwd apps/auth test:vrt
+
+  # E2E for the auth client: URL-level assertions only, so no Docker browser
+  # service — a locally installed Chromium is enough (see e2e.playwright.config.ts;
+  # the install step lives in setup-playwright, which caches the browser download).
+  # Raw commands, not `mise run test:e2e`: per-step timing, same reason as every other job.
+  # Not in lefthook: browsers are too heavy for a commit hook.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with: { install_args: "bun" }
+      - uses: ./.github/actions/setup-bun
+      - uses: ./.github/actions/setup-playwright
+      - run: bun run --cwd apps/auth test:e2e
 
   # knip runs on ubuntu-latest, not ubuntu-slim: it parses with oxc-parser, which
   # pre-allocates a fixed multi-GB ArrayBuffer that fails on ubuntu-slim's ~4.9 GB

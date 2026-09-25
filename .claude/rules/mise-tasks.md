@@ -18,6 +18,7 @@ Current set:
 | `cf-typegen` | `bunx vp run -r cf-typegen` — rewrites `apps/*/worker-configuration.d.ts` |
 | `test` | `bunx vp run -r test` |
 | `test:vrt` | auth client visual regression (`build` → `playwright test`) |
+| `test:e2e` | auth client E2E (`build` → `playwright test`; local Chromium, no Docker) |
 
 ## Writing a task file
 
