@@ -39,6 +39,8 @@ describe("GET /api/projects/:project_id/versions/:version_id/content", () => {
     // Assert
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/html");
+    expect(response.headers.get("content-security-policy")).toBe("sandbox");
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
     expect(await response.text()).toBe(html);
   });
 

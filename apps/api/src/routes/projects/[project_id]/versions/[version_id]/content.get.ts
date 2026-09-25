@@ -42,6 +42,12 @@ export const getProjectVersionContent = new Hono<HonoEnv>().get(
       return c.json({ error: "not_found" }, 404);
     }
 
-    return c.html(await object.text());
+    // Untrusted LLM-authored HTML. The Viewer renders it in a sandboxed iframe.
+    // Direct navigation here would still run its scripts as the app's origin.
+    return c.html(await object.text(), 200, {
+      "Content-Security-Policy": "sandbox",
+      // Prevent content-type sniffing that could re-classify the body as script.
+      "X-Content-Type-Options": "nosniff",
+    });
   },
 );
