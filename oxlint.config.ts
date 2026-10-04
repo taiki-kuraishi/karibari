@@ -15,6 +15,9 @@ export default defineConfig({
     "packages/better-auth/src/auth-schema.ts",
     "packages/better-auth/src/migrations",
     "packages/db/src/migrations",
+    // The shadcn/ui components and hooks are CLI output, regenerated with `shadcn add`.
+    "packages/shadcn/src/components/**",
+    "packages/shadcn/src/hooks/**",
   ],
   options: {
     typeAware: true,

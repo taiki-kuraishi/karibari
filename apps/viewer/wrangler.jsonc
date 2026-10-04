@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "karibari-viewer",
+  "compatibility_date": "2026-08-01",
+  "routes": [{ "pattern": "karibari.tsar-bmb.org", "custom_domain": true }],
+  // `assets.directory` is omitted because the Cloudflare Vite plugin fills it in at build time.
+  "assets": {
+    "not_found_handling": "single-page-application",
+  },
+  "workers_dev": true,
+  "preview_urls": false,
+}

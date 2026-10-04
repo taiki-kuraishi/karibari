@@ -13,5 +13,9 @@ packages/better-auth/src/migrations/** linguist-generated=true
 # drizzle-kit migrations.
 packages/db/src/migrations/** linguist-generated=true
 
+# shadcn/ui components and hooks, written by `shadcn add` from apps/viewer.
+packages/shadcn/src/components/** linguist-generated=true
+packages/shadcn/src/hooks/** linguist-generated=true
+
 # Playwright visual baselines.
 apps/auth/tests/visual/**/*.png linguist-generated=true

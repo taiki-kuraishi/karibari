@@ -154,9 +154,13 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - run: bun run --cwd apps/auth test:vrt
 
-  # E2E for the auth client: URL-level assertions only, so no Docker browser
-  # service — a locally installed Chromium is enough (see e2e.playwright.config.ts;
-  # the install step lives in setup-playwright, which caches the browser download).
+  # E2E for the auth client and the viewer SPA: URL-level assertions only, so no Docker
+  # browser service — a locally installed Chromium is enough (see each app's
+  # e2e.playwright.config.ts; the install step lives in setup-playwright, which caches the
+  # browser download).
+  # One job for both suites because both need the same runtime, and one setup-playwright
+  # call covers them: each app takes @playwright/test from the catalog, so the browser
+  # version is identical.
   # Raw commands, not `mise run test:e2e`: per-step timing, same reason as every other job.
   # Not in lefthook: browsers are too heavy for a commit hook.
   e2e:
@@ -169,6 +173,13 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - uses: ./.github/actions/setup-playwright
       - run: bun run --cwd apps/auth test:e2e
+      # The viewer has no unit tests — its suite builds the SPA through the webServer — so
+      # this is also where its deploy bundle is validated.
+      # That is why it has no entry in the `test` matrix above.
+      - run: bun run --cwd apps/viewer test:e2e
+      # The suite's build writes the plugin's generated deploy config, which is what the
+      # redirected Wrangler configuration points at.
+      - run: bun run --cwd apps/viewer wrangler deploy --dry-run --outdir "$RUNNER_TEMP/viewer-dist"
 
   # knip runs on ubuntu-latest, not ubuntu-slim: it parses with oxc-parser, which
   # pre-allocates a fixed multi-GB ArrayBuffer that fails on ubuntu-slim's ~4.9 GB

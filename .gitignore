@@ -12,6 +12,8 @@ dist/
 # secrets
 .dev.vars
 .env
+# The viewer's .env holds only the public origins its SPA calls, so it is committed.
+!apps/viewer/.env
 
 # logs
 *.log

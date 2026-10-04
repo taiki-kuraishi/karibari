@@ -81,6 +81,10 @@ Matrix entries are per workspace, and each job runs
 `worker: false` for tested source packages; only Worker entries run type generation and
 Wrangler dry-run. See `.claude/rules/workspace-packages.md` for the full follow-up list.
 
+A deploy unit with no unit tests has no matrix entry at all, because the `test` step is
+unconditional: `apps/viewer` (static assets, no Worker script) is built and dry-run in the
+`e2e` job instead, which is where its suite builds it anyway.
+
 ## Runner size and the vp task cache
 
 - **`knip` runs on `ubuntu-latest`, not `ubuntu-slim`.** knip parses with `oxc-parser`,

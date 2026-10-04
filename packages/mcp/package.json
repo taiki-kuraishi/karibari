@@ -12,12 +12,11 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@karibari/api": "workspace:*",
     "@modelcontextprotocol/sdk": "catalog:",
-    "hono": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@karibari/api": "workspace:*",
     "vitest": "catalog:"
   },
   "peerDependencies": {

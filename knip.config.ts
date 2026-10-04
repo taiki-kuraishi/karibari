@@ -15,6 +15,14 @@ export default {
     "apps/remote-mcp": { ignoreDependencies: ["cloudflare"] },
     "apps/api": { ignoreDependencies: ["cloudflare"] },
     "apps/auth": { ignoreDependencies: ["cloudflare"] },
+    // `src/lib/api-client.ts` is the typed API client the screens will be built on.
+    // Nothing imports it yet, so knip has to be told it is a seam rather than dead code.
+    "apps/viewer": {
+      entry: ["src/lib/api-client.ts"],
+    },
+    // The `exports` patterns in this package's package.json make every component an entry.
+    // Knip therefore reports neither unused files nor unused exports for the library surface.
+    "packages/shadcn": {},
     // `src/auth.ts` is a real program entry: the better-auth CLI loads it by path
     // (`generate:schema --config='./src/auth.ts'`), so knip must treat its exports as used.
     // `src/index.ts` is inferred from this package's `exports` field.

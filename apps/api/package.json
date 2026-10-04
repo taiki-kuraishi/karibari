@@ -3,7 +3,7 @@
   "type": "module",
   "main": "./src/entry.ts",
   "exports": {
-    "./server": "./src/server.ts"
+    "./client": "./src/client.ts"
   },
   "scripts": {
     "cf-typegen": "wrangler types --strict-vars=false",

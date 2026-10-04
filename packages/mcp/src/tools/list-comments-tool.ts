@@ -1,6 +1,4 @@
-import type { app } from "@karibari/api/server";
-
-import { hc } from "hono/client";
+import { createApiClient } from "@karibari/api/client";
 import { z } from "zod";
 
 import type { McpContext } from "../mcp-context";
@@ -26,7 +24,7 @@ export class ListCommentsTool extends AbstractTool {
   }
 
   protected async execute(args: z.infer<z.ZodObject<typeof inputSchema>>): Promise<string> {
-    const client = hc<typeof app>(this.context.apiBaseUrl);
+    const client = createApiClient(this.context.apiBaseUrl);
     const response = await client.api.projects[":project_id"].comments.$get(
       {
         param: { project_id: args.projectId },

@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    // The package's own components.json aliases point at `@karibari/shadcn/...`.
+    // This workspace therefore has to resolve that specifier itself.
+    "paths": { "@karibari/shadcn/*": ["./src/*"] }
+  },
+  "include": ["src"]
+}

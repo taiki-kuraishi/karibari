@@ -8,6 +8,7 @@ import type { VersionFactory } from "./factories/version-factory";
 import type { ApiAuthClient } from "./middlewares/inject-middleware";
 
 import { authMiddleware } from "./middlewares/auth";
+import { corsMiddleware } from "./middlewares/cors";
 import { injectMiddleware } from "./middlewares/inject-middleware";
 import { getHealth } from "./routes/health/index.get";
 import { getProjectComments } from "./routes/projects/[project_id]/comments/index.get";
@@ -36,6 +37,7 @@ export interface HonoEnv {
 // Single method chain: breaking it loses Hono's RPC type inference.
 export const app = new Hono<HonoEnv>()
   .route("/health", getHealth)
+  .use("/api/*", corsMiddleware)
   .use("/api/*", injectMiddleware)
   .use("/api/*", authMiddleware)
   .route("/api/projects/:project_id", getProject)

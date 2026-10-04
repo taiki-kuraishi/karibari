@@ -49,12 +49,15 @@ Type-aware lint is `oxlint-tsgolint`, whose version tracks TypeScript's
 
 ## Workspaces
 
-`apps/*` holds deploy units (`api` / `mcp` / `auth`, one Cloudflare Worker each).
-`packages/*` holds source-only internal packages (`@karibari/<name>`,
-`exports` pointing at `./src/*.ts`, consumed as source, never bundled). `apps/viewer` is
-neither — a Vite build unit whose `dist/` the api Worker serves as static assets, never
-deployed on its own. Shared dependency versions live in `workspaces.catalog` and are
-referenced as `"catalog:"`.
+`apps/*` holds deploy units (`api` / `auth` / `remote-mcp` / `viewer`, one Cloudflare Worker
+each). `packages/*` holds source-only internal packages (`@karibari/<name>`, `exports`
+pointing at their sources under `./src`, consumed as source, never bundled). `apps/api`
+exports only `./client`, the typed Hono RPC client its consumers build on. `apps/viewer`
+deploys static assets only: its `wrangler.jsonc` has no `main`, so wrangler uploads the
+Vite build and the client-side router owns every path. Its SPA calls the api Worker
+cross-origin. `packages/shadcn` holds the shadcn/ui components and the theme stylesheet, so
+`shadcn add` run from an app writes into the package. Shared dependency versions live in
+`workspaces.catalog` and are referenced as `"catalog:"`.
 
 **A catalog entry that nothing references fails knip.** Add the version to `catalog` in the
 same change that adds the workspace consuming it. See `.claude/rules/workspace-packages.md`.

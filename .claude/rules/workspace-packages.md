@@ -5,14 +5,23 @@ Rules for adding, removing, or renaming a **Bun workspace package** (any `apps/*
 
 ## Layout
 
-- `apps/*` — thin deploy units: `api` / `mcp` / `auth`, one
+- `apps/*` — thin deploy units: `api` / `auth` / `remote-mcp` / `viewer`, one
   Cloudflare Worker each: wiring and routes, not reusable logic.
 - `packages/*` — source-only internal packages named `@karibari/<name>`, whose `exports`
-  points at `./src/*.ts` — they are consumed as source and never bundled.
-- An `apps/*` that is itself a Worker holds a `wrangler.jsonc` with `main` and has no
-  `exports`; `exports` belongs to the packages consumed as source. `apps/viewer` is
-  neither: a Vite build unit whose `dist/` the api Worker serves as static assets, never
-  deployed on its own.
+  point at their sources under `./src` (`.ts`, plus `.tsx` and the stylesheet for
+  `packages/shadcn`) — they are consumed as source and never bundled.
+- A deploy unit that runs code holds a `wrangler.jsonc` with `main`. Its `exports` is limited
+  to what other workspaces consume: `apps/api` exports only `./client`, the typed Hono RPC
+  client. `apps/viewer` is the deliberate exception to `main`: it declares static `assets`
+  and no script, because the SPA is the whole deployment, and it reaches the api Worker
+  cross-origin.
+- `packages/shadcn` owns the shadcn/ui components and the theme stylesheet
+  (`@karibari/shadcn/globals.css`). Every app keeps its own `components.json`: its `ui` and
+  `utils` aliases point at the package, and its `tailwind.css` points at the package
+  stylesheet, which is what makes `shadcn add` run from the app install into the package.
+  The package's own `components.json` uses `@karibari/shadcn/...` aliases and its stylesheet
+  registers its classes with `@source`, because Tailwind scans from the app's root and skips
+  `node_modules`.
 
 ## Where a new workspace has to be registered
 
@@ -30,7 +39,9 @@ Adding a package is not just a directory. Follow every item that applies:
    `worker: true` for deploy units (`cf-typegen --check` + test + Wrangler dry-run) and
    `worker: false` for source packages (test only). Define `test` for workspaces in the
    matrix and `type-check` for every workspace; the lint job's `vp run -r type-check`
-   discovers the latter automatically. Workspaces without tests stay out of the matrix.
+   discovers the latter automatically. Workspaces without tests stay out of the matrix; a
+   deploy unit with no unit tests therefore keeps its `build` and Wrangler dry-run steps in
+   the job that already builds it (see the viewer in the `e2e` job).
 4. **`.mise-tasks/`** — if the package needs a task no other workspace has (a generator, a
    special test suite), add one and sync it to lefthook and CI
    (→ `.claude/rules/mise-tasks.md`).

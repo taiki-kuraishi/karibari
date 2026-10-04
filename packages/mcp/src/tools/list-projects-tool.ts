@@ -1,6 +1,4 @@
-import type { app } from "@karibari/api/server";
-
-import { hc } from "hono/client";
+import { createApiClient } from "@karibari/api/client";
 
 import type { McpContext } from "../mcp-context";
 
@@ -24,7 +22,7 @@ export class ListProjectsTool extends AbstractTool {
   }
 
   protected async execute(): Promise<string> {
-    const client = hc<typeof app>(this.context.apiBaseUrl);
+    const client = createApiClient(this.context.apiBaseUrl);
     const response = await client.api.projects.$get({
       header: { authorization: `Bearer ${this.context.token}` },
     });

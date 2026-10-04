@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // No `rootDir` here.
+    // The api client's `app` type pulls apps/api's sources into this program.
+    // Those sources read their bindings from `Cloudflare.Env`, so the api Worker's
+    // generated ambient types are in scope as well.
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    // Base sets `types: []`, so list the globals explicitly here.
+    // `node` covers the Playwright config and spec, which read ports from the environment.
+    "types": ["vite/client", "node", "../../apps/api/worker-configuration.d.ts"],
+    // TypeScript 7 dropped `baseUrl`: `paths` entries are relative to this file.
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["src", "test", "./*.ts"]
+}
