@@ -14,7 +14,7 @@ describe("toMcpContext", () => {
     });
 
     // Act
-    const context = toMcpContext(request, claims, apiBaseUrl, viewerOrigin);
+    const context = toMcpContext({ request, claims, apiBaseUrl, viewerOrigin });
 
     // Assert
     expect(context).toStrictEqual({
@@ -32,7 +32,7 @@ describe("toMcpContext", () => {
     });
 
     // Act
-    const context = toMcpContext(request, claims, apiBaseUrl, viewerOrigin);
+    const context = toMcpContext({ request, claims, apiBaseUrl, viewerOrigin });
 
     // Assert
     expect(context).toStrictEqual({
@@ -48,7 +48,7 @@ describe("toMcpContext", () => {
     const request = new Request("http://mcp/mcp");
 
     // Act
-    const context = toMcpContext(request, claims, apiBaseUrl, viewerOrigin);
+    const context = toMcpContext({ request, claims, apiBaseUrl, viewerOrigin });
 
     // Assert
     expect(context).toBeNull();
@@ -61,7 +61,7 @@ describe("toMcpContext", () => {
     });
 
     // Act
-    const context = toMcpContext(request, {}, apiBaseUrl, viewerOrigin);
+    const context = toMcpContext({ request, claims: {}, apiBaseUrl, viewerOrigin });
 
     // Assert
     expect(context).toBeNull();
