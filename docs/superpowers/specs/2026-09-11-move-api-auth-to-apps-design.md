@@ -21,6 +21,12 @@
 
 移行後の配置: `apps/api`、`apps/auth`、`apps/mcp`。`packages/` には `better-auth`、`db` が残る。将来作る `viewer` は `apps/viewer` に置き、`apps/api` からの `dist` 参照を同ツリー内に保つ。`wrangler.jsonc` の Worker 名（`karibari-api` 等）は変えない。`packages/api` → `apps/api` で深さは同一のため、`../../tsconfig.base.json` や `./src/entry.ts` 等の相対参照は維持される。
 
+その後の変更（この移行の後に入ったもの。上の移行そのものは記録として残す）:
+
+- `apps/mcp` は `apps/remote-mcp` に改名した（Worker 名は `karibari-remote-mcp`）。MCP のツールは、新設した source-only の `packages/mcp` に分けた。上の「`mcp` は `packages/` に残さない」は Worker の話で、`packages/mcp` はその Worker ではない
+- `packages/db-factory`（テスト用の meta 用 D1 の行の factory）と `packages/shadcn`（shadcn/ui のコンポーネントとテーマ）を足した
+- viewer は `apps/viewer` に置いたが、`apps/api` には同居させず、`main` の無い静的 assets だけの別 Worker にした。上の「`apps/api` からの `dist` 参照」は行っていない
+
 ## エラー処理
 
 参照の取りこぼしや CI 失敗が出た場合は同一 PR 内で修正し、CI 緑を merge 条件にする。
