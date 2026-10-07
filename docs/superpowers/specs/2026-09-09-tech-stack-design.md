@@ -8,13 +8,13 @@
 - `docs/superpowers/specs/2026-09-09-interfaces-design.md`
 
 ## 言語・モノレポ基盤（合意済み）
-- TypeScript＋bunワークスペース（`packages/viewer`・`packages/api`・`packages/mcp`・`packages/auth`）＋Vite（viewer用）
+- TypeScript＋bunワークスペース（`apps/api`・`apps/auth`・`apps/remote-mcp`・`apps/viewer`と`packages/better-auth`・`packages/db`・`packages/db-factory`・`packages/mcp`・`packages/shadcn`）＋Vite（viewer・authのSPA用）
 
 ## Api枠組み
 
 ### ルータ（合意済み）
-- Hono v4.13.7（`^4.13.7`でpin）
-- SPA同居は`assets.not_found_handling: "single-page-application"`＋`run_worker_first: ["/api/*"]`
+- Hono v4.13.7（catalogで`4.13.7`に完全に固定）
+- SPAの同居はauth（`assets.not_found_handling: "single-page-application"`＋`run_worker_first`）だけ。viewerはassetsだけのWorker（`main`なし、`not_found_handling`は`single-page-application`）
 
 ## DB
 
@@ -28,15 +28,15 @@
 - better-auth 1.7.3＋drizzle経由でDBを渡す（スキーマもdrizzle管理）
 
 ### 招待制ガード（合意済み）
-- `disableSignUp`＋`databaseHooks`でのユーザー作成ガード（OAuth経由の新規作成も招待者のみ）
+- `disableSignUp`＋`databaseHooks`でのユーザー作成ガード（OAuth経由の新規作成も招待者のみ）。未実装で、今はGitHubでサインインすれば誰でも利用者になれる
 
 ### 検証口の実装位置（合意済み）
-- `POST /verify-access`はauth.handler外の素のWorkerルートとして実装（オリジン検査回避、判定内容は変更なし）
+- `POST /verify-access`はauth.handler外の素のWorkerルートとして実装（オリジン検査回避、判定内容は変更なし）。未実装で、今の本人確認はApiが行う
 
 ## MCP
 
 ### 基盤（合意済み）
-- `@modelcontextprotocol/server` v2系をHonoに載せる（`app.all('/mcp', ...)`＋`requireBearerAuth`、`allowedHosts`設定）
+- `@modelcontextprotocol/sdk`をHonoに載せ、`/mcp`は`@better-auth/mcp`の`createMcpProtectedRequestHandler`で受ける（DPoPを使う。再利用防止はKV）
 
 ### トークン方針（合意済み）
 - Bearer転送維持＋audience検証（Authはaudにapiを含むトークンを発行、Api側でもaud検証。confused deputy回避の条件）
@@ -44,7 +44,7 @@
 ## テスト
 
 ### E2E（合意済み）
-- `createTestHarness()`でApi／MCP／Authの3 Worker同時起動
+- `createTestHarness()`は無い。Workerごとに`@cloudflare/vitest-plugin`で確かめ、画面はappごとのPlaywrightで確かめる
 
 ### ユニット（合意済み）
 - `@cloudflare/vitest-plugin`（workerd実行、D1/R2直接参照）
