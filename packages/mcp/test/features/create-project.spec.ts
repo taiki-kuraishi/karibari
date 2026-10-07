@@ -8,8 +8,9 @@ import { connectClient } from "../helpers/client";
 
 describe("create_project tool", () => {
   const apiBaseUrl = "http://api";
+  const viewerOrigin = "http://viewer";
   const token = "test-token";
-  const created = { projectId: "p1", versionId: "v1", url: "/p/p1" };
+  const created = { projectId: "p1", versionId: "v1", url: "http://viewer/p/p1" };
 
   // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
   let server: McpServer;
@@ -17,7 +18,7 @@ describe("create_project tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer({ apiBaseUrl, token, userId: "user-1" });
+    server = createMcpServer({ apiBaseUrl, token, userId: "user-1", viewerOrigin });
     client = await connectClient(server);
   });
 

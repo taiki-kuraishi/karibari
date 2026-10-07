@@ -8,6 +8,7 @@ import { connectClient } from "../helpers/client";
 
 describe("get_project_url tool", () => {
   const apiBaseUrl = "http://api";
+  const viewerOrigin = "http://viewer";
   const token = "test-token";
   const project = { id: "p1", name: "demo", owner: "user-1" };
   const shares = [{ id: "s1", kind: "private", project_id: "p1" }];
@@ -18,7 +19,7 @@ describe("get_project_url tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer({ apiBaseUrl, token, userId: "user-1" });
+    server = createMcpServer({ apiBaseUrl, token, userId: "user-1", viewerOrigin });
     client = await connectClient(server);
   });
 
@@ -68,7 +69,7 @@ describe("get_project_url tool", () => {
         text: JSON.stringify({
           projectId: "p1",
           shareCount: 1,
-          url: "/p/p1?v=v1",
+          url: "http://viewer/p/p1?v=v1",
           versionId: "v1",
         }),
         type: "text",
@@ -98,7 +99,10 @@ describe("get_project_url tool", () => {
     // Assert
     expect(res.isError).toBeFalsy();
     expect(res.content).toStrictEqual([
-      { text: JSON.stringify({ projectId: "p1", shareCount: 0, url: "/p/p1" }), type: "text" },
+      {
+        text: JSON.stringify({ projectId: "p1", shareCount: 0, url: "http://viewer/p/p1" }),
+        type: "text",
+      },
     ]);
   });
 

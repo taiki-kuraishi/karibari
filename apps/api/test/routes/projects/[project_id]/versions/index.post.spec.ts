@@ -53,7 +53,7 @@ describe("POST /api/projects/:project_id/versions", () => {
     expect(response.status).toBe(201);
     expect(body).toStrictEqual({
       versionId: expect.any(String),
-      url: `/p/${project.id}?v=${body.versionId}`,
+      url: `https://karibari.tsar-bmb.org/p/${project.id}?v=${body.versionId}`,
     });
     expect(version).toStrictEqual({
       id: body.versionId,
@@ -62,6 +62,44 @@ describe("POST /api/projects/:project_id/versions", () => {
     } satisfies Version);
     expect(await stored?.text()).toBe(html);
   });
+
+  versionsTest(
+    "201: sets the project's updated_at to the new version's created_at",
+    async ({ auth }) => {
+      // Arrange
+      const project = await factories.projects
+        .props({
+          owner: () => auth.userId,
+          created_at: () => 100,
+          updated_at: () => 100,
+        })
+        .create();
+      const headers = new Headers(auth.headers);
+      headers.set("content-type", "application/json");
+
+      // Act
+      const response = await exports.default.fetch(
+        new Request(`http://api/api/projects/${project.id}/versions`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ html: "<p>hi</p>" }),
+        }),
+      );
+      const body = await response.json<{ versionId: string }>();
+      const version = await db.query.versions.findFirst({
+        columns: { created_at: true },
+        where: (table, { eq }) => eq(table.id, body.versionId),
+      });
+      const updated = await db.query.projects.findFirst({
+        columns: { created_at: true, updated_at: true },
+        where: (table, { eq }) => eq(table.id, project.id),
+      });
+
+      // Assert
+      expect(response.status).toBe(201);
+      expect(updated).toStrictEqual({ created_at: 100, updated_at: version?.created_at });
+    },
+  );
 
   versionsTest("404: hides a foreign owner's project without writing", async ({ auth }) => {
     // Arrange

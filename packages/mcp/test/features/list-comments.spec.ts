@@ -8,6 +8,7 @@ import { connectClient } from "../helpers/client";
 
 describe("list_comments tool", () => {
   const apiBaseUrl = "http://api";
+  const viewerOrigin = "http://viewer";
   const token = "test-token";
   const payload = {
     comments: [{ body: "nice", id: "c1", project_id: "p1", target: "#a", version_id: "v1" }],
@@ -19,7 +20,7 @@ describe("list_comments tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer({ apiBaseUrl, token, userId: "user-1" });
+    server = createMcpServer({ apiBaseUrl, token, userId: "user-1", viewerOrigin });
     client = await connectClient(server);
   });
 

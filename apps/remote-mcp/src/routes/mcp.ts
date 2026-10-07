@@ -22,7 +22,12 @@ export const mcpRoute = new Hono<HonoEnv>().all("/", async (c) =>
       jwksUrl: `${AUTH_ISSUER}/jwks`,
     },
     async (request, accessTokenClaims) => {
-      const context = toMcpContext(request, accessTokenClaims, c.env.API_BASE_URL);
+      const context = toMcpContext(
+        request,
+        accessTokenClaims,
+        c.env.API_BASE_URL,
+        c.env.VIEWER_ORIGIN,
+      );
       if (!context) {
         return c.json({ error: "unauthorized" }, 401);
       }

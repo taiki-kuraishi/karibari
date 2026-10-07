@@ -13,7 +13,12 @@ describe("add tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer({ apiBaseUrl: "http://api", token: "test-token", userId: "user-1" });
+    server = createMcpServer({
+      apiBaseUrl: "http://api",
+      token: "test-token",
+      userId: "user-1",
+      viewerOrigin: "http://viewer",
+    });
     client = await connectClient(server);
   });
 

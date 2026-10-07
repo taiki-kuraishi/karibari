@@ -43,16 +43,18 @@ export class GetProjectUrlTool extends AbstractTool {
     }
     const sharesBody = (await sharesResponse.json()) as { shares: unknown[] };
 
-    const url =
-      args.versionId === undefined
-        ? `/p/${args.projectId}`
-        : `/p/${args.projectId}?v=${args.versionId}`;
+    const projectUrl = `${this.context.viewerOrigin}/p/${args.projectId}`;
+    const shareCount = sharesBody.shares.length;
+
+    if (args.versionId === undefined) {
+      return JSON.stringify({ projectId: args.projectId, shareCount, url: projectUrl });
+    }
 
     return JSON.stringify({
       projectId: args.projectId,
-      shareCount: sharesBody.shares.length,
-      url,
-      ...(args.versionId === undefined ? {} : { versionId: args.versionId }),
+      shareCount,
+      url: `${projectUrl}?v=${args.versionId}`,
+      versionId: args.versionId,
     });
   }
 }

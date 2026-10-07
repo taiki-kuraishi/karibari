@@ -2,6 +2,7 @@ export interface McpContext {
   apiBaseUrl: string;
   token: string;
   userId: string;
+  viewerOrigin: string;
 }
 
 // The MCP ingress verifies the access token (JWT + DPoP); only its raw token
@@ -10,6 +11,7 @@ export const toMcpContext = (
   request: Request,
   claims: { sub?: unknown },
   apiBaseUrl: string,
+  viewerOrigin: string,
 ): McpContext | null => {
   const token = request.headers.get("Authorization")?.split(" ", 2)[1];
   const userId = claims.sub;
@@ -17,5 +19,5 @@ export const toMcpContext = (
     return null;
   }
 
-  return { apiBaseUrl, token, userId };
+  return { apiBaseUrl, token, userId, viewerOrigin };
 };

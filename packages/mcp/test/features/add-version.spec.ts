@@ -8,8 +8,9 @@ import { connectClient } from "../helpers/client";
 
 describe("add_version tool", () => {
   const apiBaseUrl = "http://api";
+  const viewerOrigin = "http://viewer";
   const token = "test-token";
-  const created = { url: "/p/p1?v=v2", versionId: "v2" };
+  const created = { url: "http://viewer/p/p1?v=v2", versionId: "v2" };
 
   // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
   let server: McpServer;
@@ -17,7 +18,7 @@ describe("add_version tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer({ apiBaseUrl, token, userId: "user-1" });
+    server = createMcpServer({ apiBaseUrl, token, userId: "user-1", viewerOrigin });
     client = await connectClient(server);
   });
 

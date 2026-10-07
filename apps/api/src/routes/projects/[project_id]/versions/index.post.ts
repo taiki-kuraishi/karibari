@@ -1,4 +1,5 @@
-import { versions } from "@karibari/db";
+import { projects, versions } from "@karibari/db";
+import { eq as drizzleEq } from "drizzle-orm";
 import { Hono } from "hono";
 import * as v from "valibot";
 
@@ -36,8 +37,17 @@ export const postProjectVersions = new Hono<HonoEnv>().post(
     // R2 before D1: a failed D1 insert only leaves a harmless orphaned object,
     // While D1-first would leave a meta row whose HTML is missing (r2_missing 404).
     await c.env.HTML_BUCKET.put(`projects/${projectId}/versions/${version.id}/index.html`, html);
-    await c.env.db.insert(versions).values(version);
+    await c.env.db.batch([
+      c.env.db.insert(versions).values(version),
+      c.env.db
+        .update(projects)
+        .set({ updated_at: version.created_at })
+        .where(drizzleEq(projects.id, projectId)),
+    ]);
 
-    return c.json({ versionId: version.id, url: `/p/${projectId}?v=${version.id}` }, 201);
+    return c.json(
+      { versionId: version.id, url: `${c.env.VIEWER_ORIGIN}/p/${projectId}?v=${version.id}` },
+      201,
+    );
   },
 );

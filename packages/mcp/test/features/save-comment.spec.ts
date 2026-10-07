@@ -8,6 +8,7 @@ import { connectClient } from "../helpers/client";
 
 describe("save_comment tool", () => {
   const apiBaseUrl = "http://api";
+  const viewerOrigin = "http://viewer";
   const token = "test-token";
   const created = { commentId: "c1" };
 
@@ -17,7 +18,7 @@ describe("save_comment tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer({ apiBaseUrl, token, userId: "user-1" });
+    server = createMcpServer({ apiBaseUrl, token, userId: "user-1", viewerOrigin });
     client = await connectClient(server);
   });
 

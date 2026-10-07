@@ -8,6 +8,7 @@ import { connectClient } from "../helpers/client";
 
 describe("list_projects tool", () => {
   const apiBaseUrl = "http://api";
+  const viewerOrigin = "http://viewer";
   const token = "test-token";
   const projects = [{ id: "p1", name: "demo", owner: "user-1", created_at: 100, updated_at: 100 }];
 
@@ -17,7 +18,7 @@ describe("list_projects tool", () => {
   let client: Client;
 
   beforeAll(async () => {
-    server = createMcpServer({ apiBaseUrl, token, userId: "user-1" });
+    server = createMcpServer({ apiBaseUrl, token, userId: "user-1", viewerOrigin });
     client = await connectClient(server);
   });
 
