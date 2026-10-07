@@ -57,6 +57,43 @@ describe("GET /api/projects/:project_id/versions", () => {
     expect(body).toStrictEqual({ versions: [older, newer] });
   });
 
+  versionsTest("200: orders versions sharing a created_at by insertion", async ({ auth }) => {
+    // Arrange
+    const project = await factories.projects
+      .props({
+        owner: () => auth.userId,
+        name: () => "demo",
+      })
+      .create();
+    // Ids are chosen so that sorting by id would reverse the insertion order.
+    const first = await factories.versions
+      .props({
+        id: () => "b",
+        project_id: () => project.id,
+        created_at: () => 100,
+      })
+      .create();
+    const second = await factories.versions
+      .props({
+        id: () => "a",
+        project_id: () => project.id,
+        created_at: () => 100,
+      })
+      .create();
+
+    // Act
+    const response = await exports.default.fetch(
+      new Request(`http://api/api/projects/${project.id}/versions`, {
+        headers: new Headers(auth.headers),
+      }),
+    );
+    const body = await response.json<{ versions: Version[] }>();
+
+    // Assert
+    expect(response.status).toBe(200);
+    expect(body).toStrictEqual({ versions: [first, second] });
+  });
+
   versionsTest("200: returns an empty list when the project has no versions", async ({ auth }) => {
     // Arrange
     const project = await factories.projects
