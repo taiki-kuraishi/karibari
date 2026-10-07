@@ -40,6 +40,13 @@ export const postProjects = new Hono<HonoEnv>().post(
       c.env.db.insert(versions).values(version),
     ]);
 
-    return c.json({ projectId: project.id, versionId: version.id, url: `/p/${project.id}` }, 201);
+    return c.json(
+      {
+        projectId: project.id,
+        versionId: version.id,
+        url: `${c.env.VIEWER_ORIGIN}/p/${project.id}`,
+      },
+      201,
+    );
   },
 );
