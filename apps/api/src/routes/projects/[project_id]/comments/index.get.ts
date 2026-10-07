@@ -35,7 +35,8 @@ export const getProjectComments = new Hono<HonoEnv>().get(
       const latest = await c.env.db.query.versions.findFirst({
         columns: { id: true },
         where: (table, { eq }) => eq(table.project_id, projectId),
-        orderBy: (table, { desc }) => [desc(table.created_at), desc(table.id)],
+        // Last inserted version: `created_at` ties within a second and `id` is a random UUID.
+        orderBy: (_table, { desc, sql }) => [desc(sql`rowid`)],
       });
       versionId = latest?.id;
     }
