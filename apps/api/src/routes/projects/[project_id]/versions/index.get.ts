@@ -26,7 +26,9 @@ export const getProjectVersions = new Hono<HonoEnv>().get(
 
     const versions = await c.env.db.query.versions.findMany({
       where: (table, { eq }) => eq(table.project_id, projectId),
-      orderBy: (table, { asc }) => [asc(table.created_at), asc(table.id)],
+      // Insertion order. `created_at` ties within a second and `id` is a random UUID.
+      // `rowid` follows insertion because rows in this table are never deleted.
+      orderBy: (_table, { asc, sql }) => [asc(sql`rowid`)],
     });
 
     return c.json({ versions });
