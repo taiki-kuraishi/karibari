@@ -42,10 +42,12 @@ export const getProjectVersionContent = new Hono<HonoEnv>().get(
       return c.json({ error: "not_found" }, 404);
     }
 
-    // Untrusted LLM-authored HTML. The Viewer renders it in a sandboxed iframe.
-    // Direct navigation here would still run its scripts as the app's origin.
+    // Untrusted LLM-authored HTML, rendered by the Viewer in a sandboxed iframe.
+    // `allow-scripts` without `allow-same-origin` keeps the document in an opaque origin.
+    // Even opened directly, its scripts hold no cookie and cannot make credentialed API calls.
+    // Adding `allow-same-origin` would give both back.
     return c.html(await object.text(), 200, {
-      "Content-Security-Policy": "sandbox",
+      "Content-Security-Policy": "sandbox allow-scripts",
       // Prevent content-type sniffing that could re-classify the body as script.
       "X-Content-Type-Options": "nosniff",
     });
