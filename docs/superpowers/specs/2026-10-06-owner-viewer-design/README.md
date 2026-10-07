@@ -312,7 +312,7 @@ MCP ツール get_project_url【13】
 - サインインの URL【4】= `<auth の origin>/sign-in?callbackURL=<encodeURIComponent(今のページの URL)>`
 - 表示名 = `projects.name`。null のときは「無題」
 - `v` の parser【14】= URL の query `v`（`versions.id`、任意）を読み書きする nuqs の parser。書き込むと履歴に積む
-- api の client【15】= `@karibari/api/client` の `createApiClient` の戻り値（hono の typed client）。viewer が作り、api の query の provider に渡す。`packages/api-query` は型だけを import する
+- api の client【19】= `@karibari/api/client` が export する型 `ApiClient`（`createApiClient` の戻り値の型）。viewer が `createApiClient` で作り、api の query の provider に渡す。`packages/api-query` はこの型だけを import する（`ReturnType<typeof createApiClient>` で型を公開しない）
 - query の結果【15】【16】【17】= TanStack Query の結果。`data` は API が 200 のときの JSON、404 のときは `null`（未確定の間は `undefined`）。404 以外の非 2xx は例外（hono の `DetailedError`）を投げる
 - auth の client【4】= better-auth の client（`better-auth/client` の `createAuthClient`）。baseURL は `VITE_AUTH_ORIGIN`、basePath は `/api/auth`、cookie を送る（`credentials: "include"`）。viewer が `apps/viewer/src/lib/auth-client.ts` に作る
 
@@ -380,7 +380,8 @@ MCP ツール get_project_url【13】
 
 ```mermaid
 flowchart LR
-  p15["15 api-query: provider と projects の一覧"] --> p2["2 /"]
+  p19["19 api: ApiClient の型"] --> p15["15 api-query: provider と projects の一覧"]
+  p15 --> p2["2 /"]
   p15 --> p16["16 api-query: project"]
   p15 --> p17["17 api-query: versions の一覧"]
   p11["11 GET project"] --> p16
@@ -464,6 +465,7 @@ flowchart LR
 | apps/viewer/src/routes/project/project-view/hooks/use-project-view.ts | 変更 | project の表示の hook | 14 |
 | apps/viewer/src/routes/project/project-view/components/project-header.tsx | 変更 | project の見出し | 14 |
 | apps/viewer/test/e2e/project.spec.ts | 変更 | E2E: `versions` の行を選ぶと `?v=` へ移動する | 14 |
+| apps/api/src/client.ts | 変更 | api の client（型 `ApiClient` を export する） | 19 |
 | packages/api-query/package.json | 新規 | api-query の package（依存・peer・`type-check` の script） | 15 |
 | packages/api-query/tsconfig.json | 新規 | api-query の tsconfig | 15 |
 | packages/api-query/AGENTS.md | 新規 | api-query の規約（下の「api-query の置き方」を書く） | 15 |

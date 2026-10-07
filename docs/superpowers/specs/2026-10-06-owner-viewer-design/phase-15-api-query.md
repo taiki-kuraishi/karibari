@@ -1,7 +1,7 @@
 # フェーズ 15 api-query（provider と projects の一覧）
 
 - ゴール: `packages/api-query` ができ、projects の一覧の query hook が使える
-- 前提フェーズ: なし
+- 前提フェーズ: 19
 - 完了条件: `bun run --cwd packages/api-query type-check` が通る。`mise run format` の後に `mise run lint`（knip を含む）が通る。`bun dedupe --check` が通る
 - 担当: README のファイルの表でフェーズ 15 の行（`packages/api-query` と、付いてくる root の `AGENTS.md`・`knip.config.ts`・`bun.lock`）。signature は README の関数の木の【15】の行、規約は README の「api-query の置き方」にある
 
