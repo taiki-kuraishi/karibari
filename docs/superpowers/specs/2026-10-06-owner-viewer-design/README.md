@@ -402,7 +402,7 @@ flowchart LR
   p5["5 spec（merge 済み）"]
 ```
 
-1 フェーズは 1 つの API（か 1 つの画面）だけを作り、1 つの package（`apps/*` か `packages/*`）だけを触る（user の指示。diff を小さくして review できるようにするため）。package に付いてくる変更（`knip.config.ts` の workspace の指定・`bun.lock`・root の `AGENTS.md` の Directory rules の表・spec の 1 行）は、同じフェーズに含める。次のファイルは、直列のフェーズが順に書き足す（直列なので同時には触らない）: `apps/viewer/src/router.tsx` は 2 → 3 → 4 → 14、`apps/viewer/test/helpers/api-stub.ts` は 2 → 3 → 4、`apps/viewer/src/routes/home/project-list/index.tsx` は 2 → 3、`use-project-view.ts`・`project-header.tsx`・`apps/viewer/test/e2e/project.spec.ts` は 3 → 14、`apps/viewer/package.json` は 2 → 4 → 14、`bun.lock` は 15 → 2 → 4 → 14、`knip.config.ts` は 15 → 2、`packages/api-query/src/index.ts` は 15 → 16・17（16・17 は並列に作ってよく、`index.ts` の行が衝突したら、後から merge する側が rebase する）、`apps/api/src/routes/**` は 6〜11 が各 route の中身を、その後に 18 が export 名だけを直す。それ以外のファイルは 1 フェーズだけが持つ。viewer の画面のファイルの path は、下の「viewer の画面のファイルの置き方」に沿って決めてある。
+1 フェーズは 1 つの API（か 1 つの画面）だけを作り、1 つの package（`apps/*` か `packages/*`）だけを触る（user の指示。diff を小さくして review できるようにするため）。package に付いてくる変更（`knip.config.ts` の workspace の指定・`bun.lock`・root の `AGENTS.md` の Directory rules の表・spec の 1 行）は、同じフェーズに含める。次のファイルは、直列のフェーズが順に書き足す（直列なので同時には触らない）: `apps/viewer/src/router.tsx` は 2 → 3 → 4 → 14、`apps/viewer/test/helpers/api-stub.ts` は 2 → 3 → 4、`apps/viewer/src/routes/home/project-list/index.tsx` は 2 → 3、`project-view/index.tsx`・`use-project-view.ts`・`project-header.tsx`・`apps/viewer/test/e2e/project.spec.ts` は 3 → 14、`apps/viewer/package.json` は 2 → 4 → 14、`bun.lock` は 15 → 2 → 4 → 14、`knip.config.ts` は 15 → 2、`packages/api-query/src/index.ts` は 15 → 16・17（16・17 は並列に作ってよく、`index.ts` の行が衝突したら、後から merge する側が rebase する）、`apps/api/src/routes/**` は 6〜11 が各 route の中身を、その後に 18 が export 名だけを直す。spec の `2026-09-09-interfaces-design.md` は、5 の後に 12 と 13 が離れた行を直す（12 と 13 は並列でよい）。それ以外のファイルは 1 フェーズだけが持つ。viewer の画面のファイルの path は、下の「viewer の画面のファイルの置き方」に沿って決めてある。
 
 | ファイル | 新規・変更 | 中身 | フェーズ |
 | --- | --- | --- | --- |
@@ -464,6 +464,7 @@ flowchart LR
 | bun.lock | 変更 | `bun install` の結果 | 14 |
 | apps/viewer/src/router.tsx | 変更 | root route に nuqs の adapter を足す | 14 |
 | apps/viewer/src/routes/project/params.ts | 新規 | `v` の parser | 14 |
+| apps/viewer/src/routes/project/project-view/index.tsx | 変更 | project の表示（`選択肢`・`選ぶ` を見出しへ配線する） | 14 |
 | apps/viewer/src/routes/project/project-view/hooks/use-project-view.ts | 変更 | project の表示の hook | 14 |
 | apps/viewer/src/routes/project/project-view/components/project-header.tsx | 変更 | project の見出し | 14 |
 | apps/viewer/test/e2e/project.spec.ts | 変更 | E2E: `versions` の行を選ぶと `?v=` へ移動する | 14 |
@@ -480,6 +481,8 @@ flowchart LR
 | AGENTS.md | 変更 | Directory rules の表に `packages/api-query/**` の行を足す | 15 |
 | knip.config.ts | 変更 | `packages/api-query` の workspace を足す | 15 |
 | bun.lock | 変更 | `bun install` の結果 | 15 |
+| docs/superpowers/specs/2026-09-09-tech-stack-design.md | 変更 | 「言語・モノレポ基盤」の workspace の一覧に `packages/api-query` を足す（1 行） | 15 |
+| docs/superpowers/specs/2026-09-11-move-api-auth-to-apps-design.md | 変更 | 「その後の変更」に `packages/api-query` を足す（1 行） | 15 |
 | packages/api-query/src/query/use-project-query.ts | 新規 | project の query hook | 16 |
 | packages/api-query/src/index.ts | 変更 | 公開面に project の query hook を足す | 16 |
 | packages/api-query/src/query/use-versions-query.ts | 新規 | versions の一覧の query hook | 17 |

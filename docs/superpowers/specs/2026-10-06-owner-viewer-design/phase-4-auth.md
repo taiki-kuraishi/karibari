@@ -14,4 +14,4 @@
 - E2E のケース（1 ケース = URL を変える操作 1 つ）
   - `/` を開き、GET /api/auth/get-session が `null` → README の「型と API」のサインインの URL（callbackURL は開いた URL）へ移動する
   - `/p/:projectId` を開き、GET /api/auth/get-session が `null` → サインインの URL（callbackURL は開いた URL）へ移動する
-- サインインの URL への移動先（auth）も stub し、本物の auth へは届かせない
+- サインインの URL への移動先（auth）も stub し、本物の auth へは届かせない。auth も別 origin なので、auth への stub の response にも、フェーズ 2 の api の stub と同じ CORS の header（許可する origin と credentials）を付ける。付けないと browser が response を遮断し、確認が `null` に定まらない

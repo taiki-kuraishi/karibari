@@ -8,6 +8,6 @@
 ## このフェーズの決まり
 
 - `apps/viewer/package.json` に `nuqs`（`catalog:`）を足して `bun install` し、`bun.lock` も commit する。router.tsx の root route に nuqs の adapter（`nuqs/adapters/tanstack-router`）を足す
-- フェーズ 3 の `project の表示の hook` に `選択肢`・`選ぶ` と `v` の読み書きを足し、`project の見出し` に選択欄を足す。`v` が一覧に無いときは、フェーズ 3 の 404（`notFound()`）にする
+- フェーズ 3 の `project の表示の hook` に `選択肢`・`選ぶ` と `v` の読み書きを足し、`project の見出し` に選択欄を足し、`project の表示`（`project-view/index.tsx`）で hook の `選択肢`・`選ぶ` を見出しへ渡す。`v` が一覧に無いときは、フェーズ 3 の 404（`notFound()`）にする
 - E2E のケース（1 ケース = URL を変える操作 1 つ）
   - `/p/:projectId` で `versions` の行を選ぶ → `/p/:projectId?v=<versions.id>` へ移動する
