@@ -11,6 +11,7 @@
 - api と MCP が返す表示 URL を絶対 URL にし、LLM が返したリンクをそのまま開ける
 - `versions` の行の並びを挿入した順にし、`versions` に行を足したら `projects.updated_at` も更新する
 - TanStack Query の hooks を配る package（`@karibari/api-query`）を作り、viewer はその hooks で api を読む（user の指示）
+- api の route の export 名を、`AGENTS.md` の命名（route は `Route` 終わり）に合わせる（user の指示）
 - spec（overall-arch・interfaces・tech-stack・move-api-auth-to-apps）を今の実装とこの設計に合わせる
 
 ### 対象外
@@ -386,6 +387,7 @@ flowchart LR
   p15 --> p17["17 api-query: versions の一覧"]
   p11["11 GET project"] --> p16
   p11 --> p13["13 MCP get_project_url"]
+  p11 --> p18["18 api: route の export 名"]
   p8["8 GET versions（merge 済み）"] --> p17
   p2 --> p3["3 /p/:projectId"]
   p10["10 GET content（merge 済み）"] --> p3
@@ -400,7 +402,7 @@ flowchart LR
   p5["5 spec（merge 済み）"]
 ```
 
-1 フェーズは 1 つの API（か 1 つの画面）だけを作り、1 つの package（`apps/*` か `packages/*`）だけを触る（user の指示。diff を小さくして review できるようにするため）。package に付いてくる変更（`knip.config.ts` の workspace の指定・`bun.lock`・root の `AGENTS.md` の Directory rules の表・spec の 1 行）は、同じフェーズに含める。次のファイルは、直列のフェーズが順に書き足す（直列なので同時には触らない）: `apps/viewer/src/router.tsx` は 2 → 3 → 4 → 14、`apps/viewer/test/helpers/api-stub.ts` は 2 → 3 → 4、`apps/viewer/src/routes/home/project-list/index.tsx` は 2 → 3、`use-project-view.ts`・`project-header.tsx`・`apps/viewer/test/e2e/project.spec.ts` は 3 → 14、`apps/viewer/package.json` は 2 → 4 → 14、`bun.lock` は 15 → 2 → 4 → 14、`knip.config.ts` は 15 → 2、`packages/api-query/src/index.ts` は 15 → 16・17（16・17 は並列に作ってよく、`index.ts` の行が衝突したら、後から merge する側が rebase する）。それ以外のファイルは 1 フェーズだけが持つ。viewer の画面のファイルの path は、下の「viewer の画面のファイルの置き方」に沿って決めてある。
+1 フェーズは 1 つの API（か 1 つの画面）だけを作り、1 つの package（`apps/*` か `packages/*`）だけを触る（user の指示。diff を小さくして review できるようにするため）。package に付いてくる変更（`knip.config.ts` の workspace の指定・`bun.lock`・root の `AGENTS.md` の Directory rules の表・spec の 1 行）は、同じフェーズに含める。次のファイルは、直列のフェーズが順に書き足す（直列なので同時には触らない）: `apps/viewer/src/router.tsx` は 2 → 3 → 4 → 14、`apps/viewer/test/helpers/api-stub.ts` は 2 → 3 → 4、`apps/viewer/src/routes/home/project-list/index.tsx` は 2 → 3、`use-project-view.ts`・`project-header.tsx`・`apps/viewer/test/e2e/project.spec.ts` は 3 → 14、`apps/viewer/package.json` は 2 → 4 → 14、`bun.lock` は 15 → 2 → 4 → 14、`knip.config.ts` は 15 → 2、`packages/api-query/src/index.ts` は 15 → 16・17（16・17 は並列に作ってよく、`index.ts` の行が衝突したら、後から merge する側が rebase する）、`apps/api/src/routes/**` は 6〜11 が各 route の中身を、その後に 18 が export 名だけを直す。それ以外のファイルは 1 フェーズだけが持つ。viewer の画面のファイルの path は、下の「viewer の画面のファイルの置き方」に沿って決めてある。
 
 | ファイル | 新規・変更 | 中身 | フェーズ |
 | --- | --- | --- | --- |
@@ -483,8 +485,8 @@ flowchart LR
 | packages/api-query/src/query/use-versions-query.ts | 新規 | versions の一覧の query hook | 17 |
 | packages/api-query/src/index.ts | 変更 | 公開面に versions の一覧の query hook を足す | 17 |
 | apps/api/src/middlewares/auth.ts | 既存 | 認証の middleware | — |
-| apps/api/src/routes/projects/index.get.ts | 既存 | GET /api/projects | — |
-| apps/api/src/routes/projects/[project_id]/shares/index.get.ts | 既存 | GET /api/projects/:project_id/shares | — |
+| apps/api/src/routes/**/*.ts | 変更 | route の export 名を `Route` 終わりにする（`AGENTS.md` の命名）。名前だけで、中身は変えない。6〜11 が触った route も含む | 18 |
+| apps/api/src/server.ts | 変更 | 上の名前の import と chain を直す | 18 |
 | packages/mcp/src/tools/create-project-tool.ts | 既存 | MCP ツール create_project | — |
 | packages/mcp/src/tools/add-version-tool.ts | 既存 | MCP ツール add_version | — |
 | packages/mcp/src/tools/list-comments-tool.ts | 既存 | MCP ツール list_comments | — |
