@@ -37,7 +37,7 @@
 
 README の次の節を反映する。
 
-- 「型と API」: GET /api/session、表示 URL を絶対 URL にすること、`versions` の並び（`?v` が無いときは並びの最後の行。interfaces `:41` の「Api側で最新解決」を置き換える）、POST versions が `projects.updated_at` を更新すること、content の CSP を `sandbox allow-scripts` にすること
+- 「型と API」: 表示 URL を絶対 URL にすること、`versions` の並び（`?v` が無いときは並びの最後の行。interfaces `:41` の「Api側で最新解決」を置き換える）、POST versions が `projects.updated_at` を更新すること、content の CSP を `sandbox allow-scripts` にすること（`GET /api/session` を書いた箇所は、のちに取りやめた。フェーズ 12 が直す）
 - 「型と API」の get_project_url: interfaces `:74` の公開 URL 取得は、今は絶対の表示 URL と `?v=` だけで、`?invite=`・`?exp=&sig=` の組み立ては未実装と併記する
 - 「画面」: `/p/:projectId` も未ログインならサインインへ送る（interfaces `:18` の「401/403/404 → 同一404画面」の例外）。セッションが無いことは project の有無と関係ないので、存在は漏れない
 
