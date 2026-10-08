@@ -10,18 +10,18 @@ import type { ApiAuthClient } from "./middlewares/inject-middleware";
 import { authMiddleware } from "./middlewares/auth";
 import { corsMiddleware } from "./middlewares/cors";
 import { injectMiddleware } from "./middlewares/inject-middleware";
-import { getHealth } from "./routes/health/index.get";
-import { getProjectComments } from "./routes/projects/[project_id]/comments/index.get";
-import { postProjectComments } from "./routes/projects/[project_id]/comments/index.post";
-import { getProject } from "./routes/projects/[project_id]/index.get";
-import { deleteProjectShare } from "./routes/projects/[project_id]/shares/[share_id]/index.delete";
-import { getProjectShares } from "./routes/projects/[project_id]/shares/index.get";
-import { getProjectVersionContent } from "./routes/projects/[project_id]/versions/[version_id]/content.get";
-import { getProjectVersion } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
-import { getProjectVersions } from "./routes/projects/[project_id]/versions/index.get";
-import { postProjectVersions } from "./routes/projects/[project_id]/versions/index.post";
-import { getProjects } from "./routes/projects/index.get";
-import { postProjects } from "./routes/projects/index.post";
+import { getHealthRoute } from "./routes/health/index.get";
+import { getProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.get";
+import { postProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.post";
+import { getProjectRoute } from "./routes/projects/[project_id]/index.get";
+import { deleteProjectShareRoute } from "./routes/projects/[project_id]/shares/[share_id]/index.delete";
+import { getProjectSharesRoute } from "./routes/projects/[project_id]/shares/index.get";
+import { getProjectVersionContentRoute } from "./routes/projects/[project_id]/versions/[version_id]/content.get";
+import { getProjectVersionRoute } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
+import { getProjectVersionsRoute } from "./routes/projects/[project_id]/versions/index.get";
+import { postProjectVersionsRoute } from "./routes/projects/[project_id]/versions/index.post";
+import { getProjectsRoute } from "./routes/projects/index.get";
+import { postProjectsRoute } from "./routes/projects/index.post";
 
 export interface HonoEnv {
   Bindings: Cloudflare.Env & {
@@ -36,18 +36,18 @@ export interface HonoEnv {
 
 // Single method chain: breaking it loses Hono's RPC type inference.
 export const app = new Hono<HonoEnv>()
-  .route("/health", getHealth)
+  .route("/health", getHealthRoute)
   .use("/api/*", corsMiddleware)
   .use("/api/*", injectMiddleware)
   .use("/api/*", authMiddleware)
-  .route("/api/projects/:project_id", getProject)
-  .route("/api/projects/:project_id/comments", postProjectComments)
-  .route("/api/projects/:project_id/comments", getProjectComments)
-  .route("/api/projects/:project_id/shares", getProjectShares)
-  .route("/api/projects/:project_id/shares/:share_id", deleteProjectShare)
-  .route("/api/projects/:project_id/versions", postProjectVersions)
-  .route("/api/projects/:project_id/versions", getProjectVersions)
-  .route("/api/projects/:project_id/versions/:version_id", getProjectVersion)
-  .route("/api/projects/:project_id/versions/:version_id/content", getProjectVersionContent)
-  .route("/api/projects", getProjects)
-  .route("/api/projects", postProjects);
+  .route("/api/projects/:project_id", getProjectRoute)
+  .route("/api/projects/:project_id/comments", postProjectCommentsRoute)
+  .route("/api/projects/:project_id/comments", getProjectCommentsRoute)
+  .route("/api/projects/:project_id/shares", getProjectSharesRoute)
+  .route("/api/projects/:project_id/shares/:share_id", deleteProjectShareRoute)
+  .route("/api/projects/:project_id/versions", postProjectVersionsRoute)
+  .route("/api/projects/:project_id/versions", getProjectVersionsRoute)
+  .route("/api/projects/:project_id/versions/:version_id", getProjectVersionRoute)
+  .route("/api/projects/:project_id/versions/:version_id/content", getProjectVersionContentRoute)
+  .route("/api/projects", getProjectsRoute)
+  .route("/api/projects", postProjectsRoute);

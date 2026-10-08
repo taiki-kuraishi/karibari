@@ -2,7 +2,7 @@ import { Hono } from "hono";
 
 import type { HonoEnv } from "../../server";
 
-export const getProjects = new Hono<HonoEnv>().get("", async (c) => {
+export const getProjectsRoute = new Hono<HonoEnv>().get("", async (c) => {
   const owner = c.get("userId");
   const projects = await c.env.db.query.projects.findMany({
     where: (table, { eq }) => eq(table.owner, owner),

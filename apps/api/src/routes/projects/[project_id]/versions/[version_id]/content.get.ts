@@ -10,7 +10,7 @@ const paramSchema = v.object({
   version_id: v.pipe(v.string(), v.nonEmpty()),
 });
 
-export const getProjectVersionContent = new Hono<HonoEnv>().get(
+export const getProjectVersionContentRoute = new Hono<HonoEnv>().get(
   "",
   validator("param", paramSchema),
   async (c) => {
