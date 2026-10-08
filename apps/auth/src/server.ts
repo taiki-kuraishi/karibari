@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception";
 
 import type { HonoEnv } from "./middlewares/dependency-injection";
 
+import { corsMiddleware } from "./middlewares/cors";
 import { injectDependenciesMiddleware } from "./middlewares/dependency-injection";
 import { authRoute } from "./routes/auth";
 import { callbackUrlRoute } from "./routes/callback-url";
@@ -11,6 +12,7 @@ import { oauthAuthorizationServerRoute } from "./routes/oauth-authorization-serv
 
 // Single method chain: breaking it loses Hono's RPC type inference.
 export const app = new Hono<HonoEnv>()
+  .use("/api/auth/*", corsMiddleware)
   .use("/api/auth/*", injectDependenciesMiddleware)
   .use("/.well-known/oauth-authorization-server/api/auth", injectDependenciesMiddleware)
   .use("/api/callback-url", injectDependenciesMiddleware)
