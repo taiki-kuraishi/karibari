@@ -457,6 +457,7 @@ flowchart LR
 | apps/auth/src/server.ts | 変更 | `/api/auth/*` に auth の CORS の middleware を足す（GET /api/auth/get-session が viewer から呼べる） | 12 |
 | apps/auth/test/cors.spec.ts | 新規 | viewer の origin だけが許可されること | 12 |
 | docs/superpowers/specs/2026-09-09-interfaces-design.md | 変更 | セッションの確認を auth の get-session に直す（`GET /api/session` の記述を取りやめる） | 12 |
+| docs/superpowers/specs/2026-09-09-overall-arch-design.md | 変更 | ドメイン方針に、auth も viewer の origin だけを CORS で許可することを 1 文足す | 12 |
 | packages/mcp/src/tools/get-project-url-tool.ts | 変更 | MCP ツール get_project_url | 13 |
 | packages/mcp/test/features/get-project-url.spec.ts | 変更 | api の `url` を使うこと。`versionId` があれば `?v=` を足すこと | 13 |
 | docs/superpowers/specs/2026-09-09-interfaces-design.md | 変更 | MCP の公開 URL 取得の記述を、api の `url` を使う形に直す（1 行） | 13 |
