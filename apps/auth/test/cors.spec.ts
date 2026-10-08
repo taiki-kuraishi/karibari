@@ -78,6 +78,9 @@ describe("CORS on /api/auth/*", () => {
   });
 
   test("leaves a request without an Origin header untouched", async () => {
+    // Arrange
+    // No Origin header is sent.
+
     // Act
     const response = await getSessionApp.request("/api/auth/get-session");
 
