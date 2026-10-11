@@ -11,3 +11,5 @@
 - middleware は `/api/auth/*` の better-auth の handler より前に置く。preflight（OPTIONS）に答え、better-auth 自身の origin の検査と、auth の画面（同じ origin）・MCP の client（browser でない）の既存の動きを変えない
 - `apps/auth/src/server.ts` の Hono の chain を途中で切らない
 - `docs/superpowers/specs/2026-09-09-interfaces-design.md` には、フェーズ 5 が `GET /api/session` を書いた箇所がある（Viewer の画面の節の未ログインの例外と、Api の節の `GET /api/session` の項目）。viewer は auth の `get-session` を better-auth の client で直接呼ぶ形に変わったので、Api の節の項目は消し、未ログインの確認は auth の `get-session` で行う、auth に viewer の origin の CORS を足す、と書き直す
+- `docs/superpowers/specs/2026-09-09-overall-arch-design.md` の「ドメイン方針」（Api だけが CORS で Viewer の origin を許可する、と書いてある）に、viewer は auth の `get-session` も同じく `credentials: "include"` で呼ぶので、auth も `trustedOrigins` の origin だけを CORS で許可する、という 1 文を足す。ほかの記述は変えない
+- CORS の `allowMethods` は Hono の既定のままにする（api の CORS と同じ。viewer は今は GET だけを呼ぶが、ログアウトを足すときに POST が要るので、今は絞らない）
