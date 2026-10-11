@@ -23,6 +23,6 @@ export const getProject = new Hono<HonoEnv>().get(
       return c.json({ error: "not_found" }, 404);
     }
 
-    return c.json({ project });
+    return c.json({ project, url: `${c.env.VIEWER_ORIGIN}/p/${project.id}` });
   },
 );
