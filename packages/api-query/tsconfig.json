@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    // The api client's app type pulls apps/api sources into this program, so no `rootDir`.
+    // Those sources read `Cloudflare.Env`, which the api worker's generated types declare.
+    "types": ["../../apps/api/worker-configuration.d.ts"]
+  },
+  "include": ["src"]
+}

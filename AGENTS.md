@@ -125,6 +125,7 @@ sibling `CLAUDE.md` containing `@AGENTS.md`, so Claude Code auto-loads it. Keep 
 | Touching | Read first |
 | --- | --- |
 | `.github/**` | `.github/AGENTS.md` |
+| `packages/api-query/**` | `packages/api-query/AGENTS.md` |
 
 `AGENTS.md` files must not use `@import` — only `CLAUDE.md` may use `@`, because the
 directive is not expanded outside Claude Code.

@@ -30,5 +30,6 @@ export default {
     "packages/db-factory": { ignoreDependencies: ["cloudflare"] },
     "packages/db": {},
     "packages/mcp": {},
+    "packages/api-query": {},
   },
 } satisfies KnipConfig;

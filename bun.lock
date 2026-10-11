@@ -115,6 +115,21 @@
         "typescript": "catalog:",
       },
     },
+    "packages/api-query": {
+      "name": "@karibari/api-query",
+      "dependencies": {
+        "@karibari/api": "workspace:*",
+        "hono": "catalog:",
+      },
+      "devDependencies": {
+        "@types/react": "catalog:",
+      },
+      "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "react": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "packages/better-auth": {
       "name": "@karibari/better-auth",
       "dependencies": {
@@ -513,6 +528,8 @@
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.9", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.0.3", "@jridgewell/sourcemap-codec": "^1.4.10" } }, "sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ=="],
 
     "@karibari/api": ["@karibari/api@workspace:apps/api"],
+
+    "@karibari/api-query": ["@karibari/api-query@workspace:packages/api-query"],
 
     "@karibari/auth": ["@karibari/auth@workspace:apps/auth"],
 

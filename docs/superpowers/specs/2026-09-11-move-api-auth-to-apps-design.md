@@ -26,6 +26,7 @@
 - `apps/mcp` は `apps/remote-mcp` に改名した（Worker 名は `karibari-remote-mcp`）。MCP のツールは、新設した source-only の `packages/mcp` に分けた。上の「`mcp` は `packages/` に残さない」は Worker の話で、`packages/mcp` はその Worker ではない
 - `packages/db-factory`（テスト用の meta 用 D1 の行の factory）と `packages/shadcn`（shadcn/ui のコンポーネントとテーマ）を足した
 - viewer は `apps/viewer` に置いたが、`apps/api` には同居させず、`main` の無い静的 assets だけの別 Worker にした。上の「`apps/api` からの `dist` 参照」は行っていない
+- `packages/api-query`（api の REST API を TanStack Query の hooks にして apps に配る、source-only の package）を足した
 
 ## エラー処理
 

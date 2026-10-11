@@ -8,7 +8,7 @@
 - `docs/superpowers/specs/2026-09-09-interfaces-design.md`
 
 ## 言語・モノレポ基盤（合意済み）
-- TypeScript＋bunワークスペース（`apps/api`・`apps/auth`・`apps/remote-mcp`・`apps/viewer`と`packages/better-auth`・`packages/db`・`packages/db-factory`・`packages/mcp`・`packages/shadcn`）＋Vite（viewer・authのSPA用）
+- TypeScript＋bunワークスペース（`apps/api`・`apps/auth`・`apps/remote-mcp`・`apps/viewer`と`packages/better-auth`・`packages/db`・`packages/db-factory`・`packages/mcp`・`packages/shadcn`・`packages/api-query`）＋Vite（viewer・authのSPA用）
 
 ## Api枠組み
 
