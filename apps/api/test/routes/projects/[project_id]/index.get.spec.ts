@@ -14,7 +14,7 @@ describe("GET /api/projects/:project_id", () => {
 
   type Project = FactoryReturn<"projects">;
 
-  projectTest("200: returns the owner's project as-is", async ({ auth }) => {
+  projectTest("200: returns the owner's project as-is and its absolute URL", async ({ auth }) => {
     // Arrange
     const project = await factories.projects
       .props({
@@ -29,11 +29,11 @@ describe("GET /api/projects/:project_id", () => {
         headers: new Headers(auth.headers),
       }),
     );
-    const body = await response.json<{ project: Project }>();
+    const body = await response.json<{ project: Project; url: string }>();
 
     // Assert
     expect(response.status).toBe(200);
-    expect(body).toStrictEqual({ project });
+    expect(body).toStrictEqual({ project, url: `https://karibari.tsar-bmb.org/p/${project.id}` });
   });
 
   projectTest("404: hides a foreign owner's project", async ({ auth }) => {

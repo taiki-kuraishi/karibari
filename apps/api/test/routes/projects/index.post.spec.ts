@@ -48,7 +48,7 @@ describe("POST /api/projects", () => {
 
     // Assert
     expect(response.status).toBe(201);
-    expect(body.url).toBe(`/p/${body.projectId}`);
+    expect(body.url).toBe(`https://karibari.tsar-bmb.org/p/${body.projectId}`);
     expect(project).toStrictEqual({ name: "demo", owner: auth.userId });
     expect(version).toStrictEqual({ project_id: body.projectId });
     expect(await html?.text()).toBe("<p>hi</p>");

@@ -16,7 +16,7 @@ const bodySchema = v.object({
   body: v.pipe(v.string(), v.nonEmpty()),
 });
 
-export const postProjectComments = new Hono<HonoEnv>().post(
+export const postProjectCommentsRoute = new Hono<HonoEnv>().post(
   "",
   validator("param", paramSchema),
   validator("json", bodySchema),

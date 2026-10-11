@@ -12,7 +12,7 @@ const paramSchema = v.object({
   share_id: v.pipe(v.string(), v.nonEmpty()),
 });
 
-export const deleteProjectShare = new Hono<HonoEnv>().delete(
+export const deleteProjectShareRoute = new Hono<HonoEnv>().delete(
   "",
   validator("param", paramSchema),
   async (c) => {

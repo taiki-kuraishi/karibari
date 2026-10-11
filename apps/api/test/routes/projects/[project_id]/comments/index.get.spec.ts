@@ -125,6 +125,62 @@ describe("GET /api/projects/:project_id/comments", () => {
     expect(body).toStrictEqual({ comments: [latest] });
   });
 
+  commentsTest(
+    "200: resolves the last inserted version when ?v is omitted and versions share a created_at",
+    async ({ auth }) => {
+      // Arrange
+      const project = await factories.projects
+        .props({
+          owner: () => auth.userId,
+          name: () => "demo",
+        })
+        .create();
+      // Ids are chosen so that sorting by id would pick the first inserted version.
+      const firstVersion = await factories.versions
+        .props({
+          id: () => "b",
+          project_id: () => project.id,
+          created_at: () => 100,
+        })
+        .create();
+      await factories.comments
+        .props({
+          project_id: () => project.id,
+          version_id: () => firstVersion.id,
+          target: () => "#first",
+          body: () => "first",
+        })
+        .create();
+      const lastVersion = await factories.versions
+        .props({
+          id: () => "a",
+          project_id: () => project.id,
+          created_at: () => 100,
+        })
+        .create();
+      const last = await factories.comments
+        .props({
+          project_id: () => project.id,
+          version_id: () => lastVersion.id,
+          target: () => "#last",
+          body: () => "last",
+        })
+        .create();
+
+      // Act
+      const response = await exports.default.fetch(
+        new Request(`http://api/api/projects/${project.id}/comments`, {
+          headers: new Headers(auth.headers),
+        }),
+      );
+      const body = await response.json<{ comments: Comment[] }>();
+
+      // Assert
+      expect(response.status).toBe(200);
+      expect(body).toStrictEqual({ comments: [last] });
+    },
+  );
+
   commentsTest("404: hides a foreign owner's comments", async ({ auth }) => {
     // Arrange
     const foreign = await factories.projects

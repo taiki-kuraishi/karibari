@@ -9,7 +9,7 @@ const paramSchema = v.object({
   project_id: v.pipe(v.string(), v.nonEmpty()),
 });
 
-export const getProject = new Hono<HonoEnv>().get(
+export const getProjectRoute = new Hono<HonoEnv>().get(
   "",
   validator("param", paramSchema),
   async (c) => {
@@ -23,6 +23,6 @@ export const getProject = new Hono<HonoEnv>().get(
       return c.json({ error: "not_found" }, 404);
     }
 
-    return c.json({ project });
+    return c.json({ project, url: `${c.env.VIEWER_ORIGIN}/p/${project.id}` });
   },
 );
