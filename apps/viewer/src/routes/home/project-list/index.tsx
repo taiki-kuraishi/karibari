@@ -5,9 +5,11 @@ import { useProjectList } from "./hooks/use-project-list";
 
 export function ProjectList() {
   const { items, status } = useProjectList();
+
   if (status === "hidden") {
     return null;
   }
+
   if (status === "empty") {
     return (
       <Empty>

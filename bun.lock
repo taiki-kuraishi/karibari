@@ -95,6 +95,7 @@
       "name": "@karibari/viewer",
       "dependencies": {
         "@karibari/api": "workspace:*",
+        "@karibari/api-query": "workspace:*",
         "@karibari/shadcn": "workspace:*",
         "@tanstack/react-query": "catalog:",
         "@tanstack/react-router": "catalog:",

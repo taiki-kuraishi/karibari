@@ -1,6 +1,6 @@
 import type { Page, Route } from "@playwright/test";
 
-import type { apiClient } from "../../src/lib/api-client";
+import type { apiClient } from "@/lib/api-client";
 
 // `@karibari/api/client` exports no named response types, so read the body type off the endpoint.
 type ResponseBody<Endpoint> = Endpoint extends (
@@ -26,6 +26,7 @@ async function fulfill({
   status?: number;
 }) {
   const { origin } = route.request().headers();
+
   // No `Origin` header means no CORS request (an iframe's navigation, say), so it needs no CORS headers.
   if (origin === undefined) {
     await route.fulfill({ json, status });
