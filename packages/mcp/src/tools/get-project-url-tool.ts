@@ -14,7 +14,7 @@ export class GetProjectUrlTool extends AbstractTool {
   public readonly name = "get_project_url";
   public readonly title = "Get project URL";
   public readonly description =
-    "Get the viewer URL for an owned project. Self-use only: builds /p/:id plus ?v= without invite or signed params.";
+    "Get the absolute viewer URL for an owned project. Self-use only: uses the url from the API, plus ?v= for a version, without invite or signed params.";
   public readonly inputSchema = inputSchema;
 
   private readonly context: McpContext;
@@ -34,6 +34,7 @@ export class GetProjectUrlTool extends AbstractTool {
     if (!projectResponse.ok) {
       throw new Error(`API responded with ${projectResponse.status}`);
     }
+    const projectBody = await projectResponse.json();
     const sharesResponse = await client.api.projects[":project_id"].shares.$get(
       { param: { project_id: args.projectId } },
       { headers },
@@ -42,17 +43,17 @@ export class GetProjectUrlTool extends AbstractTool {
       throw new Error(`API responded with ${sharesResponse.status}`);
     }
     const sharesBody = (await sharesResponse.json()) as { shares: unknown[] };
+    const shareCount = sharesBody.shares.length;
 
-    const url =
-      args.versionId === undefined
-        ? `/p/${args.projectId}`
-        : `/p/${args.projectId}?v=${args.versionId}`;
+    if (args.versionId === undefined) {
+      return JSON.stringify({ projectId: args.projectId, shareCount, url: projectBody.url });
+    }
 
     return JSON.stringify({
       projectId: args.projectId,
-      shareCount: sharesBody.shares.length,
-      url,
-      ...(args.versionId === undefined ? {} : { versionId: args.versionId }),
+      shareCount,
+      url: `${projectBody.url}?v=${args.versionId}`,
+      versionId: args.versionId,
     });
   }
 }
