@@ -10,6 +10,7 @@ describe("get_project_url tool", () => {
   const apiBaseUrl = "http://api";
   const token = "test-token";
   const project = { id: "p1", name: "demo", owner: "user-1" };
+  const viewerUrl = "https://viewer.example/p/p1";
   const shares = [{ id: "s1", kind: "private", project_id: "p1" }];
 
   // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
@@ -31,7 +32,7 @@ describe("get_project_url tool", () => {
     vi.unstubAllGlobals();
   });
 
-  it("builds a version URL from the project and shares state without invite or signed params", async () => {
+  it("appends the version query to the API url without invite or signed params", async () => {
     // Arrange
     const seen: { url: string; authorization: string | null }[] = [];
     vi.stubGlobal(
@@ -44,7 +45,7 @@ describe("get_project_url tool", () => {
         seen.push({ authorization: headers.get("authorization"), url: input });
 
         if (input === "http://api/api/projects/p1") {
-          return Response.json({ project });
+          return Response.json({ project, url: viewerUrl });
         }
 
         return Response.json({ shares });
@@ -68,7 +69,7 @@ describe("get_project_url tool", () => {
         text: JSON.stringify({
           projectId: "p1",
           shareCount: 1,
-          url: "/p/p1?v=v1",
+          url: `${viewerUrl}?v=v1`,
           versionId: "v1",
         }),
         type: "text",
@@ -88,7 +89,7 @@ describe("get_project_url tool", () => {
           return Response.json({ shares: [] });
         }
 
-        return Response.json({ project });
+        return Response.json({ project, url: viewerUrl });
       }),
     );
 
@@ -98,7 +99,7 @@ describe("get_project_url tool", () => {
     // Assert
     expect(res.isError).toBeFalsy();
     expect(res.content).toStrictEqual([
-      { text: JSON.stringify({ projectId: "p1", shareCount: 0, url: "/p/p1" }), type: "text" },
+      { text: JSON.stringify({ projectId: "p1", shareCount: 0, url: viewerUrl }), type: "text" },
     ]);
   });
 

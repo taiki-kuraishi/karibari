@@ -31,6 +31,7 @@
   - 入力：HTML必須＋名前任意
   - 出力：案件id＋初期版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id`。LLMが返したリンクをそのまま開けるため。originはApiの`VIEWER_ORIGIN`）
 - `GET /api/projects/:id`（単体取得、公開範囲判定あり：セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
+  - 出力：`{ project, url }`。`url`は表示URL（絶対URL: `<Viewerのorigin>/p/:id`。originはApiの`VIEWER_ORIGIN`）
 
 ### 公開API versions（合意済み）
 - `GET /api/projects/:id/versions`（版一覧。`versions`の並びで返す）
@@ -73,7 +74,7 @@
 - 編集 → `POST /api/projects/:id/versions`（新version追加、不変版維持）
 - コメント保存 → `POST /api/projects/:id/comments`
 - コメント取得 → `GET /api/projects/:id/comments?v=:vid`
-- 公開URL取得 → `GET /api/projects/:id`＋shares状態から表示用URL（絶対URL: `<Viewerのorigin>/p/:id`＋`?v=`）を組み立て。`?invite=`/`?exp=&sig=`の組み立ては未実装（今はsharesの件数`shareCount`を返すだけ）
+- 公開URL取得 → `GET /api/projects/:id`の`url`（絶対の表示URL）に、versionを指定されたら`?v=`を足す（MCPはViewerのoriginを持たない）。`?invite=`/`?exp=&sig=`の組み立ては未実装（今はsharesの件数`shareCount`を返すだけ）
 - 一覧 → `GET /api/projects`（`list_projects`）
 
 ### 入出力スキーマ（合意済み）
