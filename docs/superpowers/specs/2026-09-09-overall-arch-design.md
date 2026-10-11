@@ -25,7 +25,7 @@
   - apps/remote-mcp（`mcp.karibari.tsar-bmb.org`）: html入稿 / 編集 / コメントのMCP受け口。ツールは`packages/mcp`に分ける
   - apps/auth（`auth.karibari.tsar-bmb.org`）: better-auth（user/session管理）。auth用D1だけを持つ。サインインなどの画面（SPA）をassetsで同居させる。公開範囲の判定を担う`POST /verify-access`は未実装（「公開範囲検証」）
 - MCP Workerは所有者の判定を持たない。アクセストークンを検証してBearerをApiへ転送し、本人確認と所有者の判定はApiが行う
-- ドメイン方針: 4 Workerは別オリジンだが、同じsite（`tsar-bmb.org`）に置く。ViewerのSPAはApiを`credentials: "include"`で呼び、ApiはCORSでViewerのorigin（`VIEWER_ORIGIN`）だけを許可する。セッションのCookieは`karibari.tsar-bmb.org`をdomainにして、各サブドメインで共有する（better-authの`crossSubDomainCookies`）
+- ドメイン方針: 4 Workerは別オリジンだが、同じsite（`tsar-bmb.org`）に置く。ViewerのSPAはApiを`credentials: "include"`で呼び、ApiはCORSでViewerのorigin（`VIEWER_ORIGIN`）だけを許可する。ViewerのSPAはAuthの`get-session`も同じく`credentials: "include"`で呼ぶので、AuthもCORSで`trustedOrigins`のoriginだけを許可する。セッションのCookieは`karibari.tsar-bmb.org`をdomainにして、各サブドメインで共有する（better-authの`crossSubDomainCookies`）
 
 ### D1分担
 - D1を2つに分ける（meta用 / auth用）

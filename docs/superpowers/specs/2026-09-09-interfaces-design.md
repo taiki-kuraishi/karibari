@@ -16,7 +16,7 @@
   - `?v=<versionId>` 任意（なし=`versions`の並びの最後の行。「公開API versions」）
   - `?invite=<token>` 任意
   - `?exp=<unix秒>&sig=<hmac>` 任意（署名付き）
-- `401/403/404` → 同一404画面（区別しない）。例外はセッションが無いとき（未ログイン）で、`/`と`/p/:projectId`のどちらでもAuthのサインイン（`<authのorigin>/sign-in?callbackURL=<encodeURIComponent(今のページのURL)>`）へ移動し、サインインの後は開いたURLへ戻る。セッションの有無は`GET /api/session`で確かめる。セッションが無いことはprojectの有無と関係ないので、存在は漏れない
+- `401/403/404` → 同一404画面（区別しない）。例外はセッションが無いとき（未ログイン）で、`/`と`/p/:projectId`のどちらでもAuthのサインイン（`<authのorigin>/sign-in?callbackURL=<encodeURIComponent(今のページのURL)>`）へ移動し、サインインの後は開いたURLへ戻る。セッションの有無はAuthの`GET /api/auth/get-session`で確かめる（Viewerがbetter-authのclientで直接呼ぶ。Authの「信頼オリジン」参照）。セッションが無いことはprojectの有無と関係ないので、存在は漏れない
 - セッション・招待・署名の併用時は、いずれか一つでも有効なら表示（OR判定）
 
 ## Api
@@ -24,11 +24,6 @@
 ### 公開APIの資源分割（合意済み）
 - `projects` / `versions` / `comments` / `shares` を別URLの資源に分ける
 - R2取得（HTML実体）はApi経由のみ（R2直接公開なし）
-- 資源とは別に、Viewerが未ログインを判定するための`GET /api/session`を持つ
-  - 認証：必須（Cookieのセッションか Bearer。判定は他のAPIと同じ認証のmiddleware）
-  - 入力：なし
-  - 出力：200 `{ userId }`（auth用D1の`user.id`）／404 セッションが無い
-  - Viewerからauthのget-sessionを直接呼ばないのは、Authにviewer向けのCORSが要り、確かめたいのが「Apiが受け付けるか」だから
 
 ### 公開API projects（合意済み）
 - `GET /api/projects`（自分の案件一覧、要セッション）
@@ -107,6 +102,8 @@
 
 ### 信頼オリジン（合意済み）
 - Authの信頼オリジンはViewerの`https://karibari.tsar-bmb.org`だけ（`packages/better-auth/src/auth.ts`の`trustedOrigins`）
+- ViewerはAuthの`GET /api/auth/get-session`をbetter-authのclientでCookie付きで直接呼び、未ログインかどうかを確かめる
+- そのためAuthの`/api/auth/*`に、`trustedOrigins`のoriginだけを許可するCORSを足した（credentials付き。`apps/auth/src/middlewares/cors.ts`）
 
 ### 標準エンドポイント（合意済み）
 - better-authの標準エンドポイントは既定のまま。標準のほかに、`GET /api/callback-url`（サインイン後の戻り先の検証）と`/.well-known/oauth-authorization-server/api/auth`がある（`POST /verify-access`は未実装）
