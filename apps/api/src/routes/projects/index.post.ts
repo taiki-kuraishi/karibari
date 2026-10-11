@@ -23,7 +23,7 @@ const bodySchema = v.object({
 });
 // oxlint-enable unicorn/max-nested-calls
 
-export const postProjects = new Hono<HonoEnv>().post(
+export const postProjectsRoute = new Hono<HonoEnv>().post(
   "",
   validator("json", bodySchema),
   async (c) => {

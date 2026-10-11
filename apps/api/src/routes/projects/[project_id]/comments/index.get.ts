@@ -13,7 +13,7 @@ const querySchema = v.object({
   v: v.optional(v.string()),
 });
 
-export const getProjectComments = new Hono<HonoEnv>().get(
+export const getProjectCommentsRoute = new Hono<HonoEnv>().get(
   "",
   validator("param", paramSchema),
   validator("query", querySchema),
