@@ -9,6 +9,7 @@ export function useProjectsQuery() {
   return useSuspenseQuery({
     queryFn: async () => {
       const res = await client.api.projects.$get();
+
       if (res.status === 404) {
         return null;
       }
