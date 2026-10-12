@@ -9,6 +9,14 @@ type ResponseBody<Endpoint> = Endpoint extends (
   ? Body
   : never;
 type ProjectRow = ResponseBody<typeof apiClient.api.projects.$get>["projects"][number];
+type ProjectBody = Extract<
+  ResponseBody<(typeof apiClient.api.projects)[":project_id"]["$get"]>,
+  { project: unknown }
+>;
+type VersionRow = Extract<
+  ResponseBody<(typeof apiClient.api.projects)[":project_id"]["versions"]["$get"]>,
+  { versions: unknown }
+>["versions"][number];
 
 // Must equal `VITE_API_ORIGIN` in `apps/viewer/.env`: the bundle under test calls this origin.
 const apiOrigin = "https://api.karibari.tsar-bmb.org";
@@ -43,7 +51,21 @@ async function fulfill({
   });
 }
 
-export async function stubApi({ page, projects = [] }: { page: Page; projects?: ProjectRow[] }) {
+// `project` and `versions` are served for any project id, and `content` for any version id: one project per test.
+// Leaving `project` out leaves GET /api/projects/:project_id on the catch-all 404.
+export async function stubApi({
+  content = "",
+  page,
+  project,
+  projects = [],
+  versions = [],
+}: {
+  content?: string;
+  page: Page;
+  project?: ProjectBody;
+  projects?: ProjectRow[];
+  versions?: VersionRow[];
+}) {
   // Playwright runs the most recently registered matching route first, so this catch-all goes first and the stubs below override it.
   // Whatever no stub claims must still never reach a real Worker.
   await page.route(
@@ -54,5 +76,19 @@ export async function stubApi({ page, projects = [] }: { page: Page; projects?: 
   );
   await page.route(`${apiOrigin}/api/projects`, async (route) => {
     await fulfill({ json: { projects }, route });
+  });
+
+  if (project === undefined) {
+    return;
+  }
+
+  await page.route(/\/api\/projects\/[^/]+$/, async (route) => {
+    await fulfill({ json: project, route });
+  });
+  await page.route(/\/api\/projects\/[^/]+\/versions$/, async (route) => {
+    await fulfill({ json: { versions }, route });
+  });
+  await page.route(/\/api\/projects\/[^/]+\/versions\/[^/]+\/content$/, async (route) => {
+    await route.fulfill({ body: content, contentType: "text/html" });
   });
 }
