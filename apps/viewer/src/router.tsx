@@ -3,17 +3,23 @@ import { Outlet, createRootRoute, createRoute, createRouter } from "@tanstack/re
 import { NotFoundPage } from "./components/not-found";
 import { HomePage } from "./routes/home";
 import { ProjectPage } from "./routes/project";
+import { SessionGate } from "./routes/session-gate";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
 });
-const homeRoute = createRoute({
+const sessionGateRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: "session-gate",
+  component: SessionGate,
+});
+const homeRoute = createRoute({
+  getParentRoute: () => sessionGateRoute,
   path: "/",
   component: HomePage,
 });
 const projectRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => sessionGateRoute,
   path: "/p/$projectId",
   component: ProjectPage,
   notFoundComponent: NotFoundPage,
@@ -23,7 +29,10 @@ const notFoundRoute = createRoute({
   path: "$",
   component: NotFoundPage,
 });
-const routeTree = rootRoute.addChildren([homeRoute, projectRoute, notFoundRoute]);
+const routeTree = rootRoute.addChildren([
+  sessionGateRoute.addChildren([homeRoute, projectRoute]),
+  notFoundRoute,
+]);
 
 export const router = createRouter({ routeTree });
 

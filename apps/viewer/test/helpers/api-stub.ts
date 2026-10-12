@@ -58,12 +58,15 @@ export async function stubApi({
   page,
   project,
   projects = [],
+  session = true,
   versions = [],
 }: {
   content?: string;
   page: Page;
   project?: ProjectBody;
   projects?: ProjectRow[];
+  // GET /api/auth/get-session answers `null` when there is no session.
+  session?: boolean;
   versions?: VersionRow[];
 }) {
   // Playwright runs the most recently registered matching route first, so this catch-all goes first and the stubs below override it.
@@ -74,6 +77,15 @@ export async function stubApi({
       await fulfill({ json: { error: "not_found" }, route, status: 404 });
     },
   );
+  await page.route(`${authOrigin}/api/auth/get-session`, async (route) => {
+    await fulfill({
+      json: session ? { session: { id: "session-1" }, user: { id: "user-1" } } : null,
+      route,
+    });
+  });
+  await page.route(`${authOrigin}/sign-in*`, async (route) => {
+    await route.fulfill({ body: "", contentType: "text/html" });
+  });
   await page.route(`${apiOrigin}/api/projects`, async (route) => {
     await fulfill({ json: { projects }, route });
   });
