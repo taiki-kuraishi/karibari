@@ -99,6 +99,7 @@
         "@karibari/shadcn": "workspace:*",
         "@tanstack/react-query": "catalog:",
         "@tanstack/react-router": "catalog:",
+        "better-auth": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
       },

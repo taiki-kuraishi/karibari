@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { ProjectView } from "./project/project-view";
 
-const route = getRouteApi("/p/$projectId");
+const route = getRouteApi("/session-gate/p/$projectId");
 
 export function ProjectPage() {
   const { projectId } = route.useParams();
