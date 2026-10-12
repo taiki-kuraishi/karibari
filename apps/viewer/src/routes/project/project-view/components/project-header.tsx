@@ -1,12 +1,37 @@
+import { NativeSelect, NativeSelectOption } from "@karibari/shadcn/components/native-select";
 import { Link } from "@tanstack/react-router";
 
-export function ProjectHeader({ displayName }: { displayName: string }) {
+export function ProjectHeader({
+  displayName,
+  onSelect,
+  options,
+  versionId,
+}: {
+  displayName: string;
+  onSelect: (versionId: string) => void;
+  options: { id: string }[];
+  versionId: string;
+}) {
   return (
     <header className="flex items-center gap-4 border-b px-4 py-2">
       <Link className="text-muted-foreground text-sm hover:underline" to="/">
         ホーム
       </Link>
       <h1 className="font-semibold">{displayName}</h1>
+      <NativeSelect
+        aria-label="version"
+        className="ml-auto"
+        onChange={(event) => {
+          onSelect(event.target.value);
+        }}
+        value={versionId}
+      >
+        {options.map(({ id }) => (
+          <NativeSelectOption key={id} value={id}>
+            {id}
+          </NativeSelectOption>
+        ))}
+      </NativeSelect>
     </header>
   );
 }
