@@ -1,4 +1,5 @@
 import { Outlet, createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 
 import { NotFoundPage } from "./components/not-found";
 import { HomePage } from "./routes/home";
@@ -6,7 +7,11 @@ import { ProjectPage } from "./routes/project";
 import { SessionGate } from "./routes/session-gate";
 
 const rootRoute = createRootRoute({
-  component: () => <Outlet />,
+  component: () => (
+    <NuqsAdapter>
+      <Outlet />
+    </NuqsAdapter>
+  ),
 });
 const sessionGateRoute = createRoute({
   getParentRoute: () => rootRoute,
