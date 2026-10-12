@@ -66,6 +66,7 @@
 - MCPは利用者のOAuthアクセストークンを`Authorization: Bearer`でApiに転送する
 - Apiが本人確認を自分で行う（`apps/api/src/middlewares/auth.ts`）。Bearerはauthのjwksと`aud`で検証し、Cookieはauthのget-sessionに問い合わせる。所有者の判定もApiが行う（各routeで`projects.owner`と比較）。招待・署名付きURLの判定は未実装
 - 転送維持の条件：Authはaudにapiを含むトークンを発行し、Api側でもaud検証する（confused deputy回避）
+- 現状の例外：Apiは`aud`がMCPのresource（`mcpAudience`）だけのtokenも受け入れる（MCP clientはApiのresourceを要求できず、remote-mcpが同じtokenを中継するため）。共有機能の前にtoken exchange（RFC 8693）へ移し、MCPのaudienceを外す
 
 ## MCP
 
