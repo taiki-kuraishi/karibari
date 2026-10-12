@@ -1,4 +1,4 @@
-export { apiAudience, config, createBetterAuth } from "./auth";
+export { apiAudience, config, createBetterAuth, mcpAudience } from "./auth";
 export { createAuthDatabase } from "./database";
 export type { AuthConfig, BetterAuth } from "./auth";
 export * as authSchema from "./auth-schema";

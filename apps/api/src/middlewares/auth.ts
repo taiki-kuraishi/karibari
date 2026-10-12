@@ -1,7 +1,7 @@
 import type { MiddlewareHandler } from "hono";
 
 import { oauthProviderResourceClient } from "@better-auth/oauth-provider/resource-client";
-import { apiAudience } from "@karibari/better-auth";
+import { apiAudience, mcpAudience } from "@karibari/better-auth";
 import { Result } from "better-result";
 
 import type { HonoEnv } from "../server";
@@ -16,7 +16,14 @@ export const authMiddleware: MiddlewareHandler<HonoEnv> = async (c, next) => {
         await oauthProviderResourceClient()
           .getActions()
           .verifyBearerToken(authorization.slice("Bearer ".length), {
-            verifyOptions: { audience: apiAudience, issuer: c.env.AUTH_BASE_URL },
+            // MCP clients request only the MCP resource (RFC 8707) and remote-mcp relays that
+            // Same token here, so MCP-only tokens must pass. Accepted knowingly: this is a
+            // Single-user deployment, so the confused-deputy risk is tolerated. Planned: move
+            // To token exchange (RFC 8693) and drop the MCP audience.
+            verifyOptions: {
+              audience: [apiAudience, mcpAudience],
+              issuer: c.env.AUTH_BASE_URL,
+            },
             jwksUrl: `${c.env.AUTH_BASE_URL}/jwks`,
           }),
       catch: (cause) => new AuthUnavailableError({ cause, message: "Bearer verification failed" }),
