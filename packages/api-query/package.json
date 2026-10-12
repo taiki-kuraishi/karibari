@@ -11,10 +11,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@karibari/api": "workspace:*",
     "hono": "catalog:"
   },
   "devDependencies": {
+    "@karibari/api": "workspace:*",
     "@types/react": "catalog:"
   },
   "peerDependencies": {
