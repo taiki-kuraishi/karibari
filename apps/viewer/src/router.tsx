@@ -2,6 +2,7 @@ import { Outlet, createRootRoute, createRoute, createRouter } from "@tanstack/re
 
 import { NotFoundPage } from "./components/not-found";
 import { HomePage } from "./routes/home";
+import { ProjectPage } from "./routes/project";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -11,12 +12,18 @@ const homeRoute = createRoute({
   path: "/",
   component: HomePage,
 });
+const projectRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/p/$projectId",
+  component: ProjectPage,
+  notFoundComponent: NotFoundPage,
+});
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "$",
   component: NotFoundPage,
 });
-const routeTree = rootRoute.addChildren([homeRoute, notFoundRoute]);
+const routeTree = rootRoute.addChildren([homeRoute, projectRoute, notFoundRoute]);
 
 export const router = createRouter({ routeTree });
 
