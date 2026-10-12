@@ -5,6 +5,7 @@ import { jwt } from "better-auth/plugins";
 import type { createAuthDatabase } from "./database";
 
 export const apiAudience = "https://api.karibari.tsar-bmb.org/api";
+export const mcpAudience = "https://mcp.karibari.tsar-bmb.org/mcp";
 
 export const config = {
   basePath: "",
@@ -26,11 +27,11 @@ export const config = {
       // Provisional resource identifier until the production MCP URL is fixed.
       // Both resources are linked to every dynamically registered client so one
       // Token can carry both audiences (MCP ingress + API verification).
-      clientRegistrationDefaultResources: ["https://mcp.karibari.tsar-bmb.org/mcp", apiAudience],
+      clientRegistrationDefaultResources: [mcpAudience, apiAudience],
       consentPage: "/consent",
       loginPage: "/sign-in",
-      // The API verifies this audience on Bearer tokens (confused deputy avoidance).
-      resources: ["https://mcp.karibari.tsar-bmb.org/mcp", apiAudience],
+      // The API accepts both audiences on Bearer tokens (see apps/api auth middleware).
+      resources: [mcpAudience, apiAudience],
     }),
   ],
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },

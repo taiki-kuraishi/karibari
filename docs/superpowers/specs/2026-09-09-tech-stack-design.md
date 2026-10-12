@@ -40,6 +40,7 @@
 
 ### トークン方針（合意済み）
 - Bearer転送維持＋audience検証（Authはaudにapiを含むトークンを発行、Api側でもaud検証。confused deputy回避の条件）
+- 現状の例外：Apiは`aud`がMCPのresourceだけのtokenも受け入れる（MCP clientはApiのresourceを要求できず、remote-mcpが同じtokenを中継するため）。共有機能の前にtoken exchange（RFC 8693）へ移し、MCPのaudienceを外す
 
 ## テスト
 

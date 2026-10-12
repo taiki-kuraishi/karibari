@@ -1,6 +1,6 @@
 import type { FactoryReturn } from "@karibari/db-factory";
 
-import { apiAudience } from "@karibari/better-auth";
+import { apiAudience, mcpAudience } from "@karibari/better-auth";
 import { createMetaDb } from "@karibari/db";
 import { createFactories } from "@karibari/db-factory";
 import { env } from "cloudflare:workers";
@@ -194,16 +194,39 @@ describe("authMiddleware", () => {
       expect(body).toStrictEqual({ projects: [project] });
     });
 
-    test("404: rejects a token issued for another audience", async () => {
+    test("200: accepts a token issued only for the mcp audience", async () => {
       // Arrange
       stubAuthFetch();
-      const headers = await createBearerHeaders({
-        audience: "https://mcp.karibari.tsar-bmb.org/mcp",
-        userId: crypto.randomUUID(),
-      });
+      const userId = crypto.randomUUID();
+      const headers = await createBearerHeaders({ audience: mcpAudience, userId });
+      const project = await factories.projects
+        .props({
+          owner: () => userId,
+          name: () => "mcp",
+        })
+        .create();
 
       // Act
       const response = await requestProjects(headers);
+      const body = await response.json<{ projects: Project[] }>();
+
+      // Assert
+      expect(response.status).toBe(200);
+      expect(body).toStrictEqual({ projects: [project] });
+    });
+
+    test("404: rejects a token issued for another audience", async () => {
+      // Arrange
+      stubJwksFetch();
+      const token = await mintBearer({
+        iss: env.AUTH_BASE_URL,
+        aud: "https://example.com/other",
+        sub: crypto.randomUUID(),
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      });
+
+      // Act
+      const response = await requestProjects(bearerHeaders(token));
       const body = await response.json();
 
       // Assert
