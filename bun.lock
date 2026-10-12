@@ -119,10 +119,10 @@
     "packages/api-query": {
       "name": "@karibari/api-query",
       "dependencies": {
-        "@karibari/api": "workspace:*",
         "hono": "catalog:",
       },
       "devDependencies": {
+        "@karibari/api": "workspace:*",
         "@types/react": "catalog:",
       },
       "peerDependencies": {
