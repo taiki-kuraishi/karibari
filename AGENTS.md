@@ -118,17 +118,19 @@ them. Other harnesses (pi, Codex, ...) must open all three by hand:
 
 ## Directory rules
 
-Read a directory's `AGENTS.md` before editing anything under it. Every `AGENTS.md` has a
-sibling `CLAUDE.md` containing `@AGENTS.md`, so Claude Code auto-loads it. Keep this table
-1:1 with the `AGENTS.md` files that exist.
+Read a directory's `AGENTS.md` before editing anything under it. Claude Code (v2.1.277 or
+later; checked 2026-10) reads each `AGENTS.md` directly; a subdirectory's file is loaded when Claude Code
+opens a file there. Other harnesses (pi, Codex, ...) must open it by hand. Do not add a
+`CLAUDE.md` next to an `AGENTS.md`: Claude Code would stop reading the `AGENTS.md` from
+that directory down. Keep this table 1:1 with the `AGENTS.md` files that exist.
 
 | Touching | Read first |
 | --- | --- |
 | `.github/**` | `.github/AGENTS.md` |
 | `packages/api-query/**` | `packages/api-query/AGENTS.md` |
 
-`AGENTS.md` files must not use `@import` — only `CLAUDE.md` may use `@`, because the
-directive is not expanded outside Claude Code.
+`AGENTS.md` files must not use `@import` — harnesses other than Claude Code do not expand
+the directive.
 
 ## After changing code
 
