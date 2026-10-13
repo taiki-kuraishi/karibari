@@ -1,4 +1,4 @@
-import { config, createAuthDatabase } from "@karibari/better-auth";
+import { apiAudience, config, createAuthDatabase, mcpAudience } from "@karibari/better-auth";
 import { betterAuth } from "better-auth";
 import { testUtils } from "better-auth/plugins";
 import * as v from "valibot";
@@ -98,6 +98,7 @@ export class TestBetterAuthDatabase {
         redirect_uris: [REDIRECT_URI],
         token_endpoint_auth_method: "none",
         grant_types: ["authorization_code"],
+        resources: [mcpAudience, apiAudience],
       }),
       "application/json",
     );

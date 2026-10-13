@@ -18,9 +18,10 @@ function createPlugins(tokenExchangeClientIds: readonly string[]) {
       allowDynamicClientRegistration: true,
       allowUnauthenticatedClientRegistration: true,
       // Provisional resource identifier until the production MCP URL is fixed.
-      // Both resources are linked to every dynamically registered client: the MCP
-      // Audience for ingress tokens, the API audience as the token-exchange target.
-      clientRegistrationDefaultResources: [mcpAudience, apiAudience],
+      // When re-registering the remote-mcp client via DCR, list both mcp and api in the
+      // Registration body's `resources`: without the api link it cannot use token exchange.
+      clientRegistrationAllowedResources: [apiAudience],
+      clientRegistrationDefaultResources: [mcpAudience],
       consentPage: "/consent",
       loginPage: "/sign-in",
       // A client holding an MCP-audience token reaches the API by exchanging it for an

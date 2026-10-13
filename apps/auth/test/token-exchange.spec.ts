@@ -44,7 +44,12 @@ const post = async (path: string, body: BodyInit, headers: Record<string, string
 const registerClient = async (body: Record<string, unknown>) => {
   const response = await post(
     "/oauth2/register",
-    JSON.stringify({ application_type: "native", redirect_uris: [redirectUri], ...body }),
+    JSON.stringify({
+      application_type: "native",
+      redirect_uris: [redirectUri],
+      resources: [mcpAudience, apiAudience],
+      ...body,
+    }),
     { "content-type": "application/json" },
   );
   const json = v.parse(clientSchema, await response.json());

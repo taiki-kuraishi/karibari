@@ -194,25 +194,21 @@ describe("authMiddleware", () => {
       expect(body).toStrictEqual({ projects: [project] });
     });
 
-    test("200: accepts a token issued only for the mcp audience", async () => {
+    test("404: rejects a token issued only for the mcp audience", async () => {
       // Arrange
       stubAuthFetch();
-      const userId = crypto.randomUUID();
-      const headers = await createBearerHeaders({ audience: mcpAudience, userId });
-      const project = await factories.projects
-        .props({
-          owner: () => userId,
-          name: () => "mcp",
-        })
-        .create();
+      const headers = await createBearerHeaders({
+        audience: mcpAudience,
+        userId: crypto.randomUUID(),
+      });
 
       // Act
       const response = await requestProjects(headers);
-      const body = await response.json<{ projects: Project[] }>();
+      const body = await response.json();
 
       // Assert
-      expect(response.status).toBe(200);
-      expect(body).toStrictEqual({ projects: [project] });
+      expect(response.status).toBe(404);
+      expect(body).toStrictEqual({ error: "not_found" });
     });
 
     test("404: rejects a token issued for another audience", async () => {
