@@ -7,7 +7,18 @@
   // Declared empty on purpose: `wrangler types` then stops inferring secrets from
   // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
   "secrets": { "required": [] },
-  "vars": { "API_BASE_URL": "https://api.karibari.tsar-bmb.org" },
+  "vars": {
+    "API_BASE_URL": "https://api.karibari.tsar-bmb.org",
+    "AUTH_TOKEN_URL": "https://auth.karibari.tsar-bmb.org/api/auth/oauth2/token",
+    "MCP_CLIENT_ID": "NLCotKeGOtpehePjHKlVgoCMiKrTRGar",
+  },
+  "secrets_store_secrets": [
+    {
+      "binding": "MCP_CLIENT_SECRET",
+      "store_id": "9a2d7bd458234f29b84bff50f66669d0",
+      "secret_name": "karibari-remote-mcp-client-secret",
+    },
+  ],
   "routes": [{ "pattern": "mcp.karibari.tsar-bmb.org", "custom_domain": true }],
   "kv_namespaces": [
     {

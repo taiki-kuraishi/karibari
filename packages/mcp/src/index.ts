@@ -14,7 +14,6 @@ import {
 } from "./tools";
 
 export type { McpContext } from "./mcp-context";
-export { toMcpContext } from "./mcp-context";
 
 export const createMcpServer = (context: McpContext): McpServer => {
   const server = new McpServer(

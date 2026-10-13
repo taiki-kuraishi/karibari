@@ -5,5 +5,5 @@ import { defineConfig } from "vitest/config";
 // There is no separate test config, so the test bundle matches the deploy bundle.
 export default defineConfig({
   plugins: [cloudflareTest({ wrangler: { configPath: "./wrangler.jsonc" } })],
-  test: { testTimeout: 30_000, silent: "passed-only" },
+  test: { setupFiles: ["./test/seed-secrets.ts"], testTimeout: 30_000, silent: "passed-only" },
 });

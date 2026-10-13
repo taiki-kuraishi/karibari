@@ -79,6 +79,7 @@
         "@karibari/mcp": "workspace:*",
         "@modelcontextprotocol/sdk": "catalog:",
         "better-auth": "catalog:",
+        "better-result": "catalog:",
         "hono": "catalog:",
         "zod": "catalog:",
       },
