@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { parseResponse } from "hono/client";
 
 import { useApi } from "../use-api";
@@ -6,7 +6,7 @@ import { useApi } from "../use-api";
 export function useVersionsQuery(projectId: string) {
   const client = useApi();
 
-  return useSuspenseQuery({
+  return useQuery({
     queryFn: async () => {
       const res = await client.api.projects[":project_id"].versions.$get({
         param: { project_id: projectId },

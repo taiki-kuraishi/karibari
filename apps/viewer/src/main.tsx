@@ -8,7 +8,11 @@ import "./styles.css";
 import { apiClient } from "./lib/api-client";
 import { router } from "./router";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { throwOnError: (_error, query) => query.state.data === undefined },
+  },
+});
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {

@@ -10,6 +10,10 @@ export function useProjectView(projectId: string) {
   const { data: versionsData } = useVersionsQuery(projectId);
   const [{ v }, setParams] = useQueryStates(projectParams);
 
+  if (projectData === undefined || versionsData === undefined) {
+    return { status: "loading" } as const;
+  }
+
   // Thrown at render, not in a `queryFn`, where react-query would retry it.
   if (projectData === null || versionsData === null) {
     throw notFound();
@@ -29,6 +33,7 @@ export function useProjectView(projectId: string) {
     displayName: projectData.project.name ?? "無題",
     options,
     select: async (id: string) => setParams({ v: id }),
+    status: "ready",
     versionId,
-  };
+  } as const;
 }
