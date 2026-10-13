@@ -44,7 +44,11 @@ const post = async (path: string, body: BodyInit, headers: Record<string, string
 const registerClient = async (body: Record<string, unknown>) => {
   const response = await post(
     "/oauth2/register",
-    JSON.stringify({ application_type: "native", redirect_uris: [redirectUri], ...body }),
+    JSON.stringify({
+      application_type: "native",
+      redirect_uris: [redirectUri],
+      ...body,
+    }),
     { "content-type": "application/json" },
   );
   const json = v.parse(clientSchema, await response.json());
@@ -52,8 +56,20 @@ const registerClient = async (body: Record<string, unknown>) => {
   return { clientId: json.client_id, clientSecret: json.client_secret };
 };
 
-const registerExchangeClient = async (grantTypes: string[] = [tokenExchangeGrantType]) =>
-  registerClient({ token_endpoint_auth_method: "client_secret_basic", grant_types: grantTypes });
+// DCR never links a client to the api audience, so the link token exchange needs goes in directly.
+const registerExchangeClient = async (grantTypes: string[] = [tokenExchangeGrantType]) => {
+  const client = await registerClient({
+    token_endpoint_auth_method: "client_secret_basic",
+    grant_types: grantTypes,
+  });
+  const context = await testAuth.$context;
+  await context.adapter.create({
+    model: "oauthClientResource",
+    data: { clientId: client.clientId, resourceId: apiAudience, createdAt: new Date() },
+  });
+
+  return client;
+};
 
 const claimsSchema = v.object({ aud: v.unknown(), scope: v.string(), sub: v.string() });
 const tokenResponseSchema = v.looseObject({
@@ -214,6 +230,22 @@ describe("token exchange grant", () => {
     // Assert
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({ error: "invalid_request" });
+  });
+
+  test("400 invalid_target: rejects a registration that requests the api resource", async () => {
+    // Arrange
+    const body = JSON.stringify({
+      application_type: "native",
+      redirect_uris: [redirectUri],
+      resources: [apiAudience],
+    });
+
+    // Act
+    const response = await post("/oauth2/register", body, { "content-type": "application/json" });
+
+    // Assert
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ error: "invalid_target" });
   });
 
   test("400 invalid_request: subject_token_type other than access_token", async () => {
