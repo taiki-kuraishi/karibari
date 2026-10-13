@@ -1,3 +1,4 @@
+export { tokenExchangeGrantType } from "./token-exchange";
 export { apiAudience, config, createBetterAuth, mcpAudience } from "./auth";
 export { createAuthDatabase } from "./database";
 export type { AuthConfig, BetterAuth } from "./auth";

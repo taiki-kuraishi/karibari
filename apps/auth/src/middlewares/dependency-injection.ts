@@ -16,6 +16,9 @@ export const injectDependenciesMiddleware: MiddlewareHandler<HonoEnv> = async (c
     basePath: "/api/auth",
     baseURL: c.env.BETTER_AUTH_URL,
     database: createAuthDatabase(c.env.DB),
+    tokenExchangeClientIds: c.env.TOKEN_EXCHANGE_CLIENT_IDS.split(",")
+      .map((id) => id.trim())
+      .filter((id) => id !== ""),
     secret: await c.env.BETTER_AUTH_SECRET.get(),
     // GitHub OAuth credentials come from Secrets Store (see wrangler.jsonc).
     socialProviders: {

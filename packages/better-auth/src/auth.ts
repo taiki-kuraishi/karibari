@@ -4,8 +4,38 @@ import { jwt } from "better-auth/plugins";
 
 import type { createAuthDatabase } from "./database";
 
+import { createTokenExchangeExtension } from "./token-exchange";
+
 export const apiAudience = "https://api.karibari.tsar-bmb.org/api";
 export const mcpAudience = "https://mcp.karibari.tsar-bmb.org/mcp";
+
+// `config` passes no client, so token exchange refuses everyone until the worker injects
+// `TOKEN_EXCHANGE_CLIENT_IDS` through `createBetterAuth`.
+function createPlugins(tokenExchangeClientIds: readonly string[]) {
+  return [
+    jwt(),
+    oauthProvider({
+      allowDynamicClientRegistration: true,
+      allowUnauthenticatedClientRegistration: true,
+      // Provisional resource identifier until the production MCP URL is fixed.
+      // Both resources are linked to every dynamically registered client: the MCP
+      // Audience for ingress tokens, the API audience as the token-exchange target.
+      clientRegistrationDefaultResources: [mcpAudience, apiAudience],
+      consentPage: "/consent",
+      loginPage: "/sign-in",
+      // A client holding an MCP-audience token reaches the API by exchanging it for an
+      // API-audience token (RFC 8693, see token-exchange.ts).
+      resources: [mcpAudience, apiAudience],
+      extensions: [
+        createTokenExchangeExtension({
+          allowedClientIds: tokenExchangeClientIds,
+          sourceAudience: mcpAudience,
+          targetAudience: apiAudience,
+        }),
+      ],
+    }),
+  ];
+}
 
 export const config = {
   basePath: "",
@@ -19,21 +49,7 @@ export const config = {
     // Real credentials come from the worker env. Empty here on purpose.
     github: { clientId: "", clientSecret: "" },
   },
-  plugins: [
-    jwt(),
-    oauthProvider({
-      allowDynamicClientRegistration: true,
-      allowUnauthenticatedClientRegistration: true,
-      // Provisional resource identifier until the production MCP URL is fixed.
-      // Both resources are linked to every dynamically registered client so one
-      // Token can carry both audiences (MCP ingress + API verification).
-      clientRegistrationDefaultResources: [mcpAudience, apiAudience],
-      consentPage: "/consent",
-      loginPage: "/sign-in",
-      // The API accepts both audiences on Bearer tokens (see apps/api auth middleware).
-      resources: [mcpAudience, apiAudience],
-    }),
-  ],
+  plugins: createPlugins([]),
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
   advanced: {
     crossSubDomainCookies: { enabled: true, domain: "karibari.tsar-bmb.org" },
@@ -51,9 +67,14 @@ export default betterAuth(config);
 
 // `database` is required: the worker always injects D1 here (base holds none for CLI use).
 export function createBetterAuth(
-  override: Partial<AuthConfig> & { database: ReturnType<typeof createAuthDatabase> },
+  override: Partial<AuthConfig> & {
+    database: ReturnType<typeof createAuthDatabase>;
+    tokenExchangeClientIds: readonly string[];
+  },
 ) {
-  return betterAuth({ ...config, ...override });
+  const { tokenExchangeClientIds, ...rest } = override;
+
+  return betterAuth({ ...config, plugins: createPlugins(tokenExchangeClientIds), ...rest });
 }
 
 export type BetterAuth = ReturnType<typeof createBetterAuth>;
