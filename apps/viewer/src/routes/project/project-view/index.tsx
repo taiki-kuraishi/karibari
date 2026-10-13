@@ -3,17 +3,21 @@ import { ProjectHeader } from "./components/project-header";
 import { useProjectView } from "./hooks/use-project-view";
 
 export function ProjectView({ projectId }: { projectId: string }) {
-  const { contentUrl, displayName, options, select, versionId } = useProjectView(projectId);
+  const view = useProjectView(projectId);
+
+  if (view.status === "loading") {
+    return <p className="p-6 text-muted-foreground text-sm">読み込み中…</p>;
+  }
 
   return (
     <main className="flex h-svh flex-col">
       <ProjectHeader
-        displayName={displayName}
-        onSelect={select}
-        options={options}
-        versionId={versionId}
+        displayName={view.displayName}
+        onSelect={view.select}
+        options={view.options}
+        versionId={view.versionId}
       />
-      <HtmlFrame contentUrl={contentUrl} title={displayName} />
+      <HtmlFrame contentUrl={view.contentUrl} title={view.displayName} />
     </main>
   );
 }

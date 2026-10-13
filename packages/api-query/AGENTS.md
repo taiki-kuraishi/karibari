@@ -21,14 +21,17 @@ It is source-only: `exports` point at `./src`, apps consume it as source, and no
 
 - 1 route = 1 file. Name a list route in the plural and a one-item route in the singular
   (`use-projects-query.ts`, `use-project-query.ts`).
-- Never hand-write a type. `data` is the route's 200 body (what `InferResponseType<…, 200>` gives)
-  or `null`, inferred through `parseResponse`; a hook's return type stays inferred.
+- Never hand-write a type. `data` is the route's 200 body (what `InferResponseType<…, 200>` gives),
+  `null` (404) or `undefined` (loading), inferred through `parseResponse`; a hook's return type
+  stays inferred.
 - `queryFn` returns `null` on 404 and throws on any other non-2xx through hono's `parseResponse`
   (a `DetailedError`, re-exported from `index.ts` for the apps). The api answers "missing",
   "not yours" and "signed out" with the same 404, so the hook reports it as a result. A hook
   returns the response as it arrives; retry, mapping and formatting belong to the app.
-- A hook that reads a screen's main data calls `useSuspenseQuery`; the app expresses the wait
-  with Suspense.
+- A hook that reads a screen's main data calls `useQuery`; `data === undefined` means loading, and
+  the app's view hook turns that into its own `status`. A failure with no data reaches the app's
+  Error Boundary through its `QueryClient` `throwOnError`, so a hook neither sets `throwOnError`
+  nor reads `error`.
 - The provider takes the api client, not an origin. The app renders `ApiQueryProvider` inside
   its own `QueryClientProvider`.
 - Import `@karibari/api` as a type only (`import type`). `@tanstack/react-query` and `react` are

@@ -7,6 +7,10 @@ import { useProjectList } from "./hooks/use-project-list";
 export function ProjectList() {
   const { items, status } = useProjectList();
 
+  if (status === "loading") {
+    return <p className="text-muted-foreground text-sm">読み込み中…</p>;
+  }
+
   if (status === "hidden") {
     return null;
   }

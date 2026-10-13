@@ -3,6 +3,10 @@ import { useProjectsQuery } from "@karibari/api-query";
 export function useProjectList() {
   const { data } = useProjectsQuery();
 
+  if (data === undefined) {
+    return { items: [], status: "loading" as const };
+  }
+
   // A 404 means there is no session. Sending the visitor to sign-in is the auth gate's job, so draw nothing.
   if (data === null) {
     return { items: [], status: "hidden" as const };

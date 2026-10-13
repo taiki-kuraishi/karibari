@@ -7,7 +7,12 @@ export function useSessionGate() {
   const { data } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
-      const { data: session } = await authClient.getSession();
+      const { data: session, error } = await authClient.getSession();
+
+      // Better-fetch resolves non-2xx as `{ data: null, error }`; rethrow so it is not mistaken for signed out.
+      if (error) {
+        throw new Error(error.statusText, { cause: error });
+      }
 
       return session;
     },
