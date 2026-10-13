@@ -7,6 +7,8 @@ Conventions for `.github/workflows/` and `.github/actions/`.
 - `ci.yml` — the JS/TS quality gate: `changes`, `lint`, `db-drift` (path-gated),
   `knip`, and the `test` matrix with its `test-ok` aggregate. Add a matrix entry
   per workspace; see `.claude/rules/workspace-packages.md`.
+- `migrate.yml` — applies D1 migrations to production on push to main (`changes` gate per
+  migrations directory) or `workflow_dispatch` (both DBs). One job per DB.
 
 **Split a workflow by runtime or domain, and don't invent a new granularity on your own —
 ask.** Composite actions go in `.github/actions/<name>` and are called with
@@ -34,6 +36,9 @@ concurrency:
 - `github.head_ref` is only populated for `pull_request`. On `push` / `workflow_dispatch`
   the `run_id` fallback makes every run unique, so main runs are neither cancelled nor
   serialised.
+- **Exception: `migrate.yml`** uses a per-job fixed group `${{ github.workflow }}-<database>`
+  with `cancel-in-progress: false`. Migrations against one DB must be serialised, and
+  cancelling a run mid-apply could leave a half-applied migration.
 - Every job needs `timeout-minutes`. `permissions: { contents: read }` is set once at the
   workflow level.
 - Pin third-party actions to a major tag (`actions/checkout@v7`).
