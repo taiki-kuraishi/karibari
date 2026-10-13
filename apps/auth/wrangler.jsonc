@@ -15,6 +15,8 @@
   },
   "vars": {
     "BETTER_AUTH_URL": "https://auth.karibari.tsar-bmb.org",
+    // Comma-separated client_ids allowed to use the token-exchange grant. Empty: nobody can.
+    "TOKEN_EXCHANGE_CLIENT_IDS": "",
   },
   "d1_databases": [
     {
