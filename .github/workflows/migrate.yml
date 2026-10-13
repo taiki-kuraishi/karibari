@@ -1,0 +1,80 @@
+name: migrate
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Gate is a job, not `on.push.paths:` — see .github/AGENTS.md "Path gating".
+  # Dispatch is limited to main: the ref picked in the UI is what gets checked out, and an
+  # unmerged branch must never reach production.
+  changes:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      meta: ${{ steps.filter.outputs.meta }}
+      auth: ${{ steps.filter.outputs.auth }}
+    steps:
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push'
+      - uses: dorny/paths-filter@v4
+        id: filter
+        if: github.event_name == 'push'
+        with:
+          filters: |
+            meta:
+              - 'packages/db/src/migrations/**'
+            auth:
+              - 'packages/better-auth/src/migrations/**'
+
+  # The API token can write every D1 database in the account, so each command names its
+  # database explicitly. The migrations directory comes from that app's wrangler config.
+  #
+  # `concurrency` here is an intentional exception to the "Every workflow" template: a
+  # fixed group per DB serialises runs, and cancel-in-progress is false because cancelling
+  # a half-applied migration run is unsafe.
+  meta:
+    needs: [changes]
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || needs.changes.outputs.meta == 'true'
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    concurrency:
+      group: ${{ github.workflow }}-karibari-meta-database
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with:
+          install_args: "bun"
+      - uses: ./.github/actions/setup-bun
+      - run: bun run --cwd apps/api wrangler d1 migrations apply karibari-meta-database --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  auth:
+    needs: [changes]
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || needs.changes.outputs.auth == 'true'
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    concurrency:
+      group: ${{ github.workflow }}-karibari-auth-database
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with:
+          install_args: "bun"
+      - uses: ./.github/actions/setup-bun
+      - run: bun run --cwd apps/auth wrangler d1 migrations apply karibari-auth-database --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
