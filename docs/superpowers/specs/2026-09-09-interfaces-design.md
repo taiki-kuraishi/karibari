@@ -22,27 +22,43 @@
 ## Api
 
 ### 公開APIの資源分割（合意済み）
-- `projects` / `versions` / `comments` / `shares` を別URLの資源に分ける
+- `projects` / `versions` / `screens` / `comments` / `shares` を別URLの資源に分ける（`screens`は`versions`の下）
 - R2取得（HTML実体）はApi経由のみ（R2直接公開なし）
 
 ### 公開API projects（合意済み）
 - `GET /api/projects`（自分の案件一覧、要セッション）
 - `POST /api/projects`（新規作成、要セッション）
-  - 入力：HTML必須＋名前任意
-  - 出力：案件id＋初期版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id`。LLMが返したリンクをそのまま開けるため。originはApiの`VIEWER_ORIGIN`）
+  - 入力：`{ name?, type?, screens: [{ name?, width?, height?, html }] }`。名前任意＋表示の種類任意（次項「版の表示の種類」）＋画面（入稿した順）。画面はHTML必須・名前任意・幅任意（px の整数で320〜3840、既定1440）・高さ任意（px の整数で200〜20000、既定900）。形が違う・範囲外・種類と画面の数が合わないときは`400`
+  - 出力：`201 { projectId, versionId, url }`。案件id＋初期版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id`。LLMが返したリンクをそのまま開けるため。originはApiの`VIEWER_ORIGIN`）
 - `GET /api/projects/:id`（単体取得、公開範囲判定あり：セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
   - 出力：`{ project, url }`。`url`は表示URL（絶対URL: `<Viewerのorigin>/p/:id`。originはApiの`VIEWER_ORIGIN`）
 
 ### 公開API versions（合意済み）
-- `GET /api/projects/:id/versions`（版一覧。`versions`の並びで返す）
-- `POST /api/projects/:id/versions`（新規版追加、HTML実体つき。足した行の`created_at`で`projects.updated_at`も更新する。`GET /api/projects`が`updated_at`の新しい順に並べるため）
-  - 入力：HTML必須
-  - 出力：新版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id?v=:vid`）
-- `GET /api/projects/:id/versions/:vid`（版meta取得）
-- `GET /api/projects/:id/versions/:vid/content`（HTML実体取得、R2経由。`Content-Security-Policy: sandbox allow-scripts`と`X-Content-Type-Options: nosniff`を付ける。LLMが書いたHTMLのスクリプトをopaque originで動かし、cookieもApiへの認証付きrequestも持たせないため。Viewerのiframeの`sandbox`属性も`allow-scripts`にする）
+- `GET /api/projects/:id/versions`（版一覧。`versions`の並びで返す。各行に`type`を含む）
+- `POST /api/projects/:id/versions`（新規版追加、画面のHTML実体つき。足した行の`created_at`で`projects.updated_at`も更新する。`GET /api/projects`が`updated_at`の新しい順に並べるため）
+  - 入力：`{ type?, screens: [...] }`（`POST /api/projects`の`type`・`screens`と同じ形）。形が違う・範囲外・種類と画面の数が合わないときは`400`
+  - 出力：`201 { versionId, url }`。新版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id?v=:vid`）
+- `GET /api/projects/:id/versions/:vid`（版meta取得。`type`を含む）
+- `GET /api/projects/:id/versions/:vid/content`（HTML実体取得、R2の`projects/{id}/versions/{v}/index.html`を返す。ViewerがAPI screensへ移るまで残す。画面に分けた後の入稿は`index.html`を書かないので、新しい版はここでは`404`になる。`Content-Security-Policy: sandbox allow-scripts`と`X-Content-Type-Options: nosniff`を付ける。LLMが書いたHTMLのスクリプトをopaque originで動かし、cookieもApiへの認証付きrequestも持たせないため。Viewerのiframeの`sandbox`属性も`allow-scripts`にする）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
 - `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示、`GET /api/projects/:id/comments`）は、この並びの最後の行
 - 編集は上書きせず新version追加（HTML不変版を維持）
+
+### 版の表示の種類（合意済み）
+- 版は表示の種類`type`（`"canvas"` | `"full"`）を持つ。入稿のたびにLLMが申告する（任意、既定`canvas`）
+- `canvas`：画面を1〜20個持ち、Viewerはpan/zoomできる無限キャンバスに、画面ごとに申告した幅×高さの枠で並べる（機能名 canvas）。枠からはみ出した中身は切れる
+- `full`：画面をちょうど1個持ち、Viewerはその画面をブラウザの窓いっぱいに出して操作できるようにする。幅・高さも申告か既定値で保存するが、Viewerは使わない
+- 高さはLLMの申告で決める。画面の中身を測って親に知らせる仕組み（script）は持たない
+
+### 公開API screens（合意済み）
+- 1つの版の画面は、`canvas`なら1〜20個、`full`ならちょうど1個（「版の表示の種類」）
+- `GET /api/projects/:id/versions/:vid/screens`（画面一覧）
+  - 出力：`200 { screens: [{ id, name, width, height }] }`（`name`は`null`可。入稿した順）
+- `GET /api/projects/:id/versions/:vid/screens/:sid/content`（画面のHTML実体取得、R2経由）
+  - 出力：`200` R2のHTMLをそのまま返す。ヘッダーは`GET .../content`と同じ（`Content-Security-Policy: sandbox allow-scripts`、`X-Content-Type-Options: nosniff`）
+- いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）。版が案件に、画面が版に属さないときも`404`
+- `screens`の並び：同じ`version_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。入稿した順に1回のinsertで入れる
+- 移行：画面に分ける前の版は、migrationの後に本番のmeta用D1へSQLを一度だけ流して移す（migrationには含めない）。順番は (1) 画面をまだ持たない版の`type`を`full`にする（`UPDATE versions SET type = 'full' WHERE id NOT IN (SELECT version_id FROM screens)`）、(2) 画面をまだ持たない版ごとに画面を1つ作る（画面のidは版のidと同じ、名前は`null`、幅は1440、高さは900、`rowid`順）、(3) R2の`projects/{id}/versions/{v}/index.html`を`projects/{id}/versions/{v}/screens/{v}.html`へcopyする。(1)は(2)より先に流す（(2)の後では対象の版を見分けられない）
 
 ### 公開API comments（合意済み）
 - `GET /api/projects/:id/comments?v=:vid`（指定版のコメント一覧。`v`なしは`versions`の並びの最後の行）
@@ -70,8 +86,9 @@
 ## MCP
 
 ### ツール一覧（合意済み）
-- 入稿 → `POST /api/projects`（＋初期版）
-- 編集 → `POST /api/projects/:id/versions`（新version追加、不変版維持）
+- 入稿 → `POST /api/projects`（＋初期版。入力`{ name?, type?, screens: [{ name?, width?, height?, html }] }`）
+- 編集 → `POST /api/projects/:id/versions`（新version追加、不変版維持。入力`{ projectId, type?, screens }`。版は前の版と画面を共有しないので、見せたい画面をすべて送る）
+- 入稿・編集のdescriptionには、LLMが`type`を選べるように、`canvas`は複数の画面を申告した幅×高さの枠で並べて見せる（はみ出しは切れる）、`full`は1画面をブラウザの窓いっぱいに出して操作できる、と書く
 - コメント保存 → `POST /api/projects/:id/comments`
 - コメント取得 → `GET /api/projects/:id/comments?v=:vid`
 - 公開URL取得 → `GET /api/projects/:id`の`url`（絶対の表示URL）に、versionを指定されたら`?v=`を足す（MCPはViewerのoriginを持たない）。`?invite=`/`?exp=&sig=`の組み立ては未実装（今はsharesの件数`shareCount`を返すだけ）
@@ -123,11 +140,12 @@
 - 内訳（`not_found`／`forbidden`／`expired`／`invalid_sig`／`r2_missing`／`auth_unavailable`）はサーバログのみに残す（未実装。今は認証のmiddlewareが`auth_unavailable`をログに出すだけ）
 
 ### D1/R2バインド（合意済み）
-- meta用D1：Api専用（共有しない。projects/versions/comments/shares）
+- meta用D1：Api専用（共有しない。projects/versions/screens/comments/shares）
 - auth用D1：Auth専用
 - R2：Api経由のみ（直接公開なし）
 - MCP：D1/R2直接なし（Api経由のみ）
 - remote-mcp：DPoPの再利用防止にKV（`DPOP_REPLAY`）を持つ
 
 ### R2キー形式（合意済み）
-- `projects/{id}/versions/{v}/`（単一バケット＋prefix、latestエイリアスなし）
+- 画面のHTML：`projects/{id}/versions/{v}/screens/{s}.html`（単一バケット＋prefix、latestエイリアスなし）
+- 画面に分ける前の版のHTML：`projects/{id}/versions/{v}/index.html`。`GET .../content`だけが読む

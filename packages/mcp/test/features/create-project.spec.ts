@@ -30,7 +30,7 @@ describe("create_project tool", () => {
     vi.unstubAllGlobals();
   });
 
-  it("posts html to the api with the bearer token and returns the result as JSON", async () => {
+  it("posts the screens to the api with the bearer token and returns the result as JSON", async () => {
     // Arrange
     const seen: { url: string; authorization: string | null; body: unknown; method?: string }[] =
       [];
@@ -52,9 +52,14 @@ describe("create_project tool", () => {
       }),
     );
 
+    const screens = [
+      { html: "<p>top</p>", name: "top", width: 390, height: 2400 },
+      { html: "<p>detail</p>" },
+    ];
+
     // Act
     const res = await client.callTool({
-      arguments: { html: "<p>hi</p>", name: "demo" },
+      arguments: { name: "demo", type: "canvas", screens },
       name: "create_project",
     });
 
@@ -63,7 +68,7 @@ describe("create_project tool", () => {
     expect(seen).toStrictEqual([
       {
         authorization: "Bearer test-token",
-        body: { html: "<p>hi</p>", name: "demo" },
+        body: { name: "demo", type: "canvas", screens },
         method: "POST",
         url: "http://api/api/projects",
       },
@@ -80,11 +85,27 @@ describe("create_project tool", () => {
 
     // Act
     const res = await client.callTool({
-      arguments: { html: "<p>hi</p>" },
+      arguments: { screens: [{ html: "<p>hi</p>" }] },
       name: "create_project",
     });
 
     // Assert
     expect(res.isError).toBe(true);
+  });
+
+  it("rejects an empty screens list without calling the api", async () => {
+    // Arrange
+    const fetch = vi.fn(async () => Response.json({}, { status: 201 }));
+    vi.stubGlobal("fetch", fetch);
+
+    // Act
+    const res = await client.callTool({
+      arguments: { screens: [] },
+      name: "create_project",
+    });
+
+    // Assert
+    expect(res.isError).toBe(true);
+    expect(fetch).not.toHaveBeenCalled();
   });
 });

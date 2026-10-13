@@ -15,6 +15,7 @@ export const createVersionsFactory = (db: MetaDb) =>
         props: {
           id: () => fk.string.uuid(),
           project_id: later<string>(),
+          type: () => "canvas",
           created_at: () => fakeUnixTimestamp(),
         },
         vars: {},

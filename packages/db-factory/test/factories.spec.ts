@@ -47,6 +47,23 @@ describe("@karibari/db-factory", () => {
     expect(project?.id).toBe(version.project_id);
   });
 
+  test("creates a 1440x900 screen with an associated version", async () => {
+    // Arrange
+    // The screen factory owns its default version association.
+    // Act
+    const screen = await factories.screens.create();
+    const version = await db.query.versions.findFirst({
+      where: (table, { eq }) => eq(table.id, screen.version_id),
+    });
+
+    // Assert
+    expect({ width: screen.width, height: screen.height }).toStrictEqual({
+      width: 1440,
+      height: 900,
+    });
+    expect(version?.id).toBe(screen.version_id);
+  });
+
   test("creates a comment whose project matches its version", async () => {
     // Arrange
     // The comment factory owns its default project and version associations.

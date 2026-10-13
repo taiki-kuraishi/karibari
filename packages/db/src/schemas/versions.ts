@@ -2,6 +2,8 @@ import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { projects } from "./projects";
 
+export type VersionType = "canvas" | "full";
+
 export const versions = sqliteTable(
   "versions",
   {
@@ -9,6 +11,7 @@ export const versions = sqliteTable(
     project_id: text()
       .notNull()
       .references(() => projects.id),
+    type: text().$type<VersionType>().notNull().default("canvas"),
     created_at: integer().notNull(),
   },
   (table) => [index("versions_project_idx").on(table.project_id)],
