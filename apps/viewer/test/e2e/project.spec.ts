@@ -23,6 +23,7 @@ test("`/p/:projectId` で `/` への link を押すと `/` に移動する", asy
         created_at: 1_760_000_000,
         id: "9c1d1b7e-3b5e-4d7e-8f0a-0d6f6a1c2b33",
         project_id: projectId,
+        type: "canvas",
       },
     ],
   });
@@ -69,8 +70,8 @@ test("`/p/:projectId` で `versions` の行を選ぶと `?v=<versions.id>` に�
       url: `https://karibari.tsar-bmb.org/p/${projectId}`,
     },
     versions: [
-      { created_at: 1_760_000_000, id: olderId, project_id: projectId },
-      { created_at: 1_760_000_050, id: newerId, project_id: projectId },
+      { created_at: 1_760_000_000, id: olderId, project_id: projectId, type: "canvas" },
+      { created_at: 1_760_000_050, id: newerId, project_id: projectId, type: "canvas" },
     ],
   });
   await page.goto(`/p/${projectId}`);
@@ -101,6 +102,7 @@ test("`/p/:projectId` を一覧に無い `v` で開くと 404 画面を出す", 
         created_at: 1_760_000_000,
         id: "9c1d1b7e-3b5e-4d7e-8f0a-0d6f6a1c2b33",
         project_id: projectId,
+        type: "canvas",
       },
     ],
   });

@@ -30,7 +30,7 @@ describe("add_version tool", () => {
     vi.unstubAllGlobals();
   });
 
-  it("posts html to the version endpoint with the bearer token and returns the result as JSON", async () => {
+  it("posts the screens to the version endpoint with the bearer token and returns the result as JSON", async () => {
     // Arrange
     const seen: { url: string; authorization: string | null; body: unknown; method?: string }[] =
       [];
@@ -52,9 +52,11 @@ describe("add_version tool", () => {
       }),
     );
 
+    const screens = [{ html: "<p>v2</p>" }];
+
     // Act
     const res = await client.callTool({
-      arguments: { html: "<p>v2</p>", projectId: "p1" },
+      arguments: { projectId: "p1", type: "full", screens },
       name: "add_version",
     });
 
@@ -63,7 +65,7 @@ describe("add_version tool", () => {
     expect(seen).toStrictEqual([
       {
         authorization: "Bearer test-token",
-        body: { html: "<p>v2</p>" },
+        body: { type: "full", screens },
         method: "POST",
         url: "http://api/api/projects/p1/versions",
       },
@@ -80,7 +82,7 @@ describe("add_version tool", () => {
 
     // Act
     const res = await client.callTool({
-      arguments: { html: "<p>v2</p>", projectId: "missing" },
+      arguments: { projectId: "missing", screens: [{ html: "<p>v2</p>" }] },
       name: "add_version",
     });
 

@@ -12,6 +12,7 @@
 ## 要件（合意済み）
 - MCP経由で htmlの入稿 / 編集 / コメント に対応する
 - Viewer側はURL共有、要素単位コメント、HTML編集ができること
+- 1つの版に複数の画面（HTML）を入稿でき、Viewerでpan/zoomできる無限キャンバスに、画面ごとに申告した幅×高さの枠で並べて見られること（機能名 canvas）。1画面をブラウザの窓いっぱいに出して操作する表示（`full`）も選べ、どちらにするかは入稿のたびにLLMが版ごとに申告する
 - URLの公開範囲を設定できることが必須（自分だけ / 招待 / 署名付きURLでURLを知っている人だけ、の方針）
 - Cloudflare host前提（Workers + R2 + D1想定）
 - 方向性はシンプル自前版: UI配信とMCP、R2にHTML不変バージョン、D1にmeta管理
@@ -29,13 +30,13 @@
 
 ### D1分担
 - D1を2つに分ける（meta用 / auth用）
-  - meta用D1: projects、versions、comments、shares（公開範囲・招待・署名）などのmeta管理
+  - meta用D1: projects、versions、screens（版ごとの画面）、comments、shares（公開範囲・招待・署名）などのmeta管理
   - auth用D1: better-auth系テーブル（ユーザー・セッションなど）の管理。招待はauth用D1ではなく、meta用D1の`shares.token`に持つ（db-packageのspecと同じ）
 - 境界とバックアップ単位を明確にする目的。単一D1同居より運用は少し重くなる点は許容する
 - Authはmeta用D1を読まない（`apps/auth/wrangler.jsonc`のD1はauth用だけ）。meta用D1を読み書きするのはApiだけ（interfaces-designの「判定分担」と同じ）
 
 ### R2分担
-- 単一バケット + prefix（例: projects/{id}/versions/{v}/）でHTML不変バージョンを保存する
+- 単一バケット + prefix（`projects/{id}/versions/{v}/screens/{s}.html`）でHTML不変バージョンを画面ごとに保存する
 - R2は直接公開せず、Api Worker経由でのみ取得する
 - latestエイリアス等は持たず、参照すべきバージョンはmeta用D1が持つ方向
 

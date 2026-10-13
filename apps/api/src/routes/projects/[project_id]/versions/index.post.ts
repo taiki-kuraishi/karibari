@@ -1,27 +1,25 @@
-import { projects, versions } from "@karibari/db";
+import { projects, screens, versions } from "@karibari/db";
 import { eq as drizzleEq } from "drizzle-orm";
 import { Hono } from "hono";
 import * as v from "valibot";
 
 import type { HonoEnv } from "../../../../server";
 
+import { screenHtmlKey } from "../../../../screen-html-key";
 import { validator } from "../../../../validator";
+import { versionBodySchema } from "../../../../version-body-schema";
 
 const paramSchema = v.object({
   project_id: v.pipe(v.string(), v.nonEmpty()),
 });
 
-const bodySchema = v.object({
-  html: v.pipe(v.string(), v.nonEmpty()),
-});
-
 export const postProjectVersionsRoute = new Hono<HonoEnv>().post(
   "",
   validator("param", paramSchema),
-  validator("json", bodySchema),
+  validator("json", versionBodySchema),
   async (c) => {
     const { project_id: projectId } = c.req.valid("param");
-    const { html } = c.req.valid("json");
+    const { type, screens: inputs } = c.req.valid("json");
     const owner = c.get("userId");
     const project = await c.env.db.query.projects.findFirst({
       columns: { id: true },
@@ -32,13 +30,32 @@ export const postProjectVersionsRoute = new Hono<HonoEnv>().post(
       return c.json({ error: "not_found" }, 404);
     }
 
-    const version = c.env.versionFactory.create({ projectId });
+    const version = c.env.versionFactory.create({ projectId, type });
+    const entries = inputs.map((input) => ({
+      html: input.html,
+      screen: c.env.screenFactory.create({
+        height: input.height,
+        name: input.name ?? null,
+        versionId: version.id,
+        width: input.width,
+      }),
+    }));
 
-    // R2 before D1: a failed D1 insert only leaves a harmless orphaned object,
+    // R2 before D1: a failed D1 insert only leaves harmless orphaned objects,
     // While D1-first would leave a meta row whose HTML is missing (r2_missing 404).
-    await c.env.HTML_BUCKET.put(`projects/${projectId}/versions/${version.id}/index.html`, html);
+    await Promise.all(
+      entries.map(
+        async ({ html, screen }) =>
+          await c.env.HTML_BUCKET.put(
+            screenHtmlKey({ projectId, versionId: version.id, screenId: screen.id }),
+            html,
+          ),
+      ),
+    );
     await c.env.db.batch([
       c.env.db.insert(versions).values(version),
+      // One multi-row insert keeps the submitted order in `rowid`.
+      c.env.db.insert(screens).values(entries.map(({ screen }) => screen)),
       c.env.db
         .update(projects)
         .set({ updated_at: version.created_at })

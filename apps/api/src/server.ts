@@ -4,6 +4,7 @@ import { Hono } from "hono";
 
 import type { CommentFactory } from "./factories/comment-factory";
 import type { ProjectFactory } from "./factories/project-factory";
+import type { ScreenFactory } from "./factories/screen-factory";
 import type { VersionFactory } from "./factories/version-factory";
 import type { ApiAuthClient } from "./middlewares/inject-middleware";
 
@@ -18,6 +19,8 @@ import { deleteProjectShareRoute } from "./routes/projects/[project_id]/shares/[
 import { getProjectSharesRoute } from "./routes/projects/[project_id]/shares/index.get";
 import { getProjectVersionContentRoute } from "./routes/projects/[project_id]/versions/[version_id]/content.get";
 import { getProjectVersionRoute } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
+import { getProjectVersionScreenContentRoute } from "./routes/projects/[project_id]/versions/[version_id]/screens/[screen_id]/content.get";
+import { getProjectVersionScreensRoute } from "./routes/projects/[project_id]/versions/[version_id]/screens/index.get";
 import { getProjectVersionsRoute } from "./routes/projects/[project_id]/versions/index.get";
 import { postProjectVersionsRoute } from "./routes/projects/[project_id]/versions/index.post";
 import { getProjectsRoute } from "./routes/projects/index.get";
@@ -29,6 +32,7 @@ export interface HonoEnv {
     commentFactory: CommentFactory;
     db: MetaDb;
     projectFactory: ProjectFactory;
+    screenFactory: ScreenFactory;
     versionFactory: VersionFactory;
   };
   Variables: { userId: string };
@@ -49,5 +53,10 @@ export const app = new Hono<HonoEnv>()
   .route("/api/projects/:project_id/versions", getProjectVersionsRoute)
   .route("/api/projects/:project_id/versions/:version_id", getProjectVersionRoute)
   .route("/api/projects/:project_id/versions/:version_id/content", getProjectVersionContentRoute)
+  .route("/api/projects/:project_id/versions/:version_id/screens", getProjectVersionScreensRoute)
+  .route(
+    "/api/projects/:project_id/versions/:version_id/screens/:screen_id/content",
+    getProjectVersionScreenContentRoute,
+  )
   .route("/api/projects", getProjectsRoute)
   .route("/api/projects", postProjectsRoute);

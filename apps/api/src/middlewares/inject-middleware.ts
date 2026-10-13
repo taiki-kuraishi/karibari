@@ -7,6 +7,7 @@ import type { HonoEnv } from "../server";
 
 import { CommentFactory } from "../factories/comment-factory";
 import { ProjectFactory } from "../factories/project-factory";
+import { ScreenFactory } from "../factories/screen-factory";
 import { VersionFactory } from "../factories/version-factory";
 
 const createApiAuthClient = (baseURL: string) =>
@@ -23,6 +24,7 @@ export const injectMiddleware: MiddlewareHandler<HonoEnv> = async (c, next) => {
     commentFactory: c.env.commentFactory ?? new CommentFactory(),
     db: c.env.db ?? createMetaDb(c.env.DB),
     projectFactory: c.env.projectFactory ?? new ProjectFactory(),
+    screenFactory: c.env.screenFactory ?? new ScreenFactory(),
     versionFactory: c.env.versionFactory ?? new VersionFactory(),
   });
 
