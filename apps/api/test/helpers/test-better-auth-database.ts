@@ -1,4 +1,4 @@
-import { apiAudience, config, createAuthDatabase, mcpAudience } from "@karibari/better-auth";
+import { apiAudience, config, createAuthDatabase } from "@karibari/better-auth";
 import { betterAuth } from "better-auth";
 import { testUtils } from "better-auth/plugins";
 import * as v from "valibot";
@@ -98,16 +98,22 @@ export class TestBetterAuthDatabase {
         redirect_uris: [REDIRECT_URI],
         token_endpoint_auth_method: "none",
         grant_types: ["authorization_code"],
-        resources: [mcpAudience, apiAudience],
       }),
       "application/json",
     );
+
     if (!registerResponse.ok) {
       throw new Error(
         `client registration failed: ${registerResponse.status} ${await registerResponse.text()}`,
       );
     }
     const registered = v.parse(v.object({ client_id: v.string() }), await registerResponse.json());
+    // DCR never links a client to the api audience, so the link a token exchange needs goes in directly.
+    const context = await this.#auth.$context;
+    await context.adapter.create({
+      model: "oauthClientResource",
+      data: { clientId: registered.client_id, resourceId: apiAudience, createdAt: new Date() },
+    });
 
     const verifier = toBase64Url(crypto.getRandomValues(new Uint8Array(32)));
     const challenge = await sha256Base64Url(verifier);
@@ -128,6 +134,7 @@ export class TestBetterAuthDatabase {
       new Request(authorizeUrl, { headers: sessionHeaders }),
     );
     const location = authorizeResponse.headers.get("location");
+
     if (authorizeResponse.status !== 302 || location === null) {
       throw new Error(`authorize did not redirect: ${authorizeResponse.status}`);
     }
@@ -139,6 +146,7 @@ export class TestBetterAuthDatabase {
       "application/json",
       sessionHeaders,
     );
+
     if (!consentResponse.ok) {
       throw new Error(`consent failed: ${consentResponse.status} ${await consentResponse.text()}`);
     }
@@ -152,10 +160,12 @@ export class TestBetterAuthDatabase {
     const redirectUri = [consentBody.url, consentBody.redirect_uri].find(
       (value): value is string => typeof value === "string",
     );
+
     if (redirectUri === undefined) {
       throw new Error(`consent carries no redirect: ${JSON.stringify(consentBody)}`);
     }
     const code = new URL(redirectUri, this.#baseURL).searchParams.get("code");
+
     if (code === null) {
       throw new Error(`consent redirect carries no code: ${redirectUri}`);
     }
@@ -171,6 +181,7 @@ export class TestBetterAuthDatabase {
       }).toString(),
       "application/x-www-form-urlencoded",
     );
+
     if (!tokenResponse.ok) {
       throw new Error(`token exchange failed: ${tokenResponse.status}`);
     }
@@ -179,6 +190,7 @@ export class TestBetterAuthDatabase {
     const accessToken = tokenContentType.includes("application/json")
       ? v.parse(v.object({ access_token: v.string() }), JSON.parse(tokenBody)).access_token
       : new URLSearchParams(tokenBody).get("access_token");
+
     if (accessToken === null || accessToken === "") {
       throw new Error(`token exchange carried no access_token: ${tokenBody}`);
     }

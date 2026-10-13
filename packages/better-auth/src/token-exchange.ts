@@ -27,6 +27,7 @@ const audiences = (aud: unknown): string[] => {
   if (typeof aud === "string") {
     return [aud];
   }
+
   if (Array.isArray(aud)) {
     return aud.filter((item) => typeof item === "string");
   }
@@ -36,7 +37,8 @@ const audiences = (aud: unknown): string[] => {
 
 // RFC 8693 token exchange: trades an access token whose audience is `sourceAudience` for one whose
 // Audience is only `targetAudience`. Only `allowedClientIds` may exchange: DCR lets anyone register
-// A client and every DCR client is linked to the target resource, so the grant alone is no gate.
+// A client and DCR never links one to the target resource, so the grant alone is no gate. A client
+// That exchanges must be linked to the target resource out of band.
 export const createTokenExchangeExtension = (args: {
   allowedClientIds: readonly string[];
   sourceAudience: string;

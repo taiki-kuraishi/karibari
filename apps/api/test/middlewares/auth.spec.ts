@@ -102,11 +102,13 @@ describe("authMiddleware", () => {
         true,
         ["sign", "verify"],
       );
+
       if (!("privateKey" in generated)) {
         throw new Error("ECDSA generation must return a key pair");
       }
       keyPair = generated;
       const exported = await crypto.subtle.exportKey("jwk", generated.publicKey);
+
       if (exported instanceof ArrayBuffer) {
         throw new Error("JWK export must return a key object");
       }
@@ -142,6 +144,7 @@ describe("authMiddleware", () => {
       if (typeof input === "string") {
         return input;
       }
+
       if (input instanceof Request) {
         return input.url;
       }
