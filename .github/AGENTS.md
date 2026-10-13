@@ -37,7 +37,7 @@ concurrency:
   the `run_id` fallback makes every run unique, so main runs are neither cancelled nor
   serialised.
 - **Exception: `migrate.yml`** uses a per-job fixed group `${{ github.workflow }}-<database>`
-  with `cancel-in-progress: false`. Migrations against one DB must be serialised, and
+  with `cancel-in-progress: false`, and no workflow-level `concurrency`. Migrations against one DB must be serialised, and
   cancelling a run mid-apply could leave a half-applied migration.
 - Every job needs `timeout-minutes`. `permissions: { contents: read }` is set once at the
   workflow level.
@@ -119,7 +119,7 @@ unconditional: `apps/viewer` (static assets, no Worker script) is built and dry-
 
 | Caller | `install_args` | Why |
 | --- | --- | --- |
-| `ci.yml` (`lint`, `knip`, `test`) | `bun` | vp, oxlint, oxfmt, tsc, knip, and wrangler all come from node_modules; the hosted runner already ships node |
+| `ci.yml` (`lint`, `knip`, `test`), `migrate.yml` (`meta`, `auth`) | `bun` | vp, oxlint, oxfmt, tsc, knip, and wrangler all come from node_modules; the hosted runner already ships node |
 
 `install_args` is part of the mise cache key, so jobs with different tool sets never clobber
 each other's cache.

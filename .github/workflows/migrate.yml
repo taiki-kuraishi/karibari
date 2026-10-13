@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   # Gate is a job, not `on.push.paths:` — see .github/AGENTS.md "Path gating".
-  # workflow_dispatch skips it and applies both DBs (an applied migration is a no-op).
+  # Dispatch is limited to main: the ref picked in the UI is what gets checked out, and an
+  # unmerged branch must never reach production.
   changes:
     runs-on: ubuntu-slim
     timeout-minutes: 5
@@ -42,7 +43,7 @@ jobs:
   # a half-applied migration run is unsafe.
   meta:
     needs: [changes]
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.meta == 'true'
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || needs.changes.outputs.meta == 'true'
     runs-on: ubuntu-slim
     timeout-minutes: 10
     concurrency:
@@ -61,7 +62,7 @@ jobs:
 
   auth:
     needs: [changes]
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.auth == 'true'
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || needs.changes.outputs.auth == 'true'
     runs-on: ubuntu-slim
     timeout-minutes: 10
     concurrency:
