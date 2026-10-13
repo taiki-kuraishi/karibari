@@ -1,4 +1,5 @@
 import type { OAuthProviderExtension } from "@better-auth/oauth-provider";
+import type { User } from "better-auth";
 
 import { APIError } from "better-auth/api";
 
@@ -84,7 +85,10 @@ export const createTokenExchangeExtension = (args: {
         });
       }
 
-      const user = await ctx.context.internalAdapter.findUserById(payload.sub);
+      const user = await ctx.context.adapter.findOne<User>({
+        model: "user",
+        where: [{ field: "id", value: payload.sub }],
+      });
 
       if (!user) {
         tokenError({
