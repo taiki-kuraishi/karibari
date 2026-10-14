@@ -17,7 +17,6 @@ import { postProjectCommentsRoute } from "./routes/projects/[project_id]/comment
 import { getProjectRoute } from "./routes/projects/[project_id]/index.get";
 import { deleteProjectShareRoute } from "./routes/projects/[project_id]/shares/[share_id]/index.delete";
 import { getProjectSharesRoute } from "./routes/projects/[project_id]/shares/index.get";
-import { getProjectVersionContentRoute } from "./routes/projects/[project_id]/versions/[version_id]/content.get";
 import { getProjectVersionRoute } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
 import { getProjectVersionScreenContentRoute } from "./routes/projects/[project_id]/versions/[version_id]/screens/[screen_id]/content.get";
 import { getProjectVersionScreensRoute } from "./routes/projects/[project_id]/versions/[version_id]/screens/index.get";
@@ -52,7 +51,6 @@ export const app = new Hono<HonoEnv>()
   .route("/api/projects/:project_id/versions", postProjectVersionsRoute)
   .route("/api/projects/:project_id/versions", getProjectVersionsRoute)
   .route("/api/projects/:project_id/versions/:version_id", getProjectVersionRoute)
-  .route("/api/projects/:project_id/versions/:version_id/content", getProjectVersionContentRoute)
   .route("/api/projects/:project_id/versions/:version_id/screens", getProjectVersionScreensRoute)
   .route(
     "/api/projects/:project_id/versions/:version_id/screens/:screen_id/content",

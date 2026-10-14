@@ -2,7 +2,6 @@ import { useProjectQuery, useVersionsQuery } from "@karibari/api-query";
 import { notFound } from "@tanstack/react-router";
 import { useQueryStates } from "nuqs";
 
-import { apiClient } from "@/lib/api-client";
 import { projectParams } from "@/routes/project/params";
 
 export function useProjectView(projectId: string) {
@@ -21,19 +20,18 @@ export function useProjectView(projectId: string) {
   // Newest row first, so the selector and the default (the last row) agree.
   const options = versionsData.versions.toReversed().map(({ id }) => ({ id }));
   const versionId = v ?? options.at(0)?.id;
+  const version = versionsData.versions.find(({ id }) => id === versionId);
 
-  if (versionId === undefined || !options.some(({ id }) => id === versionId)) {
+  if (version === undefined) {
     throw notFound();
   }
 
   return {
-    contentUrl: apiClient.api.projects[":project_id"].versions[":version_id"].content
-      .$url({ param: { project_id: projectId, version_id: versionId } })
-      .toString(),
     displayName: projectData.project.name ?? "無題",
     options,
     select: async (id: string) => setParams({ v: id }),
     status: "ready",
-    versionId,
+    type: version.type,
+    versionId: version.id,
   } as const;
 }

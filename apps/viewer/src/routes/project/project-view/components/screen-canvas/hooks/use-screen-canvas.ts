@@ -16,7 +16,7 @@ const MAX_ZOOM_DELTA = 50;
 const LINE_HEIGHT = 16;
 
 export function useScreenCanvas(
-  screens: { contentUrl: string; id: string; name: string | null; width: number }[],
+  screens: { contentUrl: string; height: number; id: string; name: string | null; width: number }[],
 ) {
   const [transform, setTransform] = useState<{ scale: number; x: number; y: number }>();
   const dragPoint = useRef<{ x: number; y: number }>(undefined);
@@ -33,7 +33,7 @@ export function useScreenCanvas(
         Math.min((viewport.clientWidth - FIT_PADDING * 2) / rowWidth, 1),
         MIN_SCALE,
       );
-      // Fit the whole row's width once, top-aligned; later height reports keep the view.
+      // Fit the whole row's width once, top-aligned; a re-run of this callback keeps the view.
       setTransform(
         (current) =>
           current ?? { scale, x: (viewport.clientWidth - rowWidth * scale) / 2, y: FIT_PADDING },
@@ -86,8 +86,9 @@ export function useScreenCanvas(
   );
 
   return {
-    frames: screens.map(({ contentUrl, id, name, width }, index) => ({
+    frames: screens.map(({ contentUrl, height, id, name, width }, index) => ({
       contentUrl,
+      height,
       id,
       label: name ?? `画面 ${index + 1}`,
       width,

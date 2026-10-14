@@ -1,5 +1,5 @@
-import { HtmlFrame } from "./components/html-frame";
 import { ProjectHeader } from "./components/project-header";
+import { VersionScreens } from "./components/version-screens";
 import { useProjectView } from "./hooks/use-project-view";
 
 export function ProjectView({ projectId }: { projectId: string }) {
@@ -17,7 +17,12 @@ export function ProjectView({ projectId }: { projectId: string }) {
         options={view.options}
         versionId={view.versionId}
       />
-      <HtmlFrame contentUrl={view.contentUrl} title={view.displayName} />
+      <VersionScreens
+        projectId={projectId}
+        title={view.displayName}
+        type={view.type}
+        versionId={view.versionId}
+      />
     </main>
   );
 }

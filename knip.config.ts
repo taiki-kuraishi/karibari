@@ -15,11 +15,7 @@ export default {
     "apps/remote-mcp": { ignoreDependencies: ["cloudflare"] },
     "apps/api": { ignoreDependencies: ["cloudflare"] },
     "apps/auth": { ignoreDependencies: ["cloudflare"] },
-    // `ScreenCanvas` lands before the phase that mounts it in a route.
-    // Remove this entry in that phase, or knip stops catching the component going unused.
-    "apps/viewer": {
-      entry: ["src/routes/project/project-view/components/screen-canvas/index.tsx"],
-    },
+    "apps/viewer": {},
     // The `exports` patterns in this package's package.json make every component an entry.
     // Knip therefore reports neither unused files nor unused exports for the library surface.
     "packages/shadcn": {},

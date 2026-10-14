@@ -6,7 +6,7 @@ import { useScreenCanvas } from "./hooks/use-screen-canvas";
 export function ScreenCanvas({
   screens,
 }: {
-  screens: { contentUrl: string; id: string; name: string | null; width: number }[];
+  screens: { contentUrl: string; height: number; id: string; name: string | null; width: number }[];
 }) {
   const canvas = useScreenCanvas(screens);
 
@@ -27,8 +27,14 @@ export function ScreenCanvas({
         )}
         style={{ gap: canvas.gap, transform: canvas.transform }}
       >
-        {canvas.frames.map(({ contentUrl, id, label, width }) => (
-          <ScreenFrame contentUrl={contentUrl} key={id} label={label} width={width} />
+        {canvas.frames.map(({ contentUrl, height, id, label, width }) => (
+          <ScreenFrame
+            contentUrl={contentUrl}
+            height={height}
+            key={id}
+            label={label}
+            width={width}
+          />
         ))}
       </div>
     </div>
