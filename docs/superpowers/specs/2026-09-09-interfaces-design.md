@@ -39,7 +39,6 @@
   - 入力：`{ type?, screens: [...] }`（`POST /api/projects`の`type`・`screens`と同じ形）。形が違う・範囲外・種類と画面の数が合わないときは`400`
   - 出力：`201 { versionId, url }`。新版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id?v=:vid`）
 - `GET /api/projects/:id/versions/:vid`（版meta取得。`type`を含む）
-- `GET /api/projects/:id/versions/:vid/content`（HTML実体取得、R2の`projects/{id}/versions/{v}/index.html`を返す。ViewerがAPI screensへ移るまで残す。画面に分けた後の入稿は`index.html`を書かないので、新しい版はここでは`404`になる。`Content-Security-Policy: sandbox allow-scripts`と`X-Content-Type-Options: nosniff`を付ける。LLMが書いたHTMLのスクリプトをopaque originで動かし、cookieもApiへの認証付きrequestも持たせないため。Viewerのiframeの`sandbox`属性も`allow-scripts`にする）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
 - `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示、`GET /api/projects/:id/comments`）は、この並びの最後の行
 - 編集は上書きせず新version追加（HTML不変版を維持）
@@ -55,7 +54,7 @@
 - `GET /api/projects/:id/versions/:vid/screens`（画面一覧）
   - 出力：`200 { screens: [{ id, name, width, height }] }`（`name`は`null`可。入稿した順）
 - `GET /api/projects/:id/versions/:vid/screens/:sid/content`（画面のHTML実体取得、R2経由）
-  - 出力：`200` R2のHTMLをそのまま返す。ヘッダーは`GET .../content`と同じ（`Content-Security-Policy: sandbox allow-scripts`、`X-Content-Type-Options: nosniff`）
+  - 出力：`200` R2のHTMLをそのまま返す。`Content-Security-Policy: sandbox allow-scripts`と`X-Content-Type-Options: nosniff`を付ける。LLMが書いたHTMLのスクリプトをopaque originで動かし、cookieもApiへの認証付きrequestも持たせないため。Viewerのiframeの`sandbox`属性も`allow-scripts`にする
 - いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）。版が案件に、画面が版に属さないときも`404`
 - `screens`の並び：同じ`version_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。入稿した順に1回のinsertで入れる
 - 移行：画面に分ける前の版は、migrationの後に本番のmeta用D1へSQLを一度だけ流して移す（migrationには含めない）。順番は (1) 画面をまだ持たない版の`type`を`full`にする（`UPDATE versions SET type = 'full' WHERE id NOT IN (SELECT version_id FROM screens)`）、(2) 画面をまだ持たない版ごとに画面を1つ作る（画面のidは版のidと同じ、名前は`null`、幅は1440、高さは900、`rowid`順）、(3) R2の`projects/{id}/versions/{v}/index.html`を`projects/{id}/versions/{v}/screens/{v}.html`へcopyする。(1)は(2)より先に流す（(2)の後では対象の版を見分けられない）
@@ -148,4 +147,4 @@
 
 ### R2キー形式（合意済み）
 - 画面のHTML：`projects/{id}/versions/{v}/screens/{s}.html`（単一バケット＋prefix、latestエイリアスなし）
-- 画面に分ける前の版のHTML：`projects/{id}/versions/{v}/index.html`。`GET .../content`だけが読む
+- 画面に分ける前の版のHTML：`projects/{id}/versions/{v}/index.html`。移行（「公開API screens」）で画面のHTMLのキーへcopyした元で、Apiはどこからも読まない

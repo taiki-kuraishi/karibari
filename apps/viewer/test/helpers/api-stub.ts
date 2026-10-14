@@ -17,6 +17,12 @@ type VersionRow = Extract<
   ResponseBody<(typeof apiClient.api.projects)[":project_id"]["versions"]["$get"]>,
   { versions: unknown }
 >["versions"][number];
+type ScreenRow = Extract<
+  ResponseBody<
+    (typeof apiClient.api.projects)[":project_id"]["versions"][":version_id"]["screens"]["$get"]
+  >,
+  { screens: unknown }
+>["screens"][number];
 
 // Must equal `VITE_API_ORIGIN` in `apps/viewer/.env`: the bundle under test calls this origin.
 const apiOrigin = "https://api.karibari.tsar-bmb.org";
@@ -51,20 +57,23 @@ async function fulfill({
   });
 }
 
-// `project` and `versions` are served for any project id, and `content` for any version id: one project per test.
+// `project` and `versions` are served for any project id, `screens` for any version id and
+// `screenContent` for any screen id: one project per test.
 // Leaving `project` out leaves GET /api/projects/:project_id on the catch-all 404.
 export async function stubApi({
-  content = "",
   page,
   project,
   projects = [],
+  screenContent = "",
+  screens = [],
   session = true,
   versions = [],
 }: {
-  content?: string;
   page: Page;
   project?: ProjectBody;
   projects?: ProjectRow[];
+  screenContent?: string;
+  screens?: ScreenRow[];
   // GET /api/auth/get-session answers `null` when there is no session.
   session?: boolean;
   versions?: VersionRow[];
@@ -100,7 +109,13 @@ export async function stubApi({
   await page.route(/\/api\/projects\/[^/]+\/versions$/, async (route) => {
     await fulfill({ json: { versions }, route });
   });
-  await page.route(/\/api\/projects\/[^/]+\/versions\/[^/]+\/content$/, async (route) => {
-    await route.fulfill({ body: content, contentType: "text/html" });
+  await page.route(/\/api\/projects\/[^/]+\/versions\/[^/]+\/screens$/, async (route) => {
+    await fulfill({ json: { screens }, route });
   });
+  await page.route(
+    /\/api\/projects\/[^/]+\/versions\/[^/]+\/screens\/[^/]+\/content$/,
+    async (route) => {
+      await route.fulfill({ body: screenContent, contentType: "text/html" });
+    },
+  );
 }
