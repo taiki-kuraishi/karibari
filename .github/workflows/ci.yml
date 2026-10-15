@@ -98,6 +98,9 @@ jobs:
           - name: db-factory
             path: packages/db-factory
             worker: false
+          - name: mcp
+            path: packages/mcp
+            worker: false
     name: test (${{ matrix.name }})
     steps:
       - uses: actions/checkout@v7
