@@ -13,7 +13,7 @@ import { afterEach, describe, expect, test } from "vitest";
 
 const accessTokenType = "urn:ietf:params:oauth:token-type:access_token";
 const redirectUri = "http://localhost:9999/cb";
-const origin = "https://auth.karibari.tsar-bmb.org";
+const origin = "https://auth.karibari.com";
 const tokenUrl = `${origin}/api/auth/oauth2/token`;
 
 // Same secret the setup file seeds into the Secrets Store, so cookies signed here are valid in the Worker.

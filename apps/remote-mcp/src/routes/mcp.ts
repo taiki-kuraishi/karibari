@@ -14,9 +14,9 @@ import { SubjectTokenRejectedError } from "../errors/token-exchange-errors";
 // Better-auth's `basePath: "/api/auth"` makes `ctx.context.baseURL` (and thus
 // The JWT `iss` claim) include that path segment; see `withPath` in
 // `better-auth` 1.7.3's `dist/utils/url.mjs`.
-const AUTH_ISSUER = "https://auth.karibari.tsar-bmb.org/api/auth";
-const MCP_AUDIENCE = "https://mcp.karibari.tsar-bmb.org/mcp";
-const API_AUDIENCE = "https://api.karibari.tsar-bmb.org/api";
+const AUTH_ISSUER = "https://auth.karibari.com/api/auth";
+const MCP_AUDIENCE = "https://mcp.karibari.com/mcp";
+const API_AUDIENCE = "https://api.karibari.com/api";
 // Auth's token endpoint is a same-zone Worker call; a slow answer means it is unhealthy.
 const TOKEN_EXCHANGE_TIMEOUT_MS = 10_000;
 

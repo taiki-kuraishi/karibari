@@ -5,7 +5,7 @@ import { getPlatformProxy } from "wrangler";
 
 // The port the e2e webServer serves the Worker on; e2e.playwright.config.ts derives the served origin from the same override.
 const port = Number(process.env.KARIBARI_AUTH_E2E_PORT ?? 3101);
-export const baseURL = `http://auth.karibari.tsar-bmb.org:${port}`;
+export const baseURL = `http://auth.karibari.com:${port}`;
 
 // Mirrors apps/api/test/helpers/test-better-auth-database.ts: the production config plus Test Utils, with the worker-only overrides replaced by what the local E2E origin needs. Never touch the production config in packages/better-auth/src/auth.ts.
 const createTestBetterAuth = (args: { database: D1Database; secret: string }) =>

@@ -1,11 +1,11 @@
 import { env, exports } from "cloudflare:workers";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 
-const authOrigin = "https://auth.karibari.tsar-bmb.org";
+const authOrigin = "https://auth.karibari.com";
 const issuer = `${authOrigin}/api/auth`;
 const tokenUrl = `${issuer}/oauth2/token`;
 const jwksUrl = `${issuer}/jwks`;
-const apiOrigin = "https://api.karibari.tsar-bmb.org";
+const apiOrigin = "https://api.karibari.com";
 const exchangedToken = "exchanged-api-token";
 
 const encode = (value: ArrayBuffer | string) =>
@@ -45,7 +45,7 @@ beforeAll(async () => {
   const now = Math.floor(Date.now() / 1000);
   const signingInput = `${encode(JSON.stringify({ alg: "ES256", kid: "test-key", typ: "at+jwt" }))}.${encode(
     JSON.stringify({
-      aud: "https://mcp.karibari.tsar-bmb.org/mcp",
+      aud: "https://mcp.karibari.com/mcp",
       exp: now + 3600,
       iat: now,
       iss: issuer,
@@ -125,7 +125,7 @@ describe("POST /mcp token exchange", () => {
     expect(response.status).toBe(200);
     expect(Object.fromEntries(forms[0] ?? [])).toStrictEqual({
       grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-      resource: "https://api.karibari.tsar-bmb.org/api",
+      resource: "https://api.karibari.com/api",
       subject_token: mcpToken,
       subject_token_type: "urn:ietf:params:oauth:token-type:access_token",
     });
@@ -145,7 +145,7 @@ describe("POST /mcp token exchange", () => {
     // Assert
     expect(response.status).toBe(401);
     expect(response.headers.get("WWW-Authenticate")).toContain(
-      'resource_metadata="https://mcp.karibari.tsar-bmb.org/.well-known/oauth-protected-resource/mcp"',
+      'resource_metadata="https://mcp.karibari.com/.well-known/oauth-protected-resource/mcp"',
     );
   });
 

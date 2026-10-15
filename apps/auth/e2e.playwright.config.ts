@@ -4,10 +4,10 @@ declare const process: { env: Record<string, string | undefined> };
 
 // E2E asserts URLs only, so it skips the Docker browser server that VRT needs for pixel stability.
 // A locally installed Chromium runs this suite (the `test:e2e` mise task installs it).
-// The suite speaks to the auth Worker on its configured custom-domain host (`auth.karibari.tsar-bmb.org`): `wrangler dev` rewrites local-origin headers to that host, so better-auth's trustedOrigins match only there.
+// The suite speaks to the auth Worker on its configured custom-domain host (`auth.karibari.com`): `wrangler dev` rewrites local-origin headers to that host, so better-auth's trustedOrigins match only there.
 // The browser maps the host to 127.0.0.1 via `--host-resolver-rules`.
 const e2ePort = Number(process.env.KARIBARI_AUTH_E2E_PORT ?? 3101);
-const baseURL = `http://auth.karibari.tsar-bmb.org:${e2ePort}`;
+const baseURL = `http://auth.karibari.com:${e2ePort}`;
 
 export default defineConfig({
   reporter: "dot",
@@ -26,7 +26,7 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         viewport: { height: 900, width: 1440 },
-        launchOptions: { args: ["--host-resolver-rules=MAP auth.karibari.tsar-bmb.org 127.0.0.1"] },
+        launchOptions: { args: ["--host-resolver-rules=MAP auth.karibari.com 127.0.0.1"] },
       },
     },
   ],
