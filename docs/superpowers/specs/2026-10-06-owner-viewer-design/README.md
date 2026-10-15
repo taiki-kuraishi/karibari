@@ -1,5 +1,7 @@
 # owner だけが使う Viewer と絶対の表示 URL
 
+旧 content API（`GET /api/projects/:project_id/versions/:version_id/content`）と、html-frame がそれを読む構成は phase 31（#38）で削除した（html-frame は screens の content を読む full の表示枠として残る）。今の仕様は [2026-09-09-interfaces-design.md](../2026-09-09-interfaces-design.md)。
+
 ## 目的・対象外・未決事項
 
 ### 目的

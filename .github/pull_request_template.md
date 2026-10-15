@@ -11,7 +11,7 @@ Format: <gitmoji> <type>(<scope>): <summary>  (scope optional)
 
 ## Target package
 
-<!-- Which workspace is this PR about? e.g. apps/mcp. Write "repo" for a root-level change. -->
+<!-- Which workspace is this PR about? e.g. packages/mcp. Write "repo" for a root-level change. -->
 
 ## Changes
 

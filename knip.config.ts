@@ -14,7 +14,18 @@ export default {
     // `cloudflare:workers` reads as a dependency literally named `cloudflare`.
     "apps/remote-mcp": { ignoreDependencies: ["cloudflare"] },
     "apps/api": { ignoreDependencies: ["cloudflare"] },
-    "apps/auth": { ignoreDependencies: ["cloudflare"] },
+    // The Playwright plugin is off because loading `vrt.playwright.config.ts` throws without
+    // `PW_TEST_CONNECT_WS_ENDPOINT` (VRT must run against the Docker browser server).
+    // Narrowing `playwright.config` cannot avoid it: knip also picks up config files from the
+    // `--config` flag in this package's scripts and loads them regardless.
+    // With the plugin off, both configs are parsed as plain entries and nothing reads their
+    // `testDir` or `globalSetup`, so those inputs are listed by hand below.
+    // Update `entry` whenever either config changes them.
+    "apps/auth": {
+      ignoreDependencies: ["cloudflare"],
+      entry: ["test/e2e/global-setup.ts", "test/e2e/**/*.spec.ts", "test/vrt/**/*.spec.ts"],
+      playwright: false,
+    },
     "apps/viewer": {},
     // The `exports` patterns in this package's package.json make every component an entry.
     // Knip therefore reports neither unused files nor unused exports for the library surface.
