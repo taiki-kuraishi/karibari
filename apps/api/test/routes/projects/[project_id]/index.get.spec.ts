@@ -33,7 +33,7 @@ describe("GET /api/projects/:project_id", () => {
 
     // Assert
     expect(response.status).toBe(200);
-    expect(body).toStrictEqual({ project, url: `https://karibari.tsar-bmb.org/p/${project.id}` });
+    expect(body).toStrictEqual({ project, url: `https://app.karibari.com/p/${project.id}` });
   });
 
   projectTest("404: hides a foreign owner's project", async ({ auth }) => {

@@ -7,8 +7,8 @@ const resourceClient = oauthProviderResourceClient();
 
 export const oauthProtectedResourceRoute = new Hono<HonoEnv>().get("/", async (c) => {
   const metadata = await resourceClient.getActions().getProtectedResourceMetadata({
-    resource: "https://mcp.karibari.tsar-bmb.org/mcp",
-    authorization_servers: ["https://auth.karibari.tsar-bmb.org/api/auth"],
+    resource: "https://mcp.karibari.com/mcp",
+    authorization_servers: ["https://auth.karibari.com/api/auth"],
   });
 
   return c.json(metadata);

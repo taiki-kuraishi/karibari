@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { baseURL, TestBetterAuthDatabase } from "../helpers/test-better-auth-database";
 
-const VIEWER_URL = "https://karibari.tsar-bmb.org/app";
+const VIEWER_URL = "https://app.karibari.com/app";
 
 // One TestBetterAuthDatabase per Playwright worker: the platform proxy behind it starts workerd, which is too expensive to reopen per test. The database itself is wiped in beforeEach/afterEach, so every test starts from a pristine D1.
 // oxlint-disable-next-line eslint/init-declarations -- Assigned in beforeAll.
@@ -51,7 +51,7 @@ test("ログイン済みで開くと callbackURL へ移動する", async ({ page
   const saved = await betterAuthTest.saveUser(user);
   const cookies = await betterAuthTest.getCookies({ userId: saved.id });
   await page.context().addCookies(cookies);
-  await page.route("https://karibari.tsar-bmb.org/**", async (route) => {
+  await page.route("https://app.karibari.com/**", async (route) => {
     await route.fulfill({ body: "viewer", status: 200 });
   });
 
@@ -112,7 +112,7 @@ test("OAuth 認可フローでは認可後に client の redirect_uri へ移動�
   authorizeUrl.searchParams.set("state", "e2e-state");
   authorizeUrl.searchParams.set("code_challenge", challenge);
   authorizeUrl.searchParams.set("code_challenge_method", "S256");
-  await page.route("https://karibari.tsar-bmb.org/**", async (route) => {
+  await page.route("https://app.karibari.com/**", async (route) => {
     await route.fulfill({ body: "viewer", status: 200 });
   });
 
@@ -125,5 +125,5 @@ test("OAuth 認可フローでは認可後に client の redirect_uri へ移動�
   await page.getByRole("button", { name: "許可する" }).click();
 
   // Assert
-  await expect(page).toHaveURL(/^https:\/\/karibari\.tsar-bmb\.org\/app\?/);
+  await expect(page).toHaveURL(/^https:\/\/app\.karibari\.com\/app\?/);
 });

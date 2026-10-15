@@ -16,7 +16,7 @@ test("`/p/:projectId` で `/` への link を押すと `/` に移動する", asy
         owner: "user-1",
         updated_at: 1_760_000_100,
       },
-      url: `https://karibari.tsar-bmb.org/p/${projectId}`,
+      url: `https://app.karibari.com/p/${projectId}`,
     },
     versions: [
       {
@@ -67,7 +67,7 @@ test("`/p/:projectId` で canvas の `versions` の行を選ぶと `?v=<versions
         owner: "user-1",
         updated_at: 1_760_000_100,
       },
-      url: `https://karibari.tsar-bmb.org/p/${projectId}`,
+      url: `https://app.karibari.com/p/${projectId}`,
     },
     screenContent: "<p>トップ</p>",
     screens: [
@@ -104,7 +104,7 @@ test("`/p/:projectId` で full の `versions` の行を選ぶと `?v=<versions.i
         owner: "user-1",
         updated_at: 1_760_000_100,
       },
-      url: `https://karibari.tsar-bmb.org/p/${projectId}`,
+      url: `https://app.karibari.com/p/${projectId}`,
     },
     screenContent: "<p>トップ</p>",
     screens: [
@@ -136,7 +136,7 @@ test("`/p/:projectId` を一覧に無い `v` で開くと 404 画面を出す", 
         owner: "user-1",
         updated_at: 1_760_000_100,
       },
-      url: `https://karibari.tsar-bmb.org/p/${projectId}`,
+      url: `https://app.karibari.com/p/${projectId}`,
     },
     versions: [
       {

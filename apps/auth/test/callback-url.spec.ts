@@ -26,19 +26,19 @@ describe("GET /api/callback-url", () => {
 
   test("信頼された callbackURL をそのまま返す", async () => {
     const response = await callbackUrlRoute.request(
-      "/?callbackURL=https%3A%2F%2Fkaribari.tsar-bmb.org%2Fapp",
+      "/?callbackURL=https%3A%2F%2Fapp.karibari.com%2Fapp",
       { method: "GET" },
       { auth },
     );
     expect(response.status).toBe(200);
     expect(await response.json()).toStrictEqual({
-      callbackURL: "https://karibari.tsar-bmb.org/app",
+      callbackURL: "https://app.karibari.com/app",
     });
   });
 
   test("信頼 origin に似せたホストは 403 を返す", async () => {
     const response = await callbackUrlRoute.request(
-      "/?callbackURL=https%3A%2F%2Fkaribari.tsar-bmb.org.evil.example%2F",
+      "/?callbackURL=https%3A%2F%2Fapp.karibari.com.evil.example%2F",
       { method: "GET" },
       { auth },
     );

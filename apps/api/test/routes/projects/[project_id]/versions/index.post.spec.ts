@@ -67,7 +67,7 @@ describe("POST /api/projects/:project_id/versions", () => {
     expect(response.status).toBe(201);
     expect(body).toStrictEqual({
       versionId: expect.any(String),
-      url: `https://karibari.tsar-bmb.org/p/${project.id}?v=${body.versionId}`,
+      url: `https://app.karibari.com/p/${project.id}?v=${body.versionId}`,
     });
     expect(version).toStrictEqual({
       id: body.versionId,
