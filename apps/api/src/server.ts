@@ -11,6 +11,7 @@ import type { ApiAuthClient } from "./middlewares/inject-middleware";
 import { authMiddleware } from "./middlewares/auth";
 import { corsMiddleware } from "./middlewares/cors";
 import { injectMiddleware } from "./middlewares/inject-middleware";
+import { getCommentsRoute } from "./routes/comments/index.get";
 import { getHealthRoute } from "./routes/health/index.get";
 import { getProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.get";
 import { postProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.post";
@@ -61,4 +62,5 @@ export const app = new Hono<HonoEnv>()
   .route("/api/projects", getProjectsRoute)
   .route("/api/projects", postProjectsRoute)
   .route("/api/versions", getVersionsRoute)
-  .route("/api/screens", getScreensRoute);
+  .route("/api/screens", getScreensRoute)
+  .route("/api/comments", getCommentsRoute);

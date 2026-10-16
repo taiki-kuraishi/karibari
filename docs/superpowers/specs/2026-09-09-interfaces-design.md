@@ -74,9 +74,10 @@
 - `DELETE /api/projects/:id/shares/:sid`（失効、要セッション・所有者のみ）
 
 ### 公開API 一括取得（合意済み）
-- 一覧画面が案件ごとの件数・最新版・先頭画面を出すため、案件（版）のidを複数受け取ってその行をまとめて返すrouteをテーブルごとに置く。1つのrouteは1つのテーブルの行だけを返し、件数や最新版の組み立てはViewerが行う（集計をApiの1つのrouteに持たせない）。今あるのは`versions`と`screens`
+- 一覧画面が案件ごとの件数・最新版・先頭画面を出すため、案件（版）のidを複数受け取ってその行をまとめて返すrouteをテーブルごとに置く。1つのrouteは1つのテーブルの行だけを返し、件数や最新版の組み立てはViewerが行う（集計をApiの1つのrouteに持たせない）。今あるのは`versions`・`screens`・`comments`
 - `GET /api/versions?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { versions: [{ id, project_id, type, created_at }] }`。並びは全案件を通した挿入順（`rowid`順）で、案件ごとにまとめない
 - `GET /api/screens?version_id=:vid&version_id=:vid…`（要セッション。未ログインは`404`）：`200 { screens: [{ id, version_id, name, width, height }] }`。並びは全版を通した挿入順（`rowid`順）。所有は版が属する案件の`owner`で判定する
+- `GET /api/comments?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { comments: [{ id, project_id, version_id, target, body, created_at }] }`。全版のコメントを返す。並びは全案件を通した`created_at`→`id`の順（`GET /api/projects/:id/comments`と同じ）
 - idは1〜50個。0個・51個以上は`400`。上限は所有者＋idの bind をD1の上限100に収めるため。所有していない・存在しないidは`404`にせず結果から除く（他人の案件の有無を見せない）
 
 ### 内部API（合意済み：持たない）
