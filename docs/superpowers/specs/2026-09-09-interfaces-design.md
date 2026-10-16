@@ -73,6 +73,11 @@
   - 出力：共有id＋招待ならトークン付きURL（`?invite=`）、署名なら署名付きURL（`?exp=&sig=`）
 - `DELETE /api/projects/:id/shares/:sid`（失効、要セッション・所有者のみ）
 
+### 公開API 一括取得（合意済み）
+- 一覧画面が案件ごとの件数・最新版・先頭画面を出すため、案件（版）のidを複数受け取ってその行をまとめて返すrouteをテーブルごとに置く。1つのrouteは1つのテーブルの行だけを返し、件数や最新版の組み立てはViewerが行う（集計をApiの1つのrouteに持たせない）。今あるのは`versions`だけ
+- `GET /api/versions?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { versions: [{ id, project_id, type, created_at }] }`。並びは全案件を通した挿入順（`rowid`順）で、案件ごとにまとめない
+- idは1〜50個。0個・51個以上は`400`。上限は所有者＋idの bind をD1の上限100に収めるため。所有していない・存在しないidは`404`にせず結果から除く（他人の案件の有無を見せない）
+
 ### 内部API（合意済み：持たない）
 - `/internal/*`は持たない（当初のoverall-archの内部API集約からの変更点）
 - MCPも公開`/api/*`を利用する

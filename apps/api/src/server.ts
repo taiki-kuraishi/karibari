@@ -24,6 +24,7 @@ import { getProjectVersionsRoute } from "./routes/projects/[project_id]/versions
 import { postProjectVersionsRoute } from "./routes/projects/[project_id]/versions/index.post";
 import { getProjectsRoute } from "./routes/projects/index.get";
 import { postProjectsRoute } from "./routes/projects/index.post";
+import { getVersionsRoute } from "./routes/versions/index.get";
 
 export interface HonoEnv {
   Bindings: Cloudflare.Env & {
@@ -57,4 +58,5 @@ export const app = new Hono<HonoEnv>()
     getProjectVersionScreenContentRoute,
   )
   .route("/api/projects", getProjectsRoute)
-  .route("/api/projects", postProjectsRoute);
+  .route("/api/projects", postProjectsRoute)
+  .route("/api/versions", getVersionsRoute);
