@@ -32,6 +32,9 @@
   - 出力：`201 { projectId, versionId, url }`。案件id＋初期版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id`。LLMが返したリンクをそのまま開けるため。originはApiの`VIEWER_ORIGIN`）
 - `GET /api/projects/:id`（単体取得、公開範囲判定あり：セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
   - 出力：`{ project, url }`。`url`は表示URL（絶対URL: `<Viewerのorigin>/p/:id`。originはApiの`VIEWER_ORIGIN`）
+- `PATCH /api/projects/:id`（名前の変更、要セッション・所有者のみ。所有していない・存在しない案件は`404`）
+  - 入力：`{ name }`。前後の空白を除き、空なら`null`（`POST /api/projects`の`name`と同じ扱い）。`name`が無い・文字列でないときは`400`
+  - 出力：`200 { project }`（変更後の行）。`projects.updated_at`も変更した時刻に進める（一覧の並びで先頭に来る）
 
 ### 公開API versions（合意済み）
 - `GET /api/projects/:id/versions`（版一覧。`versions`の並びで返す。各行に`type`を含む）

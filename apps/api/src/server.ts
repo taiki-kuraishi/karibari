@@ -16,6 +16,7 @@ import { getHealthRoute } from "./routes/health/index.get";
 import { getProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.get";
 import { postProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.post";
 import { getProjectRoute } from "./routes/projects/[project_id]/index.get";
+import { patchProjectRoute } from "./routes/projects/[project_id]/index.patch";
 import { deleteProjectShareRoute } from "./routes/projects/[project_id]/shares/[share_id]/index.delete";
 import { getProjectSharesRoute } from "./routes/projects/[project_id]/shares/index.get";
 import { getProjectVersionRoute } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
@@ -48,6 +49,7 @@ export const app = new Hono<HonoEnv>()
   .use("/api/*", injectMiddleware)
   .use("/api/*", authMiddleware)
   .route("/api/projects/:project_id", getProjectRoute)
+  .route("/api/projects/:project_id", patchProjectRoute)
   .route("/api/projects/:project_id/comments", postProjectCommentsRoute)
   .route("/api/projects/:project_id/comments", getProjectCommentsRoute)
   .route("/api/projects/:project_id/shares", getProjectSharesRoute)
