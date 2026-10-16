@@ -26,6 +26,7 @@ import { postProjectVersionsRoute } from "./routes/projects/[project_id]/version
 import { getProjectsRoute } from "./routes/projects/index.get";
 import { postProjectsRoute } from "./routes/projects/index.post";
 import { getScreensRoute } from "./routes/screens/index.get";
+import { getSharesRoute } from "./routes/shares/index.get";
 import { getVersionsRoute } from "./routes/versions/index.get";
 
 export interface HonoEnv {
@@ -63,4 +64,5 @@ export const app = new Hono<HonoEnv>()
   .route("/api/projects", postProjectsRoute)
   .route("/api/versions", getVersionsRoute)
   .route("/api/screens", getScreensRoute)
-  .route("/api/comments", getCommentsRoute);
+  .route("/api/comments", getCommentsRoute)
+  .route("/api/shares", getSharesRoute);
