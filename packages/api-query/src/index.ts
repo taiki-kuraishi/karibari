@@ -1,5 +1,6 @@
 export { DetailedError } from "hono/client";
 export { ApiQueryProvider } from "./provider";
+export { useCommentsQuery } from "./query/use-comments-query";
 export { useProjectQuery } from "./query/use-project-query";
 export { useProjectVersionsQuery } from "./query/use-project-versions-query";
 export { useProjectsQuery } from "./query/use-projects-query";
