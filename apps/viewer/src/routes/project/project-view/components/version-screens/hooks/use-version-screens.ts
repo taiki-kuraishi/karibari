@@ -1,4 +1,4 @@
-import { useScreensQuery } from "@karibari/api-query";
+import { useVersionScreensQuery } from "@karibari/api-query";
 import { notFound } from "@tanstack/react-router";
 
 import { apiClient } from "@/lib/api-client";
@@ -12,7 +12,7 @@ export function useVersionScreens({
   type: "canvas" | "full";
   versionId: string;
 }) {
-  const { data } = useScreensQuery(projectId, versionId);
+  const { data } = useVersionScreensQuery(projectId, versionId);
 
   if (data === undefined) {
     return { status: "loading" } as const;

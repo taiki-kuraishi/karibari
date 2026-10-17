@@ -1,4 +1,4 @@
-import { useProjectQuery, useVersionsQuery } from "@karibari/api-query";
+import { useProjectQuery, useProjectVersionsQuery } from "@karibari/api-query";
 import { notFound } from "@tanstack/react-router";
 import { useQueryStates } from "nuqs";
 
@@ -6,7 +6,7 @@ import { projectParams } from "@/routes/project/params";
 
 export function useProjectView(projectId: string) {
   const { data: projectData } = useProjectQuery(projectId);
-  const { data: versionsData } = useVersionsQuery(projectId);
+  const { data: versionsData } = useProjectVersionsQuery(projectId);
   const [{ v }, setParams] = useQueryStates(projectParams);
 
   if (projectData === undefined || versionsData === undefined) {

@@ -3,14 +3,12 @@ import { parseResponse } from "hono/client";
 
 import { useApi } from "../use-api";
 
-export function useVersionsQuery(projectId: string) {
+export function useVersionsQuery(projectIds: string[]) {
   const client = useApi();
 
   return useQuery({
     queryFn: async () => {
-      const res = await client.api.projects[":project_id"].versions.$get({
-        param: { project_id: projectId },
-      });
+      const res = await client.api.versions.$get({ query: { project_id: projectIds } });
 
       if (res.status === 404) {
         return null;
@@ -18,6 +16,6 @@ export function useVersionsQuery(projectId: string) {
 
       return await parseResponse(res);
     },
-    queryKey: ["projects", projectId, "versions"],
+    queryKey: ["versions", projectIds],
   });
 }

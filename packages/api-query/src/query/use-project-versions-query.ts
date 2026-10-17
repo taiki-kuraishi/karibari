@@ -3,13 +3,13 @@ import { parseResponse } from "hono/client";
 
 import { useApi } from "../use-api";
 
-export function useScreensQuery(projectId: string, versionId: string) {
+export function useProjectVersionsQuery(projectId: string) {
   const client = useApi();
 
   return useQuery({
     queryFn: async () => {
-      const res = await client.api.projects[":project_id"].versions[":version_id"].screens.$get({
-        param: { project_id: projectId, version_id: versionId },
+      const res = await client.api.projects[":project_id"].versions.$get({
+        param: { project_id: projectId },
       });
 
       if (res.status === 404) {
@@ -18,6 +18,6 @@ export function useScreensQuery(projectId: string, versionId: string) {
 
       return await parseResponse(res);
     },
-    queryKey: ["projects", projectId, "versions", versionId, "screens"],
+    queryKey: ["projects", projectId, "versions"],
   });
 }

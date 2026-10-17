@@ -20,7 +20,10 @@ It is source-only: `exports` point at `./src`, apps consume it as source, and no
 ## Rules
 
 - 1 route = 1 file. Name a list route in the plural and a one-item route in the singular
-  (`use-projects-query.ts`, `use-project-query.ts`).
+  (`use-projects-query.ts`, `use-project-query.ts`). A route nested under a parent takes its
+  immediate parent's name as a prefix (`/api/projects/:id/versions` → `use-project-versions-query.ts`,
+  `…/versions/:vid/screens` → `use-version-screens-query.ts`), so the bare plural stays free for the
+  top-level batch route (`/api/versions` → `use-versions-query.ts`).
 - Never hand-write a type. `data` is the route's 200 body (what `InferResponseType<…, 200>` gives),
   `null` (404) or `undefined` (loading), inferred through `parseResponse`; a hook's return type
   stays inferred.
@@ -44,6 +47,7 @@ It is source-only: `exports` point at `./src`, apps consume it as source, and no
 2. Rename the hook and point the client call at the new route. Each route param becomes an
    argument of the hook.
 3. Set the query key to the route's path with params as values: `["projects"]`,
-   `["projects", projectId]`, `["projects", projectId, "versions"]`.
+   `["projects", projectId]`, `["projects", projectId, "versions"]`. A batch route's id list is the
+   value after its path: `["versions", projectIds]`.
 4. Add one line to `src/index.ts`: `export { use<Resource>Query } from "./query/use-<resource>-query";`
 5. Run `bun run --cwd packages/api-query type-check`.
