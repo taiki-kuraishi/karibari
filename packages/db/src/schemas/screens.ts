@@ -8,7 +8,7 @@ export const screens = sqliteTable(
     id: text().primaryKey(),
     version_id: text()
       .notNull()
-      .references(() => versions.id),
+      .references(() => versions.id, { onDelete: "cascade" }),
     name: text(),
     width: integer().notNull(),
     height: integer().notNull(),

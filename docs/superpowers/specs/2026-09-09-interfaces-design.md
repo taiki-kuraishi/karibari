@@ -35,6 +35,9 @@
 - `PATCH /api/projects/:id`（名前の変更、要セッション・所有者のみ。所有していない・存在しない案件は`404`）
   - 入力：`{ name }`。前後の空白を除き、空なら`null`（`POST /api/projects`の`name`と同じ扱い）。`name`が無い・文字列でないときは`400`
   - 出力：`200 { project }`（変更後の行）。`projects.updated_at`も変更した時刻に進める（一覧の並びで先頭に来る）
+- `DELETE /api/projects/:id`（案件の削除、要セッション・所有者のみ。所有していない・存在しない案件は`404`で何も消さない。元に戻せない）
+  - `projects`の行を消し、外部キーの`ON DELETE cascade`でその案件の`versions`・`screens`・`comments`・`shares`の行も消す。そのあとR2の`projects/{id}/`以下を消す（R2は外部キーでは消えない）。D1を先に消すのは、R2の削除が途中で失敗しても参照されない実体が残るだけで済むため（逆だと実体の無い行が残る）
+  - 出力：`200 { deleted: true }`
 
 ### 公開API versions（合意済み）
 - `GET /api/projects/:id/versions`（版一覧。`versions`の並びで返す。各行に`type`を含む）
@@ -43,7 +46,7 @@
   - 出力：`201 { versionId, url }`。新版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id?v=:vid`）
 - `GET /api/projects/:id/versions/:vid`（版meta取得。`type`を含む）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
-- `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示、`GET /api/projects/:id/comments`）は、この並びの最後の行
+- `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。SQLiteは新しい行に、残っている行の最大の`rowid`＋1を振るので、案件の削除で行が消えても残った行の順は崩れない。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示、`GET /api/projects/:id/comments`）は、この並びの最後の行
 - 編集は上書きせず新version追加（HTML不変版を維持）
 
 ### 版の表示の種類（合意済み）

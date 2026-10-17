@@ -27,7 +27,7 @@ export const getVersionsRoute = new Hono<HonoEnv>().get(
           table.project_id,
           projects.map((project) => project.id),
         ),
-      // `rowid` follows insertion because rows in this table are never deleted.
+      // `rowid` follows insertion: SQLite gives a new row the largest live rowid plus one.
       orderBy: (_table, { asc, sql }) => [asc(sql`rowid`)],
     });
 

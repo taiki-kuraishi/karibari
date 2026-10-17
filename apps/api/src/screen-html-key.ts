@@ -1,3 +1,5 @@
-// Both submission routes write and the content route reads this key, so they must not drift.
+// One key format for every route: submission writes, content reads and project delete clears it.
+export const projectHtmlPrefix = (projectId: string) => `projects/${projectId}/`;
+
 export const screenHtmlKey = (args: { projectId: string; screenId: string; versionId: string }) =>
-  `projects/${args.projectId}/versions/${args.versionId}/screens/${args.screenId}.html`;
+  `${projectHtmlPrefix(args.projectId)}versions/${args.versionId}/screens/${args.screenId}.html`;

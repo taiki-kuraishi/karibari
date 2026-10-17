@@ -37,7 +37,7 @@ export const getScreensRoute = new Hono<HonoEnv>().get(
 
     const screens = await c.env.db.query.screens.findMany({
       where: (table, { inArray }) => inArray(table.version_id, ownedVersionIds),
-      // `rowid` follows insertion because rows in this table are never deleted.
+      // `rowid` follows insertion: SQLite gives a new row the largest live rowid plus one.
       orderBy: (_table, { asc, sql }) => [asc(sql`rowid`)],
     });
 
