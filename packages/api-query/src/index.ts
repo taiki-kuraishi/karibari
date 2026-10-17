@@ -1,5 +1,6 @@
 export { DetailedError } from "hono/client";
 export { ApiQueryProvider } from "./provider";
+export { useRenameProjectMutation } from "./mutation/use-rename-project-mutation";
 export { useCommentsQuery } from "./query/use-comments-query";
 export { useProjectQuery } from "./query/use-project-query";
 export { useProjectVersionsQuery } from "./query/use-project-versions-query";
