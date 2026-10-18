@@ -16,6 +16,7 @@ import {
 } from "@karibari/shadcn/components/pagination";
 
 import { ProjectGrid } from "./components/project-grid";
+import { ProjectOnboarding } from "./components/project-onboarding";
 import { ProjectToolbar } from "./components/project-toolbar";
 import { useProjectList } from "./hooks/use-project-list";
 
@@ -31,15 +32,7 @@ export function ProjectList() {
   }
 
   if (view.status === "empty") {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyDescription>
-            まだありません。MCP の create_project で HTML を入稿すると、ここに出ます。
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
+    return <ProjectOnboarding />;
   }
 
   if (view.status === "no-match") {
