@@ -11,7 +11,7 @@ export function ProjectThumbnail({
 
   return (
     <div className="relative aspect-video overflow-hidden rounded-md bg-muted" ref={view.frameRef}>
-      {/* `inert` hands every click to the card's link. */}
+      {/* `inert` hands every click to the link around the thumbnail. */}
       {view.status === "ready" && (
         <iframe
           className="pointer-events-none absolute top-0 left-0 origin-top-left bg-white"

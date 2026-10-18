@@ -6,6 +6,7 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@karibari/shadcn/components/empty";
+import { toast } from "@karibari/shadcn/components/toast";
 
 const mcpUrl = `${import.meta.env.VITE_MCP_ORIGIN}/mcp`;
 
@@ -26,7 +27,13 @@ export function ProjectOnboarding() {
           <code className="flex-1 truncate rounded-md bg-muted px-3 py-2 text-left font-mono text-sm">
             {mcpUrl}
           </code>
-          <Button onClick={() => void navigator.clipboard.writeText(mcpUrl)} variant="outline">
+          <Button
+            onClick={async () => {
+              await navigator.clipboard.writeText(mcpUrl);
+              toast.add({ title: "URL をコピーしました", type: "success" });
+            }}
+            variant="outline"
+          >
             コピー
           </Button>
         </div>
