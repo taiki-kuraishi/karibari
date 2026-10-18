@@ -109,6 +109,16 @@ export async function stubApi({
   await page.route(`${apiOrigin}/api/projects`, async (route) => {
     await fulfill({ json: { projects }, route });
   });
+  // The home grid reads these for the listed projects; no test needs their rows yet.
+  await page.route(`${apiOrigin}/api/versions?*`, async (route) => {
+    await fulfill({ json: { versions: [] }, route });
+  });
+  await page.route(`${apiOrigin}/api/comments?*`, async (route) => {
+    await fulfill({ json: { comments: [] }, route });
+  });
+  await page.route(`${apiOrigin}/api/shares?*`, async (route) => {
+    await fulfill({ json: { shares: [] }, route });
+  });
 
   if (project === undefined) {
     return;

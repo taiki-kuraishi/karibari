@@ -11,6 +11,7 @@
 
 ### SPAルート（合意済み）
 - `GET /` → 一覧/案内（未ログイン時はログイン画面へ遷移）
+  - `?page=<n>` 任意（24件ごとのページ。なし=1。範囲外は最寄りのページを出す）
 - ログイン画面はAuth側で集約（Viewer内に`/login`は持たない）
 - `GET /p/:projectId` → Viewer本体
   - `?v=<versionId>` 任意（なし=`versions`の並びの最後の行。「公開API versions」）
