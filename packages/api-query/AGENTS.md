@@ -51,6 +51,11 @@ It is source-only: `exports` point at `./src`, apps consume it as source, and no
 - A mutation hook invalidates, in `onSuccess`, the query keys whose data the write changed. Query
   keys follow the route's path, so a prefix such as `["projects"]` also reaches
   `["projects", projectId]`. Anything else the app does after a write stays in the app.
+- A query hook whose screen-specific options vary (`enabled`, `placeholderData`) takes them as
+  `options?: Omit<UseQueryOptions<Data>, "queryFn" | "queryKey">`, with `Data` derived from the
+  route (`InferResponseType<Route, 200> | null`), and spreads them before `queryFn` and `queryKey`.
+  When an id list can be empty, the app passes `enabled: ids.length > 0`; a batch route answers
+  400 to an empty list.
 
 ## Adding a query hook
 
