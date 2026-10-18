@@ -38,5 +38,6 @@ export default {
     "packages/db": {},
     "packages/mcp": {},
     "packages/api-query": {},
+    "packages/auth-query": {},
   },
 } satisfies KnipConfig;

@@ -86,11 +86,22 @@ export async function stubApi({
       await fulfill({ json: { error: "not_found" }, route, status: 404 });
     },
   );
+  // Sign-out flips this, so the session gate's next get-session sees no session.
+  let signedIn = session;
   await page.route(`${authOrigin}/api/auth/get-session`, async (route) => {
     await fulfill({
-      json: session ? { session: { id: "session-1" }, user: { id: "user-1" } } : null,
+      json: signedIn
+        ? {
+            session: { id: "session-1" },
+            user: { id: "user-1", name: "Taiki", email: "taiki@example.com", image: null },
+          }
+        : null,
       route,
     });
+  });
+  await page.route(`${authOrigin}/api/auth/sign-out`, async (route) => {
+    signedIn = false;
+    await fulfill({ json: { success: true }, route });
   });
   await page.route(`${authOrigin}/sign-in*`, async (route) => {
     await route.fulfill({ body: "", contentType: "text/html" });

@@ -25,3 +25,19 @@ test("`/` で行を押すと `/p/:projectId` へ移動する", async ({ page }) 
   // Assert
   await expect(page).toHaveURL(`/p/${projectId}`);
 });
+
+test("`/` でログアウトするとサインインへ移動する", async ({ baseURL, page }) => {
+  // Arrange
+  await stubApi({ page });
+  const openedUrl = new URL("/", baseURL).href;
+  await page.goto(openedUrl);
+  await page.getByRole("button", { name: "ユーザーメニュー" }).click();
+
+  // Act
+  await page.getByRole("menuitem", { name: "ログアウト" }).click();
+
+  // Assert
+  await expect(page).toHaveURL(
+    `https://auth.karibari.tsar-bmb.org/sign-in?callbackURL=${encodeURIComponent(openedUrl)}`,
+  );
+});

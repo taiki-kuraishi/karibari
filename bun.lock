@@ -97,6 +97,7 @@
       "dependencies": {
         "@karibari/api": "workspace:*",
         "@karibari/api-query": "workspace:*",
+        "@karibari/auth-query": "workspace:*",
         "@karibari/shadcn": "workspace:*",
         "@tanstack/react-query": "catalog:",
         "@tanstack/react-router": "catalog:",
@@ -127,6 +128,18 @@
       "devDependencies": {
         "@karibari/api": "workspace:*",
         "@types/react": "catalog:",
+      },
+      "peerDependencies": {
+        "@tanstack/react-query": "catalog:",
+        "react": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/auth-query": {
+      "name": "@karibari/auth-query",
+      "devDependencies": {
+        "@types/react": "catalog:",
+        "better-auth": "catalog:",
       },
       "peerDependencies": {
         "@tanstack/react-query": "catalog:",
@@ -536,6 +549,8 @@
     "@karibari/api-query": ["@karibari/api-query@workspace:packages/api-query"],
 
     "@karibari/auth": ["@karibari/auth@workspace:apps/auth"],
+
+    "@karibari/auth-query": ["@karibari/auth-query@workspace:packages/auth-query"],
 
     "@karibari/better-auth": ["@karibari/better-auth@workspace:packages/better-auth"],
 
