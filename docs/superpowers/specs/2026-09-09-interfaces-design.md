@@ -12,6 +12,8 @@
 ### SPAルート（合意済み）
 - `GET /` → 一覧/案内（未ログイン時はログイン画面へ遷移）
   - `?page=<n>` 任意（24件ごとのページ。なし=1。範囲外は最寄りのページを出す）
+  - `?q=<文字列>` 任意（名前の部分一致。大文字小文字を区別しない。名前の無い案件は「無題」で照合）
+  - `?sort=updated|created|name` 任意（なし=`updated`。更新日・作成日の新しい順、名前順）。`q`・`sort`を変えると`page`は1に戻る
 - ログイン画面はAuth側で集約（Viewer内に`/login`は持たない）
 - `GET /p/:projectId` → Viewer本体
   - `?v=<versionId>` 任意（なし=`versions`の並びの最後の行。「公開API versions」）

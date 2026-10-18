@@ -1,4 +1,11 @@
-import { Empty, EmptyDescription, EmptyHeader } from "@karibari/shadcn/components/empty";
+import { Button } from "@karibari/shadcn/components/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@karibari/shadcn/components/empty";
 import {
   Pagination,
   PaginationContent,
@@ -9,6 +16,7 @@ import {
 } from "@karibari/shadcn/components/pagination";
 
 import { ProjectGrid } from "./components/project-grid";
+import { ProjectToolbar } from "./components/project-toolbar";
 import { useProjectList } from "./hooks/use-project-list";
 
 export function ProjectList() {
@@ -33,11 +41,31 @@ export function ProjectList() {
       </Empty>
     );
   }
+
+  if (view.status === "no-match") {
+    return (
+      <div className="flex flex-col gap-6">
+        <ProjectToolbar {...view.toolbar} />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>一致するプロジェクトはありません</EmptyTitle>
+            <EmptyDescription>「{view.toolbar.q}」に一致する名前がありません。</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button onClick={() => view.toolbar.search("")} variant="outline">
+              検索をクリア
+            </Button>
+          </EmptyContent>
+        </Empty>
+      </div>
+    );
+  }
   const { currentPage, pageCount, selectPage } = view;
   const pages = Array.from({ length: pageCount }, (_, index) => index + 1);
 
   return (
     <div className="flex flex-col gap-6">
+      <ProjectToolbar {...view.toolbar} />
       <ProjectGrid projects={view.projects} />
       {pageCount > 1 && (
         <Pagination>
