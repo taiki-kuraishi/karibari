@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@karibari/shadcn/components/dropdown-menu";
 
+import { DeleteDialog } from "./components/delete-dialog";
 import { RenameDialog } from "./components/rename-dialog";
 import { useProjectCardMenu } from "./hooks/use-project-card-menu";
 
@@ -19,7 +20,8 @@ export function ProjectCardMenu({
   name: string | null;
   projectId: string;
 }) {
-  const { closeRename, copyUrl, openRename, renaming } = useProjectCardMenu(projectId);
+  const { closeDelete, closeRename, copyUrl, deleting, openDelete, openRename, renaming } =
+    useProjectCardMenu(projectId);
 
   return (
     <>
@@ -35,13 +37,16 @@ export function ProjectCardMenu({
           <DropdownMenuItem onClick={copyUrl}>URL をコピー</DropdownMenuItem>
           <DropdownMenuItem onClick={openRename}>名前を変更</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem disabled variant="destructive">
+          <DropdownMenuItem onClick={openDelete} variant="destructive">
             削除
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {/* Mounted only while open, so its input starts from the current name every time. */}
+      {/* Each dialog mounts only while open, so the rename input starts from the current name. */}
       {renaming && <RenameDialog name={name} onClose={closeRename} projectId={projectId} />}
+      {deleting && (
+        <DeleteDialog displayName={displayName} onClose={closeDelete} projectId={projectId} />
+      )}
     </>
   );
 }
