@@ -2,6 +2,7 @@ import { Badge } from "@karibari/shadcn/components/badge";
 import { Card, CardContent, CardDescription, CardTitle } from "@karibari/shadcn/components/card";
 import { Link } from "@tanstack/react-router";
 
+import { ProjectThumbnail } from "./components/project-thumbnail";
 import { useProjectGrid } from "./hooks/use-project-grid";
 
 export function ProjectGrid({
@@ -26,7 +27,7 @@ export function ProjectGrid({
           <Link className="block" params={{ projectId: card.id }} to="/p/$projectId">
             <Card>
               <CardContent>
-                <div className="aspect-video rounded-md bg-muted" />
+                <ProjectThumbnail cover={card.cover} title={card.displayName} />
               </CardContent>
               <CardContent className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
