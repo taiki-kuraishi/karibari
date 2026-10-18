@@ -47,7 +47,11 @@ export function ProjectGrid({
                   {` · 版 ${card.versionCount} · コメント ${card.commentCount} · 共有 ${card.shareCount}`}
                 </CardDescription>
               </div>
-              <ProjectCardMenu name={card.displayName} projectId={card.id} />
+              <ProjectCardMenu
+                displayName={card.displayName}
+                name={card.name}
+                projectId={card.id}
+              />
             </CardContent>
           </Card>
         </li>

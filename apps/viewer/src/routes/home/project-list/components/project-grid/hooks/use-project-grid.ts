@@ -75,6 +75,7 @@ export function useProjectGrid({
       },
       displayName: project.name ?? "無題",
       id: project.id,
+      name: project.name,
       shareCount: sharesData.shares.filter((share) => share.project_id === project.id).length,
       type: latest?.type,
       updatedAt: new Date(project.updated_at * 1000).toLocaleString("ja-JP"),
