@@ -1,9 +1,13 @@
+import { HomeHeader } from "./home/home-header";
 import { ProjectList } from "./home/project-list";
 
 export function HomePage() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-6">
-      <ProjectList />
-    </main>
+    <>
+      <HomeHeader />
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-6">
+        <ProjectList />
+      </main>
+    </>
   );
 }

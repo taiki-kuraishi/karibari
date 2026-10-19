@@ -10,7 +10,7 @@ export const versions = sqliteTable(
     id: text().primaryKey(),
     project_id: text()
       .notNull()
-      .references(() => projects.id),
+      .references(() => projects.id, { onDelete: "cascade" }),
     type: text().$type<VersionType>().notNull().default("canvas"),
     created_at: integer().notNull(),
   },

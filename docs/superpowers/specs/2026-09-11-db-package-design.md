@@ -28,6 +28,7 @@
 - `comments`: `id` TEXT PK、`project_id` TEXT NOT NULL → `projects.id`、`version_id` TEXT NOT NULL → `versions.id`、`target` TEXT NOT NULL（要素指定の opaque セレクタ）、`body` TEXT NOT NULL、`created_at` INTEGER NOT NULL。
 - `shares`: `id` TEXT PK、`project_id` TEXT NOT NULL → `projects.id`、`kind` TEXT NOT NULL（`private` / `invite` / `signed`）、`token` TEXT NULL 可 UNIQUE（invite 用）、`key_id` TEXT NULL 可（signed 用。鍵本体は Secrets）、失効は行削除（DELETE＝失効）。`exp` は URL に載せ保存しない。`target` の版スコープ指定は持たない（署名対象の version は URL の `?v=` で運ぶ）。
 - index: `versions(project_id)`、`screens(version_id)`、`comments(project_id, version_id)`、`shares(project_id)`、`shares(token)` UNIQUE。
+- 外部キーはすべて `ON DELETE cascade`。案件の削除は `projects` の行を消すだけで、版・画面・コメント・共有の行も消える。
 
 ## 設計
 

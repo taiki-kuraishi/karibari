@@ -1,16 +1,23 @@
+import type { ApiClient } from "@karibari/api/client";
+import type { UseQueryOptions } from "@tanstack/react-query";
+import type { InferResponseType } from "hono/client";
+
 import { useQuery } from "@tanstack/react-query";
 import { parseResponse } from "hono/client";
 
 import { useApi } from "../use-api";
 
-export function useVersionsQuery(projectId: string) {
+type Route = ApiClient["api"]["versions"]["$get"];
+type Data = InferResponseType<Route, 200> | null;
+type Options = Omit<UseQueryOptions<Data>, "queryFn" | "queryKey">;
+
+export function useVersionsQuery(projectIds: string[], options?: Options) {
   const client = useApi();
 
-  return useQuery({
+  return useQuery<Data>({
+    ...options,
     queryFn: async () => {
-      const res = await client.api.projects[":project_id"].versions.$get({
-        param: { project_id: projectId },
-      });
+      const res = await client.api.versions.$get({ query: { project_id: projectIds } });
 
       if (res.status === 404) {
         return null;
@@ -18,6 +25,6 @@ export function useVersionsQuery(projectId: string) {
 
       return await parseResponse(res);
     },
-    queryKey: ["projects", projectId, "versions"],
+    queryKey: ["versions", projectIds],
   });
 }

@@ -38,7 +38,7 @@ export const getProjectVersionScreensRoute = new Hono<HonoEnv>().get(
       columns: { id: true, name: true, width: true, height: true },
       where: (table, { eq }) => eq(table.version_id, versionId),
       // Submission order, which a version's screens have no column for.
-      // `rowid` follows insertion because rows in this table are never deleted.
+      // `rowid` follows insertion: SQLite gives a new row the largest live rowid plus one.
       orderBy: (_table, { asc, sql }) => [asc(sql`rowid`)],
     });
 

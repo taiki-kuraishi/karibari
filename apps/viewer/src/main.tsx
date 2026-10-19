@@ -1,4 +1,6 @@
 import { ApiQueryProvider } from "@karibari/api-query";
+import { AuthQueryProvider } from "@karibari/auth-query";
+import { Toaster } from "@karibari/shadcn/components/toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
@@ -6,6 +8,7 @@ import { createRoot } from "react-dom/client";
 
 import "./styles.css";
 import { apiClient } from "./lib/api-client";
+import { authClient } from "./lib/auth-client";
 import { router } from "./router";
 
 const queryClient = new QueryClient({
@@ -22,9 +25,13 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ApiQueryProvider client={apiClient}>
-        <RouterProvider router={router} />
-      </ApiQueryProvider>
+      <AuthQueryProvider client={authClient}>
+        <ApiQueryProvider client={apiClient}>
+          <Toaster>
+            <RouterProvider router={router} />
+          </Toaster>
+        </ApiQueryProvider>
+      </AuthQueryProvider>
     </QueryClientProvider>
   </StrictMode>,
 );

@@ -10,7 +10,7 @@ export const shares = sqliteTable(
     id: text().primaryKey(),
     project_id: text()
       .notNull()
-      .references(() => projects.id),
+      .references(() => projects.id, { onDelete: "cascade" }),
     kind: text().$type<ShareKind>().notNull(),
     token: text(),
     key_id: text(),

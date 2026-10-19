@@ -11,10 +11,13 @@ import type { ApiAuthClient } from "./middlewares/inject-middleware";
 import { authMiddleware } from "./middlewares/auth";
 import { corsMiddleware } from "./middlewares/cors";
 import { injectMiddleware } from "./middlewares/inject-middleware";
+import { getCommentsRoute } from "./routes/comments/index.get";
 import { getHealthRoute } from "./routes/health/index.get";
 import { getProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.get";
 import { postProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.post";
+import { deleteProjectRoute } from "./routes/projects/[project_id]/index.delete";
 import { getProjectRoute } from "./routes/projects/[project_id]/index.get";
+import { patchProjectRoute } from "./routes/projects/[project_id]/index.patch";
 import { deleteProjectShareRoute } from "./routes/projects/[project_id]/shares/[share_id]/index.delete";
 import { getProjectSharesRoute } from "./routes/projects/[project_id]/shares/index.get";
 import { getProjectVersionRoute } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
@@ -24,6 +27,9 @@ import { getProjectVersionsRoute } from "./routes/projects/[project_id]/versions
 import { postProjectVersionsRoute } from "./routes/projects/[project_id]/versions/index.post";
 import { getProjectsRoute } from "./routes/projects/index.get";
 import { postProjectsRoute } from "./routes/projects/index.post";
+import { getScreensRoute } from "./routes/screens/index.get";
+import { getSharesRoute } from "./routes/shares/index.get";
+import { getVersionsRoute } from "./routes/versions/index.get";
 
 export interface HonoEnv {
   Bindings: Cloudflare.Env & {
@@ -44,6 +50,8 @@ export const app = new Hono<HonoEnv>()
   .use("/api/*", injectMiddleware)
   .use("/api/*", authMiddleware)
   .route("/api/projects/:project_id", getProjectRoute)
+  .route("/api/projects/:project_id", patchProjectRoute)
+  .route("/api/projects/:project_id", deleteProjectRoute)
   .route("/api/projects/:project_id/comments", postProjectCommentsRoute)
   .route("/api/projects/:project_id/comments", getProjectCommentsRoute)
   .route("/api/projects/:project_id/shares", getProjectSharesRoute)
@@ -57,4 +65,8 @@ export const app = new Hono<HonoEnv>()
     getProjectVersionScreenContentRoute,
   )
   .route("/api/projects", getProjectsRoute)
-  .route("/api/projects", postProjectsRoute);
+  .route("/api/projects", postProjectsRoute)
+  .route("/api/versions", getVersionsRoute)
+  .route("/api/screens", getScreensRoute)
+  .route("/api/comments", getCommentsRoute)
+  .route("/api/shares", getSharesRoute);

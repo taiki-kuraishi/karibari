@@ -11,6 +11,9 @@
 
 ### SPAルート（合意済み）
 - `GET /` → 一覧/案内（未ログイン時はログイン画面へ遷移）
+  - `?page=<n>` 任意（24件ごとのページ。なし=1。範囲外は最寄りのページを出す）
+  - `?q=<文字列>` 任意（名前の部分一致。大文字小文字を区別しない。名前の無い案件は「無題」で照合）
+  - `?sort=updated|created|name` 任意（なし=`updated`。更新日・作成日の新しい順、名前順）。`q`・`sort`を変えると`page`は1に戻る
 - ログイン画面はAuth側で集約（Viewer内に`/login`は持たない）
 - `GET /p/:projectId` → Viewer本体
   - `?v=<versionId>` 任意（なし=`versions`の並びの最後の行。「公開API versions」）
@@ -22,7 +25,7 @@
 ## Api
 
 ### 公開APIの資源分割（合意済み）
-- `projects` / `versions` / `screens` / `comments` / `shares` を別URLの資源に分ける（`screens`は`versions`の下）
+- `projects` / `versions` / `screens` / `comments` / `shares` を別URLの資源に分ける（`screens`は`versions`の下）。複数の案件（版）をまとめて引く一括取得だけは最上位に置く（「公開API 一括取得」）
 - R2取得（HTML実体）はApi経由のみ（R2直接公開なし）
 
 ### 公開API projects（合意済み）
@@ -32,6 +35,12 @@
   - 出力：`201 { projectId, versionId, url }`。案件id＋初期版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id`。LLMが返したリンクをそのまま開けるため。originはApiの`VIEWER_ORIGIN`）
 - `GET /api/projects/:id`（単体取得、公開範囲判定あり：セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
   - 出力：`{ project, url }`。`url`は表示URL（絶対URL: `<Viewerのorigin>/p/:id`。originはApiの`VIEWER_ORIGIN`）
+- `PATCH /api/projects/:id`（名前の変更、要セッション・所有者のみ。所有していない・存在しない案件は`404`）
+  - 入力：`{ name }`。前後の空白を除き、空なら`null`（`POST /api/projects`の`name`と同じ扱い）。`name`が無い・文字列でないときは`400`
+  - 出力：`200 { project }`（変更後の行）。`projects.updated_at`も変更した時刻に進める（一覧の並びで先頭に来る）
+- `DELETE /api/projects/:id`（案件の削除、要セッション・所有者のみ。所有していない・存在しない案件は`404`で何も消さない。元に戻せない）
+  - `projects`の行を消し、外部キーの`ON DELETE cascade`でその案件の`versions`・`screens`・`comments`・`shares`の行も消す。そのあとR2の`projects/{id}/`以下を消す（R2は外部キーでは消えない）。D1を先に消すのは、R2の削除が途中で失敗しても参照されない実体が残るだけで済むため（逆だと実体の無い行が残る）
+  - 出力：`200 { deleted: true }`
 
 ### 公開API versions（合意済み）
 - `GET /api/projects/:id/versions`（版一覧。`versions`の並びで返す。各行に`type`を含む）
@@ -40,7 +49,7 @@
   - 出力：`201 { versionId, url }`。新版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id?v=:vid`）
 - `GET /api/projects/:id/versions/:vid`（版meta取得。`type`を含む）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
-- `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示、`GET /api/projects/:id/comments`）は、この並びの最後の行
+- `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。SQLiteは新しい行に、残っている行の最大の`rowid`＋1を振るので、案件の削除で行が消えても残った行の順は崩れない。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示、`GET /api/projects/:id/comments`）は、この並びの最後の行
 - 編集は上書きせず新version追加（HTML不変版を維持）
 
 ### 版の表示の種類（合意済み）
@@ -72,6 +81,14 @@
   - 入力：種別（公開範囲設定／招待発行／署名発行のいずれか）＋対象指定
   - 出力：共有id＋招待ならトークン付きURL（`?invite=`）、署名なら署名付きURL（`?exp=&sig=`）
 - `DELETE /api/projects/:id/shares/:sid`（失効、要セッション・所有者のみ）
+
+### 公開API 一括取得（合意済み）
+- 一覧画面が案件ごとの件数・最新版・先頭画面を出すため、案件（版）のidを複数受け取ってその行をまとめて返すrouteをテーブルごとに置く。1つのrouteは1つのテーブルの行だけを返し、件数や最新版の組み立てはViewerが行う（集計をApiの1つのrouteに持たせない）
+- `GET /api/versions?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { versions: [{ id, project_id, type, created_at }] }`。並びは全案件を通した挿入順（`rowid`順）で、案件ごとにまとめない
+- `GET /api/screens?version_id=:vid&version_id=:vid…`（要セッション。未ログインは`404`）：`200 { screens: [{ id, version_id, name, width, height }] }`。並びは全版を通した挿入順（`rowid`順）。所有は版が属する案件の`owner`で判定する
+- `GET /api/comments?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { comments: [{ id, project_id, version_id, target, body, created_at }] }`。全版のコメントを返す。並びは全案件を通した`created_at`→`id`の順（`GET /api/projects/:id/comments`と同じ）
+- `GET /api/shares?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { shares: [{ id, project_id, kind, token, key_id }] }`。並びは全案件を通した`id`の順（`GET /api/projects/:id/shares`と同じ）
+- idは1〜50個。0個・51個以上は`400`。上限は所有者＋idの bind をD1の上限100に収めるため。所有していない・存在しないidは`404`にせず結果から除く（他人の案件の有無を見せない）
 
 ### 内部API（合意済み：持たない）
 - `/internal/*`は持たない（当初のoverall-archの内部API集約からの変更点）

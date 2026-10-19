@@ -1,22 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-
-import { authClient } from "@/lib/auth-client";
+import { useSessionQuery } from "@karibari/auth-query";
 
 export function useSessionGate() {
   // Children render while this resolves, so only a settled `null` sends the visitor away.
-  const { data } = useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data: session, error } = await authClient.getSession();
-
-      // Better-fetch resolves non-2xx as `{ data: null, error }`; rethrow so it is not mistaken for signed out.
-      if (error) {
-        throw new Error(error.statusText, { cause: error });
-      }
-
-      return session;
-    },
-  });
+  const { data } = useSessionQuery();
 
   if (data !== null) {
     return { signInHref: undefined };

@@ -9,10 +9,10 @@ export const comments = sqliteTable(
     id: text().primaryKey(),
     project_id: text()
       .notNull()
-      .references(() => projects.id),
+      .references(() => projects.id, { onDelete: "cascade" }),
     version_id: text()
       .notNull()
-      .references(() => versions.id),
+      .references(() => versions.id, { onDelete: "cascade" }),
     target: text().notNull(),
     body: text().notNull(),
     created_at: integer().notNull(),

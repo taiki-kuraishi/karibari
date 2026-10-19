@@ -128,6 +128,7 @@ that directory down. Keep this table 1:1 with the `AGENTS.md` files that exist.
 | --- | --- |
 | `.github/**` | `.github/AGENTS.md` |
 | `packages/api-query/**` | `packages/api-query/AGENTS.md` |
+| `packages/auth-query/**` | `packages/auth-query/AGENTS.md` |
 
 `AGENTS.md` files must not use `@import` — harnesses other than Claude Code do not expand
 the directive.

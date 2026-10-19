@@ -11,7 +11,9 @@
   "dependencies": {
     "@karibari/api": "workspace:*",
     "@karibari/api-query": "workspace:*",
+    "@karibari/auth-query": "workspace:*",
     "@karibari/shadcn": "workspace:*",
+    "@tanstack/react-form": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "better-auth": "catalog:",
