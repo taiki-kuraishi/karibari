@@ -6,8 +6,8 @@ import type { createAuthDatabase } from "./database";
 
 import { createTokenExchangeExtension } from "./token-exchange";
 
-export const apiAudience = "https://api.karibari.tsar-bmb.org/api";
-export const mcpAudience = "https://mcp.karibari.tsar-bmb.org/mcp";
+export const apiAudience = "https://api.karibari.com/api";
+export const mcpAudience = "https://mcp.karibari.com/mcp";
 
 // `config` passes no client, so token exchange refuses everyone until the worker injects
 // `TOKEN_EXCHANGE_CLIENT_IDS` through `createBetterAuth`.
@@ -17,7 +17,6 @@ function createPlugins(tokenExchangeClientIds: readonly string[]) {
     oauthProvider({
       allowDynamicClientRegistration: true,
       allowUnauthenticatedClientRegistration: true,
-      // Provisional resource identifier until the production MCP URL is fixed.
       // DCR cannot link a client to the api audience. After re-registering the remote-mcp
       // Client, insert its client and api (`apiAudience`) row into `oauth_client_resource` in
       // The auth D1 by hand: without it the client cannot use token exchange.
@@ -42,10 +41,10 @@ export const config = {
   basePath: "",
   // CLI-only placeholder: the worker overrides both with env values.
   // `oauth-provider` parses this at init, so it must be a valid URL even here.
-  baseURL: "https://auth.karibari.tsar-bmb.org",
+  baseURL: "https://auth.karibari.com",
   // Overridden by the worker with Secrets. Never commit a real value here.
   secret: "",
-  trustedOrigins: ["https://karibari.tsar-bmb.org"],
+  trustedOrigins: ["https://app.karibari.com"],
   socialProviders: {
     // Real credentials come from the worker env. Empty here on purpose.
     github: { clientId: "", clientSecret: "" },
@@ -53,7 +52,7 @@ export const config = {
   plugins: createPlugins([]),
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
   advanced: {
-    crossSubDomainCookies: { enabled: true, domain: "karibari.tsar-bmb.org" },
+    crossSubDomainCookies: { enabled: true, domain: "karibari.com" },
     // Spec: Lax. httpOnly stays on (better-auth default).
     defaultCookieAttributes: { sameSite: "lax", secure: true },
   },

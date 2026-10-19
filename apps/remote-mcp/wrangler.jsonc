@@ -8,8 +8,8 @@
   // .dev.vars, so the committed worker-configuration.d.ts stays free of machine-local values.
   "secrets": { "required": [] },
   "vars": {
-    "API_BASE_URL": "https://api.karibari.tsar-bmb.org",
-    "AUTH_TOKEN_URL": "https://auth.karibari.tsar-bmb.org/api/auth/oauth2/token",
+    "API_BASE_URL": "https://api.karibari.com",
+    "AUTH_TOKEN_URL": "https://auth.karibari.com/api/auth/oauth2/token",
     "MCP_CLIENT_ID": "NLCotKeGOtpehePjHKlVgoCMiKrTRGar",
   },
   "secrets_store_secrets": [
@@ -19,7 +19,7 @@
       "secret_name": "karibari-remote-mcp-client-secret",
     },
   ],
-  "routes": [{ "pattern": "mcp.karibari.tsar-bmb.org", "custom_domain": true }],
+  "routes": [{ "pattern": "mcp.karibari.com", "custom_domain": true }],
   "kv_namespaces": [
     {
       "binding": "DPOP_REPLAY",

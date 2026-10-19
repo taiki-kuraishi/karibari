@@ -2,7 +2,7 @@
   "mcpServers": {
     "karibari-remote-mcp": {
       "type": "http",
-      "url": "https://mcp.karibari.tsar-bmb.org/mcp"
+      "url": "https://mcp.karibari.com/mcp"
     },
     "cloudflare-api": {
       "type": "http",

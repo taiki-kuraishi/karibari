@@ -112,6 +112,6 @@ test("`/` でログアウトするとサインインへ移動する", async ({ b
 
   // Assert
   await expect(page).toHaveURL(
-    `https://auth.karibari.tsar-bmb.org/sign-in?callbackURL=${encodeURIComponent(openedUrl)}`,
+    `https://auth.karibari.com/sign-in?callbackURL=${encodeURIComponent(openedUrl)}`,
   );
 });

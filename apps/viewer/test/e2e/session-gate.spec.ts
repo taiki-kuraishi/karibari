@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { stubApi } from "../helpers/api-stub";
 
-const signInUrl = "https://auth.karibari.tsar-bmb.org/sign-in";
+const signInUrl = "https://auth.karibari.com/sign-in";
 
 test("セッションが無いまま `/` を開くとサインインへ移動する", async ({ baseURL, page }) => {
   // Arrange

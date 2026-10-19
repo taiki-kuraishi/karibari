@@ -25,8 +25,8 @@ type ScreenRow = Extract<
 >["screens"][number];
 
 // Must equal `VITE_API_ORIGIN` in `apps/viewer/.env`: the bundle under test calls this origin.
-const apiOrigin = "https://api.karibari.tsar-bmb.org";
-const authOrigin = "https://auth.karibari.tsar-bmb.org";
+const apiOrigin = "https://api.karibari.com";
+const authOrigin = "https://auth.karibari.com";
 
 // The viewer is served from another origin than the api, and the port it runs on is configurable.
 // So the caller's own origin is echoed back instead of a fixed one.
