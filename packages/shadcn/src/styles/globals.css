@@ -1,7 +1,18 @@
+/* Theme: karibari, the persimmon-tannin washi board that paper is stretched and dried on.
+   The app is the same kind of board for submitted HTML, so the palette is unbleached paper,
+   Sumi ink and kakishibu brown with a little indigo. Only tokens, fonts, shadows and element
+   Rules in @layer base change; component classes stay as shadcn generates them. */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+/* Static weights: @fontsource ships no variable build for these Japanese families. */
+@import "@fontsource/zen-old-mincho/500.css";
+@import "@fontsource/zen-old-mincho/700.css";
+@import "@fontsource/zen-kaku-gothic-new/400.css";
+@import "@fontsource/zen-kaku-gothic-new/500.css";
+@import "@fontsource/zen-kaku-gothic-new/700.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
 
 /* Tailwind skips node_modules and starts its scan at the consuming app's root.
    This package's own classes therefore have to be registered explicitly.
@@ -11,8 +22,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: "Geist Variable", sans-serif;
+  --font-heading: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  --font-sans:
+    "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+  --font-mono: "IBM Plex Mono", "Zen Kaku Gothic New", ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -51,75 +64,89 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Short, warm-tinted shadows: the theme reads as paper lying on a board, not floating cards. */
+  --shadow-2xs: 0 1px 0 0 oklch(0.3 0.03 55 / 5%);
+  --shadow-xs: 0 1px 1px -0.5px oklch(0.3 0.03 55 / 7%);
+  --shadow-sm: 0 1px 2px -1px oklch(0.3 0.03 55 / 12%), 0 1px 1px -1px oklch(0.3 0.03 55 / 7%);
+  --shadow-md: 0 2px 4px -2px oklch(0.28 0.035 52 / 14%), 0 1px 2px -1px oklch(0.28 0.035 52 / 8%);
+  --shadow-lg: 0 6px 12px -6px oklch(0.26 0.04 50 / 18%), 0 2px 4px -3px oklch(0.26 0.04 50 / 10%);
+  --shadow-xl:
+    0 12px 20px -10px oklch(0.26 0.04 50 / 20%), 0 3px 6px -4px oklch(0.26 0.04 50 / 10%);
+  --shadow-2xl: 0 24px 40px -20px oklch(0.24 0.04 50 / 24%);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  color-scheme: light;
+
+  --background: oklch(0.9705 0.0085 85);
+  --foreground: oklch(0.265 0.014 58);
+  --card: oklch(0.988 0.004 90);
+  --card-foreground: oklch(0.265 0.014 58);
+  --popover: oklch(0.988 0.004 90);
+  --popover-foreground: oklch(0.265 0.014 58);
+  --primary: oklch(0.45 0.105 50);
+  --primary-foreground: oklch(0.975 0.01 85);
+  --secondary: oklch(0.938 0.011 80);
+  --secondary-foreground: oklch(0.31 0.02 55);
+  --muted: oklch(0.935 0.013 80);
+  --muted-foreground: oklch(0.512 0.019 60);
+  --accent: oklch(0.925 0.018 250);
+  --accent-foreground: oklch(0.31 0.05 255);
+  --destructive: oklch(0.505 0.185 27);
+  --border: oklch(0.845 0.015 76);
+  /* Darker than --border: an input's frame must stand out against the paper texture. */
+  --input: oklch(0.72 0.022 70);
+  --ring: oklch(0.47 0.09 255);
+  --chart-1: oklch(0.52 0.12 48);
+  --chart-2: oklch(0.48 0.08 252);
+  --chart-3: oklch(0.56 0.075 148);
+  --chart-4: oklch(0.58 0.15 32);
+  --chart-5: oklch(0.62 0.02 70);
+  --radius: 0.25rem;
+  --sidebar: oklch(0.955 0.01 82);
+  --sidebar-foreground: oklch(0.28 0.015 58);
+  --sidebar-primary: oklch(0.45 0.105 50);
+  --sidebar-primary-foreground: oklch(0.975 0.01 85);
+  --sidebar-accent: oklch(0.928 0.012 80);
+  --sidebar-accent-foreground: oklch(0.31 0.02 55);
+  --sidebar-border: oklch(0.845 0.015 76);
+  --sidebar-ring: oklch(0.47 0.09 255);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  color-scheme: dark;
+
+  --background: oklch(0.205 0.011 55);
+  --foreground: oklch(0.938 0.012 82);
+  --card: oklch(0.245 0.013 55);
+  --card-foreground: oklch(0.938 0.012 82);
+  --popover: oklch(0.248 0.013 55);
+  --popover-foreground: oklch(0.938 0.012 82);
+  --primary: oklch(0.635 0.115 48);
+  --primary-foreground: oklch(0.195 0.022 50);
+  --secondary: oklch(0.285 0.014 55);
+  --secondary-foreground: oklch(0.945 0.012 82);
+  --muted: oklch(0.278 0.013 55);
+  --muted-foreground: oklch(0.755 0.014 78);
+  --accent: oklch(0.3 0.028 252);
+  --accent-foreground: oklch(0.92 0.02 250);
+  --destructive: oklch(0.71 0.16 27);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 26%);
+  --ring: oklch(0.66 0.085 252);
+  --chart-1: oklch(0.68 0.12 48);
+  --chart-2: oklch(0.72 0.08 250);
+  --chart-3: oklch(0.75 0.075 148);
+  --chart-4: oklch(0.74 0.14 32);
+  --chart-5: oklch(0.8 0.02 78);
+  --sidebar: oklch(0.178 0.01 55);
+  --sidebar-foreground: oklch(0.92 0.012 82);
+  --sidebar-primary: oklch(0.635 0.115 48);
+  --sidebar-primary-foreground: oklch(0.195 0.022 50);
+  --sidebar-accent: oklch(0.285 0.014 55);
+  --sidebar-accent-foreground: oklch(0.945 0.012 82);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.66 0.085 252);
 }
 
 @layer base {
@@ -128,8 +155,42 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Gradients, not an image file, so the paper texture ships with no extra request. */
+    background-image:
+      linear-gradient(to right, oklch(0.62 0.03 62 / 5.5%) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.62 0.03 62 / 5.5%) 1px, transparent 1px),
+      repeating-linear-gradient(102deg, oklch(0.7 0.02 70 / 4.5%) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(168deg, oklch(0.7 0.02 70 / 3.5%) 0 1px, transparent 1px 13px);
+    background-attachment: fixed;
+    background-size:
+      32px 32px,
+      32px 32px,
+      auto,
+      auto;
+    /* Proportional kana spacing; Japanese text set full-width looks loose at UI sizes. */
+    font-feature-settings: "palt" 1;
+  }
+  .dark body {
+    background-image:
+      linear-gradient(to right, oklch(0.95 0.02 84 / 3.5%) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.95 0.02 84 / 3.5%) 1px, transparent 1px),
+      repeating-linear-gradient(102deg, oklch(0.82 0.03 70 / 3.5%) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(168deg, oklch(0.82 0.03 70 / 2.8%) 0 1px, transparent 1px 13px);
   }
   html {
     @apply font-sans;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    letter-spacing: 0.02em;
+  }
+  figcaption {
+    font-family: var(--font-heading);
+  }
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
   }
 }
