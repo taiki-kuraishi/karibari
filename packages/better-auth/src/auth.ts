@@ -1,5 +1,5 @@
 import { oauthProvider } from "@better-auth/oauth-provider";
-import { type BetterAuthOptions, betterAuth } from "better-auth";
+import { type BetterAuthOptions, type GithubOptions, betterAuth } from "better-auth";
 import { jwt } from "better-auth/plugins";
 
 import type { createAuthDatabase } from "./database";
@@ -37,6 +37,10 @@ function createPlugins(tokenExchangeClientIds: readonly string[]) {
   ];
 }
 
+// Real credentials come from the worker env. Empty here on purpose.
+// Annotated, not inferred, so the worker's override may set any GitHub option (`prompt`).
+const github: GithubOptions = { clientId: "", clientSecret: "" };
+
 export const config = {
   basePath: "",
   // CLI-only placeholder: the worker overrides both with env values.
@@ -45,10 +49,9 @@ export const config = {
   // Overridden by the worker with Secrets. Never commit a real value here.
   secret: "",
   trustedOrigins: ["https://app.karibari.com"],
-  socialProviders: {
-    // Real credentials come from the worker env. Empty here on purpose.
-    github: { clientId: "", clientSecret: "" },
-  },
+  socialProviders: { github },
+  // The auth SPA renders `/error`, so better-auth's own `/api/auth/error` HTML page never shows.
+  onAPIError: { errorURL: "/error" },
   plugins: createPlugins([]),
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
   advanced: {

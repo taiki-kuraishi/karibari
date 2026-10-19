@@ -25,7 +25,9 @@ test.afterEach(async () => {
 });
 
 // GitHub and the external viewer origin stay mocked so nothing leaves the machine; every auth-server endpoint is the real Worker.
-test("未ログインで GitHub ログインを押すと GitHub の認可画面へ移動する", async ({ page }) => {
+test("未ログインで GitHub ログインを押すと、アカウント選択付きで GitHub の認可画面へ移動する", async ({
+  page,
+}) => {
   // Arrange
   await page.route("https://github.com/**", async (route) => {
     await route.fulfill({ body: "github", status: 200 });
@@ -36,7 +38,9 @@ test("未ログインで GitHub ログインを押すと GitHub の認可画面�
   await page.getByRole("button", { name: "GitHubでログインする" }).click();
 
   // Assert
-  await expect(page).toHaveURL(/^https:\/\/github\.com\/login\/oauth\/authorize\?/);
+  await expect(page).toHaveURL(
+    /^https:\/\/github\.com\/login\/oauth\/authorize\?(?:.*&)?prompt=select_account(?:&|$)/,
+  );
 });
 
 test("ログイン済みで開くと callbackURL へ移動する", async ({ page }) => {
