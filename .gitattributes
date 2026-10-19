@@ -18,4 +18,4 @@ packages/shadcn/src/components/** linguist-generated=true
 packages/shadcn/src/hooks/** linguist-generated=true
 
 # Playwright visual baselines.
-apps/auth/tests/visual/**/*.png linguist-generated=true
+apps/auth/test/vrt/**/*.png linguist-generated=true

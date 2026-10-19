@@ -140,7 +140,7 @@
 - そのためAuthの`/api/auth/*`に、`trustedOrigins`のoriginだけを許可するCORSを足した（credentials付き。`apps/auth/src/middlewares/cors.ts`）
 
 ### 標準エンドポイント（合意済み）
-- better-authの標準エンドポイントは既定のまま。標準のほかに、`GET /api/callback-url`（サインイン後の戻り先の検証）と`/.well-known/oauth-authorization-server/api/auth`がある（`POST /verify-access`は未実装）
+- better-authの標準エンドポイントは既定のまま。ただしエラーの行き先は`onAPIError.errorURL: "/error"`（`packages/better-auth/src/auth.ts`）で、AuthのSPAの`/error?error=<code>`画面に出す（既定の`GET /api/auth/error`はHTMLを返さず、そこへ302する）。標準のほかに、`GET /api/callback-url`（サインイン後の戻り先の検証）と`/.well-known/oauth-authorization-server/api/auth`がある（`POST /verify-access`は未実装）
 
 ## 横断
 

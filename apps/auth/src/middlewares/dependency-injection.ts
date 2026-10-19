@@ -25,6 +25,9 @@ export const injectDependenciesMiddleware: MiddlewareHandler<HonoEnv> = async (c
       github: {
         clientId: await c.env.GITHUB_CLIENT_ID.get(),
         clientSecret: await c.env.GITHUB_CLIENT_SECRET.get(),
+        // Set here, not in auth.ts: `createBetterAuth` merges shallowly, so the override's
+        // `socialProviders` replaces auth.ts's. The picker stops GitHub reusing the browser's account.
+        prompt: "select_account",
       },
     },
   });

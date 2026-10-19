@@ -4,8 +4,11 @@
     "rootDir": ".",
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    // Base sets `types: []`, so list worker globals explicitly here.
-    "types": ["./worker-configuration.d.ts", "@cloudflare/vitest-plugin/types"]
+    // Base sets `types: []`, so list the globals explicitly here.
+    // `vite/client` types the client entry's stylesheet import.
+    "types": ["vite/client", "./worker-configuration.d.ts", "@cloudflare/vitest-plugin/types"],
+    // TypeScript 7 dropped `baseUrl`: `paths` entries are relative to this file.
+    "paths": { "@/*": ["./src/client/*"] }
   },
   "include": ["src", "test", "tests", "./*.ts"]
 }
