@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
-    "@fontsource-variable/geist": "catalog:",
+    "@fontsource/ibm-plex-mono": "catalog:",
+    "@fontsource/zen-kaku-gothic-new": "catalog:",
+    "@fontsource/zen-old-mincho": "catalog:",
     "@shadcn/react": "catalog:",
     "class-variance-authority": "catalog:",
     "cmdk": "catalog:",

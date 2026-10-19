@@ -209,7 +209,9 @@
       "name": "@karibari/shadcn",
       "dependencies": {
         "@base-ui/react": "catalog:",
-        "@fontsource-variable/geist": "catalog:",
+        "@fontsource/ibm-plex-mono": "catalog:",
+        "@fontsource/zen-kaku-gothic-new": "catalog:",
+        "@fontsource/zen-old-mincho": "catalog:",
         "@shadcn/react": "catalog:",
         "class-variance-authority": "catalog:",
         "cmdk": "catalog:",
@@ -243,7 +245,9 @@
     "@cloudflare/workers-types": "5.20260918.1",
     "@factory-js/factory": "0.4.2",
     "@faker-js/faker": "10.6.0",
-    "@fontsource-variable/geist": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/zen-kaku-gothic-new": "5.3.1",
+    "@fontsource/zen-old-mincho": "5.3.1",
     "@hono/valibot-validator": "0.6.1",
     "@modelcontextprotocol/sdk": "1.30.0",
     "@playwright/test": "1.62.1",
@@ -475,7 +479,11 @@
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
 
-    "@fontsource-variable/geist": ["@fontsource-variable/geist@5.3.0", "", {}, "sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA=="],
+    "@fontsource/ibm-plex-mono": ["@fontsource/ibm-plex-mono@5.3.0", "", {}, "sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q=="],
+
+    "@fontsource/zen-kaku-gothic-new": ["@fontsource/zen-kaku-gothic-new@5.3.1", "", {}, "sha512-L69mE6bkzeVK3UdTenxOmCIWvTwMxohJRNm1dAj+W+UiCULQ91b7M77ENVw+pjGmFL6zKPFYFeH3g8x2ugAJNw=="],
+
+    "@fontsource/zen-old-mincho": ["@fontsource/zen-old-mincho@5.3.1", "", {}, "sha512-wahFUlw1s0zKkxiTRj9jJiyVrdNT5uHNYWakr6cDEIgp91YoP/LOvfD2+JVIKiXIwTChDM1oW1yqXJbdtlI56w=="],
 
     "@hono/node-server": ["@hono/node-server@2.1.1", "", { "peerDependencies": { "hono": "^4" } }, "sha512-ELuehkj5VCBdgEw9zs+ivkKwyzzUCSQuE96YmiPvn1ECBoZCczbFXJLeEGMTYjphP6gydh4pHMqEYPVMYUVgQg=="],
 
