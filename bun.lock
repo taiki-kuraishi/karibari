@@ -47,7 +47,6 @@
         "@hono/valibot-validator": "catalog:",
         "@karibari/better-auth": "workspace:*",
         "@karibari/shadcn": "workspace:*",
-        "@tanstack/react-form": "catalog:",
         "@tanstack/react-query": "catalog:",
         "@tanstack/react-router": "catalog:",
         "better-auth": "catalog:",

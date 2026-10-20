@@ -16,6 +16,9 @@ function createPlugins(tokenExchangeClientIds: readonly string[]) {
     jwt(),
     oauthProvider({
       allowDynamicClientRegistration: true,
+      // Lets sign-in and consent read public client fields before login through
+      // `oauth2.publicClientPrelogin` (verified against the signed `oauth_query`).
+      allowPublicClientPrelogin: true,
       allowUnauthenticatedClientRegistration: true,
       // DCR cannot link a client to the api audience. After re-registering the remote-mcp
       // Client, insert its client and api (`apiAudience`) row into `oauth_client_resource` in
