@@ -1,9 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { unstable_readConfig } from "wrangler";
+// Exported for specs that must sign an oauth query exactly like the server
+// (e.g. a correctly signed but expired `exp`); the served Worker reads the
+// Same value from its Secrets Store binding.
+export const TEST_BETTER_AUTH_SECRET = "karibari-e2e-secret-0123456789abcdef0123456789ab";
 
 // Values for the Secrets Store entries `wrangler dev` reads locally; the store IDs and secret names are not duplicated here — they come straight from wrangler.jsonc. The values are committed test secrets — never replace them with real credentials.
 const TEST_SECRET_VALUES: Record<string, string> = {
-  BETTER_AUTH_SECRET: "karibari-e2e-secret-0123456789abcdef0123456789ab",
+  BETTER_AUTH_SECRET: TEST_BETTER_AUTH_SECRET,
   GITHUB_CLIENT_ID: "e2e-github-client-id",
   GITHUB_CLIENT_SECRET: "e2e-github-client-secret",
 };
