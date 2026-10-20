@@ -4,6 +4,8 @@ import { stubApi } from "../helpers/api-stub";
 
 const projectId = "2f1b6c1e-6a39-4c58-9a0f-6d6a4d0f9a11";
 
+test.use({ timezoneId: "Asia/Tokyo" });
+
 test("`/p/:projectId` で `/` への link を押すと `/` に移動する", async ({ page }) => {
   // Arrange
   await stubApi({
@@ -74,14 +76,26 @@ test("`/p/:projectId` で canvas の `versions` の行を選ぶと `?v=<versions
       { height: 900, id: "5d3b8f2a-7c1e-4a9b-8e6d-2f4a6c8b0e55", name: "トップ", width: 1440 },
     ],
     versions: [
-      { created_at: 1_760_000_000, id: olderId, project_id: projectId, type: "canvas" },
-      { created_at: 1_760_000_050, id: newerId, project_id: projectId, type: "full" },
+      {
+        created_at: Date.parse("2026-10-20T14:30:00+09:00") / 1000,
+        id: olderId,
+        project_id: projectId,
+        type: "canvas",
+      },
+      {
+        created_at: Date.parse("2026-10-20T14:30:00+09:00") / 1000,
+        id: newerId,
+        project_id: projectId,
+        type: "full",
+      },
     ],
   });
   await page.goto(`/p/${projectId}`);
 
   // Act
-  await page.getByRole("combobox", { name: "version" }).selectOption(olderId);
+  await page
+    .getByRole("combobox", { name: "version" })
+    .selectOption({ label: "v1 · 2026/10/20 14:30" });
 
   // Assert
   await expect(page).toHaveURL(`/p/${projectId}?v=${olderId}`);
@@ -111,14 +125,26 @@ test("`/p/:projectId` で full の `versions` の行を選ぶと `?v=<versions.i
       { height: 900, id: "5d3b8f2a-7c1e-4a9b-8e6d-2f4a6c8b0e55", name: "トップ", width: 1440 },
     ],
     versions: [
-      { created_at: 1_760_000_000, id: olderId, project_id: projectId, type: "full" },
-      { created_at: 1_760_000_050, id: newerId, project_id: projectId, type: "canvas" },
+      {
+        created_at: Date.parse("2026-10-20T14:30:00+09:00") / 1000,
+        id: olderId,
+        project_id: projectId,
+        type: "full",
+      },
+      {
+        created_at: Date.parse("2026-10-20T15:30:00+09:00") / 1000,
+        id: newerId,
+        project_id: projectId,
+        type: "canvas",
+      },
     ],
   });
   await page.goto(`/p/${projectId}`);
 
   // Act
-  await page.getByRole("combobox", { name: "version" }).selectOption(olderId);
+  await page
+    .getByRole("combobox", { name: "version" })
+    .selectOption({ label: "v1 · 2026/10/20 14:30" });
 
   // Assert
   await expect(page).toHaveURL(`/p/${projectId}?v=${olderId}`);

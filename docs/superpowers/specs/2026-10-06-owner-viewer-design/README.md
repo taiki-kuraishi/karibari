@@ -21,7 +21,6 @@
 - 招待・署名付き URL・`POST /api/projects/:project_id/shares`・auth の `POST /verify-access`（共有の機能と一緒に作る）
 - サインアップの制限。今は GitHub でサインインすれば誰でも利用者になれる（招待の機能と一緒に閉じる）
 - Viewer の要素単位コメント・HTML 編集・ログアウト・Viewer からの入稿・`shares` の一覧と失効の画面
-- 日時（`projects.updated_at`・`versions.created_at`）を画面に出すこと（spec にもデザインにも無い）
 - 404 の内訳をサーバのログに残すこと（interfaces-design の「エラーレスポンス形状」）
 
 ### 未決事項（1〜3 は user の承認で決定済み。4 は仮置き）
@@ -63,7 +62,7 @@ flowchart LR
 
 #### /p/:projectId?v=<versions.id>
 
-1 つの `projects` の行の HTML を表示する。入力は無い。上に見出し（`/` への link・`projects.name`（null なら「無題」）・`versions` の行の選択）、その下の残りの高さすべてに HTML の表示枠を置く。選択肢は新しい行を上に並べ、ラベルは `versions.id`（UUID）をそのまま出す（user と合意）。
+1 つの `projects` の行の HTML を表示する。入力は無い。上に見出し（`/` への link・`projects.name`（null なら「無題」）・`versions` の行の選択）、その下の残りの高さすべてに HTML の表示枠を置く。選択肢は新しい行を上に並べ、プロジェクト内の挿入順に付けた `v1`・`v2`…と作成日時を `v3 · 2026/10/20 14:30` の形で表示する。日時は閲覧端末のタイムゾーンを使い、選択欄を閉じたときも同じラベルを表示する。番号は表示用に算出し、DB・API の行と URL の `?v=` は引き続き UUID を使う。
 
 - 開く → GET /api/projects/:project_id と GET /api/projects/:project_id/versions。表示する行は `v` の `versions.id`、`v` が無ければ一覧の最後の行。HTML の表示枠がその行の content を読み込む。GET のどちらかが 404 か、`v` が一覧に無いときは 404 画面を出す
 - 選ぶ → `/p/:projectId?v=<versions.id>` へ移動する（履歴に積む）
@@ -263,7 +262,7 @@ sequenceDiagram
     │     受け取る: route の param（projects.id）
     ├── project の表示（接続）【3】
     │   │ 受け取る: projects.id
-    │   ├── project の表示の hook(projects.id) → { 表示名, 選択肢: { versions.id }[], 表示する versions.id, content の URL, 選ぶ(versions.id) }【3】【14】
+    │   ├── project の表示の hook(projects.id) → { 表示名, 選択肢: { versions.id, label }[], 表示する versions.id, content の URL, 選ぶ(versions.id) }【3】【14】
     │   │     失敗: 見つからない（query hook が null を返す, v が一覧に無い）
     │   │   ├── project の query hook(projects.id) → query の結果（data: { project, url } | null）【16】
     │   │   │   ├── api の client を取る hook()【15】
