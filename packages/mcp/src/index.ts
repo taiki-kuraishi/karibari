@@ -8,8 +8,10 @@ import {
   AddVersionTool,
   CreateProjectTool,
   GetProjectUrlTool,
+  GetScreenContentTool,
   ListCommentsTool,
   ListProjectsTool,
+  ListScreensTool,
   SaveCommentTool,
 } from "./tools";
 
@@ -28,6 +30,8 @@ export const createMcpServer = (context: McpContext): McpServer => {
   new ListCommentsTool(context).register(server);
   new GetProjectUrlTool(context).register(server);
   new ListProjectsTool(context).register(server);
+  new ListScreensTool(context).register(server);
+  new GetScreenContentTool(context).register(server);
 
   return server;
 };

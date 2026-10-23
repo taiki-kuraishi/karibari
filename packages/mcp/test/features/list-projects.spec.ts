@@ -86,6 +86,8 @@ describe("list_projects tool", () => {
       "list_comments",
       "get_project_url",
       "list_projects",
+      "list_screens",
+      "get_screen_content",
     ]);
   });
 });

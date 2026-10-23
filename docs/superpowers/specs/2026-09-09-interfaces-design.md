@@ -109,9 +109,11 @@
 - コメント取得 → `GET /api/projects/:id/comments?v=:vid`
 - 公開URL取得 → `GET /api/projects/:id`の`url`（絶対の表示URL）に、versionを指定されたら`?v=`を足す（MCPはViewerのoriginを持たない）。`?invite=`/`?exp=&sig=`の組み立ては未実装（今はsharesの件数`shareCount`を返すだけ）
 - 一覧 → `GET /api/projects`（`list_projects`）
+- 画面一覧 → `list_screens`。入力`{ projectId, versionId? }`。`GET /api/projects/:id/versions`で種類と対象版を取得し、`versionId`省略時は並びの末尾を最新版とする。`GET /api/projects/:id/versions/:vid/screens`で画面一覧を取得する（HTMLは含めない）
+- 画面HTML取得 → `get_screen_content`。入力`{ projectId, versionId, screenId }`。`GET /api/projects/:id/versions/:vid/screens/:sid/content`で画面1枚のHTMLを取得する。版の全画面HTMLを一括取得するtoolは持たない（contextが大きすぎるため）
 
 ### 入出力スキーマ（合意済み）
-- 対応Apiに準拠（入稿・編集・コメント保存・取得は対応Apiと同一、公開URL取得の出力は表示URL）
+- 原則は対応Apiに準拠（入稿・編集・コメント保存・取得は対応Apiと同一、公開URL取得の出力は表示URL）。`list_screens`の出力は`{ versionId, type, screens: [{ id, name, width, height }] }`のJSON文字列、`get_screen_content`の出力はHTML本文の文字列。どちらもApiがok以外を返したらthrowし、MCPの`isError`にする。対象版がない場合も`isError`にする
 
 ## Auth
 
