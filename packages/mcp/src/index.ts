@@ -4,7 +4,6 @@ import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv
 import type { McpContext } from "./mcp-context";
 
 import {
-  AddTool,
   AddVersionTool,
   CreateProjectTool,
   GetProjectUrlTool,
@@ -12,6 +11,7 @@ import {
   ListCommentsTool,
   ListProjectsTool,
   ListScreensTool,
+  ListVersionsTool,
   SaveCommentTool,
 } from "./tools";
 
@@ -23,13 +23,13 @@ export const createMcpServer = (context: McpContext): McpServer => {
     { jsonSchemaValidator: new AjvJsonSchemaValidator() },
   );
 
-  new AddTool().register(server);
   new CreateProjectTool(context).register(server);
   new AddVersionTool(context).register(server);
   new SaveCommentTool(context).register(server);
   new ListCommentsTool(context).register(server);
   new GetProjectUrlTool(context).register(server);
   new ListProjectsTool(context).register(server);
+  new ListVersionsTool(context).register(server);
   new ListScreensTool(context).register(server);
   new GetScreenContentTool(context).register(server);
 
