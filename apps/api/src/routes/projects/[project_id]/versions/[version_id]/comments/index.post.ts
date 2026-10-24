@@ -2,27 +2,27 @@ import { comments } from "@karibari/db";
 import { Hono } from "hono";
 import * as v from "valibot";
 
-import type { HonoEnv } from "../../../../server";
+import type { HonoEnv } from "../../../../../../server";
 
-import { validator } from "../../../../validator";
+import { validator } from "../../../../../../validator";
 
 const paramSchema = v.object({
   project_id: v.pipe(v.string(), v.nonEmpty()),
+  version_id: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const bodySchema = v.object({
-  versionId: v.pipe(v.string(), v.nonEmpty()),
   target: v.pipe(v.string(), v.nonEmpty()),
   body: v.pipe(v.string(), v.nonEmpty()),
 });
 
-export const postProjectCommentsRoute = new Hono<HonoEnv>().post(
+export const postProjectVersionCommentsRoute = new Hono<HonoEnv>().post(
   "",
   validator("param", paramSchema),
   validator("json", bodySchema),
   async (c) => {
-    const { project_id: projectId } = c.req.valid("param");
-    const { versionId, target, body } = c.req.valid("json");
+    const { project_id: projectId, version_id: versionId } = c.req.valid("param");
+    const { target, body } = c.req.valid("json");
     const owner = c.get("userId");
     const project = await c.env.db.query.projects.findFirst({
       columns: { id: true },

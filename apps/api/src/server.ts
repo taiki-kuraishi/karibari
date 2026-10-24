@@ -13,13 +13,13 @@ import { corsMiddleware } from "./middlewares/cors";
 import { injectMiddleware } from "./middlewares/inject-middleware";
 import { getCommentsRoute } from "./routes/comments/index.get";
 import { getHealthRoute } from "./routes/health/index.get";
-import { getProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.get";
-import { postProjectCommentsRoute } from "./routes/projects/[project_id]/comments/index.post";
 import { deleteProjectRoute } from "./routes/projects/[project_id]/index.delete";
 import { getProjectRoute } from "./routes/projects/[project_id]/index.get";
 import { patchProjectRoute } from "./routes/projects/[project_id]/index.patch";
 import { deleteProjectShareRoute } from "./routes/projects/[project_id]/shares/[share_id]/index.delete";
 import { getProjectSharesRoute } from "./routes/projects/[project_id]/shares/index.get";
+import { getProjectVersionCommentsRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/index.get";
+import { postProjectVersionCommentsRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/index.post";
 import { getProjectVersionRoute } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
 import { getProjectVersionScreenContentRoute } from "./routes/projects/[project_id]/versions/[version_id]/screens/[screen_id]/content.get";
 import { getProjectVersionScreensRoute } from "./routes/projects/[project_id]/versions/[version_id]/screens/index.get";
@@ -52,13 +52,13 @@ export const app = new Hono<HonoEnv>()
   .route("/api/projects/:project_id", getProjectRoute)
   .route("/api/projects/:project_id", patchProjectRoute)
   .route("/api/projects/:project_id", deleteProjectRoute)
-  .route("/api/projects/:project_id/comments", postProjectCommentsRoute)
-  .route("/api/projects/:project_id/comments", getProjectCommentsRoute)
   .route("/api/projects/:project_id/shares", getProjectSharesRoute)
   .route("/api/projects/:project_id/shares/:share_id", deleteProjectShareRoute)
   .route("/api/projects/:project_id/versions", postProjectVersionsRoute)
   .route("/api/projects/:project_id/versions", getProjectVersionsRoute)
   .route("/api/projects/:project_id/versions/:version_id", getProjectVersionRoute)
+  .route("/api/projects/:project_id/versions/:version_id/comments", postProjectVersionCommentsRoute)
+  .route("/api/projects/:project_id/versions/:version_id/comments", getProjectVersionCommentsRoute)
   .route("/api/projects/:project_id/versions/:version_id/screens", getProjectVersionScreensRoute)
   .route(
     "/api/projects/:project_id/versions/:version_id/screens/:screen_id/content",

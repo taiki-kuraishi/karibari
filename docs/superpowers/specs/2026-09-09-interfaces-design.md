@@ -25,7 +25,7 @@
 ## Api
 
 ### 公開APIの資源分割（合意済み）
-- `projects` / `versions` / `screens` / `comments` / `shares` を別URLの資源に分ける（`screens`は`versions`の下）。複数の案件（版）をまとめて引く一括取得だけは最上位に置く（「公開API 一括取得」）
+- `projects` / `versions` / `screens` / `comments` / `shares` を別URLの資源に分ける（`screens`と`comments`は`versions`の下）。複数の案件（版）をまとめて引く一括取得だけは最上位に置く（「公開API 一括取得」）
 - R2取得（HTML実体）はApi経由のみ（R2直接公開なし）
 
 ### 公開API projects（合意済み）
@@ -49,7 +49,7 @@
   - 出力：`201 { versionId, url }`。新版id＋表示URL（絶対URL: `<Viewerのorigin>/p/:id?v=:vid`）
 - `GET /api/projects/:id/versions/:vid`（版meta取得。`type`を含む）
 - いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
-- `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。SQLiteは新しい行に、残っている行の最大の`rowid`＋1を振るので、案件の削除で行が消えても残った行の順は崩れない。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示、`GET /api/projects/:id/comments`）は、この並びの最後の行
+- `versions`の並び：同じ`project_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。SQLiteは新しい行に、残っている行の最大の`rowid`＋1を振るので、案件の削除で行が消えても残った行の順は崩れない。`created_at`は秒単位で`id`はランダムなUUIDなので、どちらでも同じ秒に入った行の順は決まらない。`?v`なしのときに使う行（Viewerの表示）は、この並びの最後の行
 - 編集は上書きせず新version追加（HTML不変版を維持）
 
 ### 版の表示の種類（合意済み）
@@ -69,11 +69,12 @@
 - 移行：画面に分ける前の版は、migrationの後に本番のmeta用D1へSQLを一度だけ流して移す（migrationには含めない）。順番は (1) 画面をまだ持たない版の`type`を`full`にする（`UPDATE versions SET type = 'full' WHERE id NOT IN (SELECT version_id FROM screens)`）、(2) 画面をまだ持たない版ごとに画面を1つ作る（画面のidは版のidと同じ、名前は`null`、幅は1440、高さは900、`rowid`順）、(3) R2の`projects/{id}/versions/{v}/index.html`を`projects/{id}/versions/{v}/screens/{v}.html`へcopyする。(1)は(2)より先に流す（(2)の後では対象の版を見分けられない）
 
 ### 公開API comments（合意済み）
-- `GET /api/projects/:id/comments?v=:vid`（指定版のコメント一覧。`v`なしは`versions`の並びの最後の行）
-- `POST /api/projects/:id/comments`（要素単位コメントの保存、対象版＋要素指定つき）
-  - 入力：対象版id＋要素指定＋本文必須
-  - 出力：コメントid
-- いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）
+- `GET /api/projects/:id/versions/:vid/comments`（指定版のコメント一覧）
+  - 出力：`200 { comments }`。並びは`created_at`→`id`の順
+- `POST /api/projects/:id/versions/:vid/comments`（要素単位コメントの保存）
+  - 入力：`{ target, body }`
+  - 出力：`201 { commentId }`
+- いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）。案件・版が無い、見られない、版が案件に属さないときは`404`
 
 ### 公開API shares（合意済み）
 - `GET /api/projects/:id/shares`（公開設定一覧、要セッション・所有者のみ）
@@ -86,7 +87,7 @@
 - 一覧画面が案件ごとの件数・最新版・先頭画面を出すため、案件（版）のidを複数受け取ってその行をまとめて返すrouteをテーブルごとに置く。1つのrouteは1つのテーブルの行だけを返し、件数や最新版の組み立てはViewerが行う（集計をApiの1つのrouteに持たせない）
 - `GET /api/versions?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { versions: [{ id, project_id, type, created_at }] }`。並びは全案件を通した挿入順（`rowid`順）で、案件ごとにまとめない
 - `GET /api/screens?version_id=:vid&version_id=:vid…`（要セッション。未ログインは`404`）：`200 { screens: [{ id, version_id, name, width, height }] }`。並びは全版を通した挿入順（`rowid`順）。所有は版が属する案件の`owner`で判定する
-- `GET /api/comments?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { comments: [{ id, project_id, version_id, target, body, created_at }] }`。全版のコメントを返す。並びは全案件を通した`created_at`→`id`の順（`GET /api/projects/:id/comments`と同じ）
+- `GET /api/comments?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { comments: [{ id, project_id, version_id, target, body, created_at }] }`。全版のコメントを返す。並びは全案件を通した`created_at`→`id`の順（`GET /api/projects/:id/versions/:vid/comments`と同じ）
 - `GET /api/shares?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { shares: [{ id, project_id, kind, token, key_id }] }`。並びは全案件を通した`id`の順（`GET /api/projects/:id/shares`と同じ）
 - idは1〜50個。0個・51個以上は`400`。上限は所有者＋idの bind をD1の上限100に収めるため。所有していない・存在しないidは`404`にせず結果から除く（他人の案件の有無を見せない）
 
@@ -105,15 +106,16 @@
 - 入稿 → `POST /api/projects`（＋初期版。入力`{ name?, type?, screens: [{ name?, width?, height?, html }] }`）
 - 編集 → `POST /api/projects/:id/versions`（新version追加、不変版維持。入力`{ projectId, type?, screens }`。版は前の版と画面を共有しないので、見せたい画面をすべて送る）
 - 入稿・編集のdescriptionには、LLMが`type`を選べるように、`canvas`は複数の画面を申告した幅×高さの枠で並べて見せる（はみ出しは切れる）、`full`は1画面をブラウザの窓いっぱいに出して操作できる、と書く
-- コメント保存 → `POST /api/projects/:id/comments`
-- コメント取得 → `GET /api/projects/:id/comments?v=:vid`
+- コメント保存 → `save_comment`。入力`{ projectId, versionId, target, body }`。`POST /api/projects/:id/versions/:vid/comments`を呼ぶ
+- コメント取得 → `list_comments`。入力`{ projectId, versionId }`（両方必須）。`GET /api/projects/:id/versions/:vid/comments`を呼ぶ。対象版は先に`list_versions`で選ぶ
 - 公開URL取得 → `GET /api/projects/:id`の`url`（絶対の表示URL）に、versionを指定されたら`?v=`を足す（MCPはViewerのoriginを持たない）。`?invite=`/`?exp=&sig=`の組み立ては未実装（今はsharesの件数`shareCount`を返すだけ）
 - 一覧 → `GET /api/projects`（`list_projects`）
-- 画面一覧 → `list_screens`。入力`{ projectId, versionId? }`。`GET /api/projects/:id/versions`で種類と対象版を取得し、`versionId`省略時は並びの末尾を最新版とする。`GET /api/projects/:id/versions/:vid/screens`で画面一覧を取得する（HTMLは含めない）
+- 版一覧 → `list_versions`。入力`{ projectId }`。`GET /api/projects/:id/versions`の出力`{ versions }`をそのまま返す。agentがこの一覧から対象版を選ぶ
+- 画面一覧 → `list_screens`。入力`{ projectId, versionId }`（両方必須）。`list_versions`で選んだ版の`GET /api/projects/:id/versions/:vid/screens`だけを呼び、画面一覧を返す（HTMLは含めない）
 - 画面HTML取得 → `get_screen_content`。入力`{ projectId, versionId, screenId }`。`GET /api/projects/:id/versions/:vid/screens/:sid/content`で画面1枚のHTMLを取得する。版の全画面HTMLを一括取得するtoolは持たない（contextが大きすぎるため）
 
 ### 入出力スキーマ（合意済み）
-- 原則は対応Apiに準拠（入稿・編集・コメント保存・取得は対応Apiと同一、公開URL取得の出力は表示URL）。`list_screens`の出力は`{ versionId, type, screens: [{ id, name, width, height }] }`のJSON文字列、`get_screen_content`の出力はHTML本文の文字列。どちらもApiがok以外を返したらthrowし、MCPの`isError`にする。対象版がない場合も`isError`にする
+- 原則は対応Apiに準拠（入稿・編集・コメント保存・取得は対応Apiと同一、公開URL取得の出力は表示URL）。`list_versions`の出力は`{ versions }`、`list_screens`の出力は`{ screens: [{ id, name, width, height }] }`のJSON文字列、`get_screen_content`の出力はHTML本文の文字列。Apiがok以外を返したらthrowし、MCPの`isError`にする。対象版がない場合も`isError`にする
 
 ## Auth
 

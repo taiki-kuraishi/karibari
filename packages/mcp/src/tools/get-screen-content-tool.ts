@@ -7,7 +7,7 @@ import { AbstractTool } from "./abstract-tool";
 
 const inputSchema = {
   projectId: z.string().describe("The target project id."),
-  versionId: z.string().describe("The version id returned by list_screens."),
+  versionId: z.string().describe("The version id returned by list_versions."),
   screenId: z.string().describe("The screen id returned by list_screens."),
 };
 
@@ -15,7 +15,7 @@ export class GetScreenContentTool extends AbstractTool {
   public readonly name = "get_screen_content";
   public readonly title = "Get screen content";
   public readonly description =
-    "Read the submitted HTML of one screen. Use list_screens to resolve the version and screen ids first.";
+    "Read the submitted HTML of one screen. Use list_versions and list_screens to resolve the version and screen ids first.";
   public readonly inputSchema = inputSchema;
 
   private readonly context: McpContext;

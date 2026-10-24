@@ -1,25 +1,20 @@
 import { Hono } from "hono";
 import * as v from "valibot";
 
-import type { HonoEnv } from "../../../../server";
+import type { HonoEnv } from "../../../../../../server";
 
-import { validator } from "../../../../validator";
+import { validator } from "../../../../../../validator";
 
 const paramSchema = v.object({
   project_id: v.pipe(v.string(), v.nonEmpty()),
+  version_id: v.pipe(v.string(), v.nonEmpty()),
 });
 
-const querySchema = v.object({
-  v: v.optional(v.string()),
-});
-
-export const getProjectCommentsRoute = new Hono<HonoEnv>().get(
+export const getProjectVersionCommentsRoute = new Hono<HonoEnv>().get(
   "",
   validator("param", paramSchema),
-  validator("query", querySchema),
   async (c) => {
-    const { project_id: projectId } = c.req.valid("param");
-    const { v: queryVersionId } = c.req.valid("query");
+    const { project_id: projectId, version_id: versionId } = c.req.valid("param");
     const owner = c.get("userId");
     const project = await c.env.db.query.projects.findFirst({
       columns: { id: true },
@@ -27,21 +22,6 @@ export const getProjectCommentsRoute = new Hono<HonoEnv>().get(
     });
 
     if (!project) {
-      return c.json({ error: "not_found" }, 404);
-    }
-
-    let versionId = queryVersionId;
-    if (!versionId) {
-      const latest = await c.env.db.query.versions.findFirst({
-        columns: { id: true },
-        where: (table, { eq }) => eq(table.project_id, projectId),
-        // Last inserted version: `created_at` ties within a second and `id` is a random UUID.
-        orderBy: (_table, { desc, sql }) => [desc(sql`rowid`)],
-      });
-      versionId = latest?.id;
-    }
-
-    if (!versionId) {
       return c.json({ error: "not_found" }, 404);
     }
 

@@ -79,13 +79,13 @@ describe("list_projects tool", () => {
 
     // Assert
     expect(tools.map((tool) => tool.name)).toStrictEqual([
-      "add",
       "create_project",
       "add_version",
       "save_comment",
       "list_comments",
       "get_project_url",
       "list_projects",
+      "list_versions",
       "list_screens",
       "get_screen_content",
     ]);

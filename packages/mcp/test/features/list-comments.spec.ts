@@ -32,7 +32,7 @@ describe("list_comments tool", () => {
     vi.unstubAllGlobals();
   });
 
-  it("gets comments for a version with the bearer token and returns them as JSON", async () => {
+  it("gets a version's comments with the bearer token and returns them as JSON", async () => {
     // Arrange
     const seen: { url: string; authorization: string | null }[] = [];
     vi.stubGlobal(
@@ -57,32 +57,12 @@ describe("list_comments tool", () => {
     // Assert
     expect(res.isError).toBeFalsy();
     expect(seen).toStrictEqual([
-      { authorization: "Bearer test-token", url: "http://api/api/projects/p1/comments?v=v1" },
+      {
+        authorization: "Bearer test-token",
+        url: "http://api/api/projects/p1/versions/v1/comments",
+      },
     ]);
     expect(res.content).toStrictEqual([{ text: JSON.stringify(payload), type: "text" }]);
-  });
-
-  it("omits the version query for the latest version", async () => {
-    // Arrange
-    const seen: { url: string }[] = [];
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (input: RequestInfo | URL) => {
-        if (typeof input !== "string") {
-          throw new Error("expected a string URL");
-        }
-        seen.push({ url: input });
-
-        return Response.json(payload);
-      }),
-    );
-
-    // Act
-    const res = await client.callTool({ arguments: { projectId: "p1" }, name: "list_comments" });
-
-    // Assert
-    expect(res.isError).toBeFalsy();
-    expect(seen).toStrictEqual([{ url: "http://api/api/projects/p1/comments" }]);
   });
 
   it("reports an api failure as a tool error", async () => {

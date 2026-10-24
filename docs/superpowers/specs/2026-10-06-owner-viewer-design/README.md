@@ -223,8 +223,8 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   participant Tool as MCP ツール list_comments（既存）
-  participant Api as GET /api/projects/:project_id/comments
-  Tool->>Api: ?v=versionId（versions と comments を読む。v が無ければ versions の並びの最後の行）
+  participant Api as GET /api/projects/:project_id/versions/:version_id/comments
+  Tool->>Api: list_versions で選んだ versionId（指定版の comments を読む）
   Api-->>Tool: 200 { comments }
 ```
 
@@ -292,7 +292,7 @@ MCP ツール add_version（既存）
 └── POST /api/projects/:project_id/versions【7】
 
 MCP ツール list_comments（既存）
-└── GET /api/projects/:project_id/comments【9】
+└── GET /api/projects/:project_id/versions/:version_id/comments【9】
 
 MCP ツール get_project_url【13】
 ├── GET /api/projects/:project_id【11】
@@ -351,11 +351,11 @@ MCP ツール get_project_url【13】
 - 変えるのは並びだけ。「データ」の `versions` の並びにする
 - response: 200 `{ versions }` / 404
 
-#### GET /api/projects/:project_id/comments（変更）【9】
+#### GET /api/projects/:project_id/versions/:version_id/comments（変更）【9】
 
-- 変えるのは `v` が無いときに使う `versions` の行だけ。「データ」の `versions` の並びの最後の行にする
-- request: `?v=<versions.id>`（任意）
-- response: 200 `{ comments }` / 404
+- path で指定した版のコメントを返す。版は MCP の `list_versions` で選ぶ。最新版の自動選択はしない
+- request: path の `project_id` と `version_id`（両方必須）
+- response: 200 `{ comments }`（`created_at`→`id`の順）/ 404 案件・版が無いか見られない
 
 #### GET /api/projects/:project_id/versions/:version_id/content（変更）【10】
 
@@ -448,8 +448,8 @@ flowchart LR
 | apps/api/test/routes/projects/[project_id]/versions/index.post.spec.ts | 変更 | `url` の期待値と、`projects.updated_at` の更新 | 7 |
 | apps/api/src/routes/projects/[project_id]/versions/index.get.ts | 変更 | GET /api/projects/:project_id/versions | 8 |
 | apps/api/test/routes/projects/[project_id]/versions/index.get.spec.ts | 変更 | 同じ `created_at` の行が挿入した順に並ぶこと | 8 |
-| apps/api/src/routes/projects/[project_id]/comments/index.get.ts | 変更 | GET /api/projects/:project_id/comments | 9 |
-| apps/api/test/routes/projects/[project_id]/comments/index.get.spec.ts | 変更 | `v` が無いとき、同じ `created_at` の `versions` の行のうち最後に挿入した行を使うこと | 9 |
+| apps/api/src/routes/projects/[project_id]/versions/[version_id]/comments/index.get.ts | 変更 | GET /api/projects/:project_id/versions/:version_id/comments | 9 |
+| apps/api/test/routes/projects/[project_id]/versions/[version_id]/comments/index.get.spec.ts | 変更 | 指定版のコメントだけを返し、案件・版が無いか見られないときは 404 になること | 9 |
 | apps/api/src/routes/projects/[project_id]/versions/[version_id]/content.get.ts | 変更 | GET /api/projects/:project_id/versions/:version_id/content | 10 |
 | apps/api/test/routes/projects/[project_id]/versions/[version_id]/content.get.spec.ts | 変更 | CSP の期待値 | 10 |
 | apps/api/src/routes/projects/[project_id]/index.get.ts | 変更 | GET /api/projects/:project_id | 11 |

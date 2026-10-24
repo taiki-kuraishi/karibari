@@ -30,7 +30,7 @@ describe("save_comment tool", () => {
     vi.unstubAllGlobals();
   });
 
-  it("posts a comment with the bearer token and returns the result as JSON", async () => {
+  it("posts a comment to the version endpoint with the bearer token and returns the result as JSON", async () => {
     // Arrange
     const seen: { url: string; authorization: string | null; body: unknown; method?: string }[] =
       [];
@@ -63,9 +63,9 @@ describe("save_comment tool", () => {
     expect(seen).toStrictEqual([
       {
         authorization: "Bearer test-token",
-        body: { body: "nice", target: "#a", versionId: "v1" },
+        body: { body: "nice", target: "#a" },
         method: "POST",
-        url: "http://api/api/projects/p1/comments",
+        url: "http://api/api/projects/p1/versions/v1/comments",
       },
     ]);
     expect(res.content).toStrictEqual([{ text: JSON.stringify(created), type: "text" }]);

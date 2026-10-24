@@ -5,17 +5,17 @@ import { createFactories } from "@karibari/db-factory";
 import { env, exports } from "cloudflare:workers";
 import { describe, expect } from "vitest";
 
-import { authTest } from "../../../../helpers/auth-test";
+import { authTest } from "../../../../../../helpers/auth-test";
 
-describe("POST /api/projects/:project_id/comments", () => {
+describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
   const db = createMetaDb(env.DB);
   const factories = createFactories(db);
   const commentsTest = authTest({
-    path: "/api/projects/dummy-id/comments",
+    path: "/api/projects/dummy-id/versions/dummy-vid/comments",
     init: {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ versionId: "dummy-vid", target: "#a", body: "protected" }),
+      body: JSON.stringify({ target: "#a", body: "protected" }),
     },
   });
 
@@ -39,10 +39,10 @@ describe("POST /api/projects/:project_id/comments", () => {
 
     // Act
     const response = await exports.default.fetch(
-      new Request(`http://api/api/projects/${project.id}/comments`, {
+      new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ versionId: version.id, target: "#hero", body: "Nice!" }),
+        body: JSON.stringify({ target: "#hero", body: "Nice!" }),
       }),
     );
     const body = await response.json<{ commentId: string }>();
@@ -80,10 +80,10 @@ describe("POST /api/projects/:project_id/comments", () => {
 
     // Act
     const response = await exports.default.fetch(
-      new Request(`http://api/api/projects/${foreign.id}/comments`, {
+      new Request(`http://api/api/projects/${foreign.id}/versions/${version.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ versionId: version.id, target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();
@@ -106,10 +106,10 @@ describe("POST /api/projects/:project_id/comments", () => {
 
     // Act
     const response = await exports.default.fetch(
-      new Request(`http://api/api/projects/${missingId}/comments`, {
+      new Request(`http://api/api/projects/${missingId}/versions/${missingVersionId}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ versionId: missingVersionId, target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();
@@ -138,10 +138,10 @@ describe("POST /api/projects/:project_id/comments", () => {
 
     // Act
     const response = await exports.default.fetch(
-      new Request(`http://api/api/projects/${project.id}/comments`, {
+      new Request(`http://api/api/projects/${project.id}/versions/${otherVersion.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ versionId: otherVersion.id, target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();
