@@ -1,0 +1,20 @@
+#:schema https://fnox.jdx.dev/schema.json
+
+# The secrets live in the personal AWS account, so fnox assumes a role there on top of AWS_PROFILE (local) or the OIDC credentials (CI, FNOX_PROFILE=ci).
+[providers.aws]
+type = "aws-sm"
+region = "ap-northeast-1"
+role_arn = "arn:aws:iam::297580067274:role/OrganizationAccountAccessRole"
+
+# A profile replaces a provider as a whole, so every field is repeated here.
+[profiles.ci.providers.aws]
+type = "aws-sm"
+region = "ap-northeast-1"
+role_arn = "arn:aws:iam::297580067274:role/terraform-plan-ura-karibari"
+
+[secrets]
+CLOUDFLARE_API_TOKEN = { provider = "aws", value = "URA_KARIBARI_CLOUDFLARE_API_TOKEN", if_missing = "error" }
+TF_VAR_karibari_auth_better_auth_secret = { provider = "aws", value = "URA_KARIBARI_BETTER_AUTH_SECRET", if_missing = "error" }
+TF_VAR_karibari_auth_github_client_id = { provider = "aws", value = "URA_KARIBARI_GITHUB_CLIENT_ID", if_missing = "error" }
+TF_VAR_karibari_auth_github_client_secret = { provider = "aws", value = "URA_KARIBARI_GITHUB_CLIENT_SECRET", if_missing = "error" }
+TF_VAR_karibari_remote_mcp_client_secret = { provider = "aws", value = "URA_KARIBARI_REMOTE_MCP_CLIENT_SECRET", if_missing = "error" }

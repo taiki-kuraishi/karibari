@@ -5,7 +5,16 @@ lefthook = "2.1.10"
 # shims, so without node `mise run lint` dies with "env: node: No such file or directory".
 # CI's install_args stays "bun" — the hosted runner already ships node.
 node = "24"
+aws = "2.37.12"
+terraform = "1.16.0"
+tflint = "0.64.0"
+"aqua:jdx/fnox" = "1.39.0"
 
 [settings]
 npm.bun = true
 lockfile = true
+
+[env]
+# Reads the tf-state backend and the personal account (aws provider, fnox, tflint deep_check).
+# mise.ci.toml unsets it: CI gets credentials from GitHub OIDC.
+AWS_PROFILE = "kuraishi"

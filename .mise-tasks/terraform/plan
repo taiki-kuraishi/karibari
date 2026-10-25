@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="terraform plan with secrets injected by fnox"
+#MISE dir="{{config_root}}/infra/env/prod"
+
+set -euo pipefail
+
+fnox exec -- terraform plan "$@"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#MISE description="Format all code (oxfmt, oxlint --fix)"
+#MISE description="Format all code (oxfmt, oxlint --fix, terraform fmt)"
 #MISE dir="{{config_root}}"
 
 set -euo pipefail
@@ -14,3 +14,5 @@ bunx vp run oxfmt
 # Fix whatever oxlint can fix. Errors it cannot fix still exit non-zero here, so a
 # broken commit is caught before it lands; warnings are CI's `--deny-warnings`.
 bunx vp run oxlint --fix
+
+terraform fmt -recursive infra
