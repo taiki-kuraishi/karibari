@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="Check Terraform (fmt -check, validate, tflint)"
+#MISE dir="{{config_root}}/infra/env/prod"
+
+set -euo pipefail
+
+# Check only; `mise run format` runs the rewriting `terraform fmt`.
+# validate and tflint need `mise run terraform:init` first; tflint's aws `deep_check`
+# also needs AWS credentials.
+terraform fmt -check -recursive ../..
+terraform validate
+tflint

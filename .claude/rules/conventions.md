@@ -11,6 +11,7 @@ versions). Language-level tools (linters, formatters, the compiler) come from Bu
 | `vp` (npm `vite-plus`) | task runner. Pinned in root `devDependencies`, run as `bunx vp` |
 | `oxlint` / `oxfmt` | linter / formatter, driven through `vp run` so vp can cache them |
 | `knip` | unused file / export / dependency detection — never through `vp run` |
+| `terraform` / `tflint` / `aws` / `fnox` | Terraform for `infra/` (see `infra/AGENTS.md`); no npm distribution, so mise installs them |
 
 > **`node` is not optional.** `node_modules/.bin/{vp,oxfmt,oxlint,knip,tsc}` are
 > `#!/usr/bin/env node` shims, so without node every mise task dies with

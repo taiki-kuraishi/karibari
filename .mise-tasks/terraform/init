@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Initialize infra/env/prod (terraform init, tflint --init)"
+#MISE dir="{{config_root}}/infra/env/prod"
+
+set -euo pipefail
+
+# The S3 backend needs AWS credentials: `aws sso login --profile kuraishi` first.
+terraform init -input=false
+tflint --init

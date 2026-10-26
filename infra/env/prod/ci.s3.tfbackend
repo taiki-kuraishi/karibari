@@ -1,0 +1,3 @@
+assume_role = {
+  role_arn = "arn:aws:iam::756921148444:role/terraform-plan-ura-karibari"
+}

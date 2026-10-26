@@ -25,3 +25,6 @@ pre-commit:
     # `worker-configuration.d.ts` before rewriting it, so under `parallel: true` another
     # hook would read an empty file. Generated-file drift is CI's `cf-typegen --check`.
     # See .claude/rules/mise-tasks.md.
+    # `lint:terraform` is deliberately absent: its `fmt -check` would race `format`'s
+    # `terraform fmt`, and validate/tflint need AWS credentials. CI's terraform job runs the
+    # same checks.

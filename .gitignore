@@ -22,3 +22,9 @@ dist/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# terraform
+**/.terraform/
+**/terraform.tfstate*
+**/crash.log
+**/crash.*.log

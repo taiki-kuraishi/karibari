@@ -57,7 +57,8 @@ deploys static assets only: its `wrangler.jsonc` has no `main`, so wrangler uplo
 Vite build and the client-side router owns every path. Its SPA calls the api Worker
 cross-origin. `packages/shadcn` holds the shadcn/ui components and the theme stylesheet, so
 `shadcn add` run from an app writes into the package. Shared dependency versions live in
-`workspaces.catalog` and are referenced as `"catalog:"`.
+`workspaces.catalog` and are referenced as `"catalog:"`. `infra/` holds the Terraform for
+the Cloudflare and AWS resources the Workers use; it is not a workspace.
 
 **A catalog entry that nothing references fails knip.** Add the version to `catalog` in the
 same change that adds the workspace consuming it. See `.claude/rules/workspace-packages.md`.
@@ -127,6 +128,7 @@ that directory down. Keep this table 1:1 with the `AGENTS.md` files that exist.
 | Touching | Read first |
 | --- | --- |
 | `.github/**` | `.github/AGENTS.md` |
+| `infra/**` | `infra/AGENTS.md` |
 | `packages/api-query/**` | `packages/api-query/AGENTS.md` |
 | `packages/auth-query/**` | `packages/auth-query/AGENTS.md` |
 

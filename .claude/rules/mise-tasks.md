@@ -8,14 +8,16 @@ Current set:
 | Task | Does |
 | --- | --- |
 | `install` | `mise install` → `bun install --frozen-lockfile` → `lefthook install` |
-| `format` | `bunx vp run oxfmt` → `bunx vp run oxlint --fix` (the rewriting side) |
+| `format` | `bunx vp run oxfmt` → `bunx vp run oxlint --fix` → `terraform fmt` (the rewriting side) |
 | `lint` | aggregate; `depends` on every `lint:*` below |
 | `lint:lockfile` | `bun install --frozen-lockfile --dry-run` |
 | `lint:oxlint` | `bunx vp run oxlint --deny-warnings` |
 | `lint:oxfmt` | `bunx vp run oxfmt --check` |
 | `lint:type-check` | `bunx vp run -r type-check` — `-r` includes the root |
 | `lint:knip` | `bun run knip` |
+| `lint:terraform` | `terraform fmt -check` → `validate` → `tflint` in `infra/env/prod`; needs `terraform:init` and AWS credentials |
 | `cf-typegen` | `bunx vp run -r cf-typegen` — rewrites `apps/*/worker-configuration.d.ts` |
+| `terraform:init` / `terraform:plan` / `terraform:apply` | Terraform in `infra/env/prod`; see `infra/AGENTS.md` |
 | `test` | `bunx vp run -r test` |
 | `test:vrt` | auth client visual regression (`build` → `playwright test`) |
 | `test:e2e` | auth client and viewer SPA E2E (`build` → `playwright test`; local Chromium, no Docker) |
@@ -31,6 +33,7 @@ Current set:
 - **`lint` / `test` / `format` / generator tasks need `#MISE dir="{{config_root}}"`.**
   A mise task's default cwd is wherever mise was invoked, and `bunx vp run` resolves the
   package from the cwd. `_default` files that only carry `depends` don't need it.
+  Terraform tasks use `#MISE dir="{{config_root}}/infra/env/prod"`, the root module.
 
 ## The three-place sync
 
@@ -64,12 +67,16 @@ lefthook and CI are deliberately asymmetric:
   generator with `stage_fixed: true` and stage the output. `git diff --exit-code` is CI's job.
   `cf-typegen` is also absent for its own reason: `wrangler types` truncates
   `worker-configuration.d.ts` before writing it, so a parallel reader sees an empty file.
+- **Not in lefthook:** `lint:terraform`. Its `fmt -check` would race `format`'s
+  `terraform fmt`, and `validate` / `tflint` need `terraform:init` and AWS credentials.
 - **CI-only steps** (no `.mise-tasks/` counterpart, by design):
   `bun dedupe --check`, `git diff --exit-code -- mise.lock`, `cf-typegen --check`,
   `wrangler deploy --dry-run`, and the drizzle migration drift check
   (`generate:migration` + `git diff --exit-code`) in a dedicated path-gated `db-drift` job. They exist to catch a dirty tree or an undeployable bundle on
   a runner, which is not a local concern. `cf-typegen --check` is the drift check for the
   committed `apps/*/worker-configuration.d.ts`; the `cf-typegen` task itself rewrites.
+  `terraform init -backend-config=ci.s3.tfbackend` is CI-only too: only CI reads state
+  through the read-only plan role.
 - **Not in CI:** `lint:lockfile`. `setup-bun` already runs
   `bun install --frozen-lockfile`, which fails on the same drift; a second CI step would
   only repeat it.
