@@ -37,7 +37,11 @@ mise run lint:terraform   # fmt -check, validate, tflint
 ```
 
 - `mise run format` includes `terraform fmt`.
-- Apply locally and merge only once plan shows No changes.
+- Apply locally and merge only once plan shows No changes. CI's `terraform` job runs plan
+  with `-detailed-exitcode` on every PR and push to main, so pending changes or drift fail it.
+- CI borrows `terraform-plan-ura-karibari` through GitHub OIDC; its trust policy lives in the
+  taiki-kuraishi/personal repo and must list this repo's `pull_request` and `refs/heads/main`
+  subjects. CI reads state through the read-only role in `env/prod/ci.s3.tfbackend`.
 - Secrets live in the personal account's Secrets Manager; `fnox exec` passes them as env.
   Never write them to disk or commit them. Change one with
   `mise exec -- fnox set <KEY> --provider aws` (`<KEY>` is a key under `[secrets]` in

@@ -202,6 +202,43 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - run: bun run knip
 
+  # Terraform for infra/ (see infra/AGENTS.md). Not path-gated: plan also catches drift made
+  # outside a PR. Credentials come from GitHub OIDC through the plan role the
+  # taiki-kuraishi/personal repo trusts for this repo, so fork PRs (no id-token) fail here.
+  # MISE_ENV=ci loads mise.ci.toml, which unsets the local-only AWS_PROFILE.
+  terraform:
+    runs-on: ubuntu-slim
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      MISE_ENV: ci
+      FNOX_PROFILE: ci
+      TF_VAR_aws_account_role_name: terraform-plan-ura-karibari
+    defaults:
+      run:
+        working-directory: infra/env/prod
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-mise
+        with:
+          install_args: "terraform tflint aqua:jdx/fnox"
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::180713304056:role/terraform-plan-ura-karibari
+          aws-region: ap-northeast-1
+      - run: terraform fmt -check -recursive -diff ../..
+      - run: terraform init -input=false -backend-config=ci.s3.tfbackend
+      - run: terraform validate
+      - run: tflint --init
+        env:
+          # Unauthenticated plugin downloads share the runner IP's 60 requests/hour and fail with 403.
+          GITHUB_TOKEN: ${{ github.token }}
+      - run: tflint
+      # The state-read role cannot write the lockfile, so plan runs without a lock.
+      - run: fnox --non-interactive exec -- terraform plan -input=false -lock=false -detailed-exitcode
+
   # Path-gated: the drift gate only matters when `packages/db` changed, so it stays out of
   # `lint`. Regenerating and diffing is how a committed generator output is checked when the
   # generator has no `--check` flag — same shape as the `mise.lock` step. The last step also

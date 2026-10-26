@@ -75,6 +75,8 @@ lefthook and CI are deliberately asymmetric:
   (`generate:migration` + `git diff --exit-code`) in a dedicated path-gated `db-drift` job. They exist to catch a dirty tree or an undeployable bundle on
   a runner, which is not a local concern. `cf-typegen --check` is the drift check for the
   committed `apps/*/worker-configuration.d.ts`; the `cf-typegen` task itself rewrites.
+  `terraform init -backend-config=ci.s3.tfbackend` is CI-only too: only CI reads state
+  through the read-only plan role.
 - **Not in CI:** `lint:lockfile`. `setup-bun` already runs
   `bun install --frozen-lockfile`, which fails on the same drift; a second CI step would
   only repeat it.

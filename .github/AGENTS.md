@@ -7,6 +7,8 @@ Conventions for `.github/workflows/` and `.github/actions/`.
 - `ci.yml` — the JS/TS quality gate: `changes`, `lint`, `db-drift` (path-gated),
   `knip`, and the `test` matrix with its `test-ok` aggregate. Add a matrix entry
   per workspace; see `.claude/rules/workspace-packages.md`.
+- The `terraform` job in `ci.yml` is not path-gated: its plan also catches drift made
+  outside a PR. It needs OIDC (`id-token: write`), so fork PRs fail it.
 - `migrate.yml` — applies D1 migrations to production on push to main (`changes` gate per
   migrations directory) or `workflow_dispatch` (both DBs). One job per DB.
 
@@ -120,6 +122,7 @@ unconditional: `apps/viewer` (static assets, no Worker script) is built and dry-
 | Caller | `install_args` | Why |
 | --- | --- | --- |
 | `ci.yml` (`lint`, `knip`, `test`), `migrate.yml` (`meta`, `auth`) | `bun` | vp, oxlint, oxfmt, tsc, knip, and wrangler all come from node_modules; the hosted runner already ships node |
+| `ci.yml` (`terraform`) | `terraform tflint aqua:jdx/fnox` | aws credentials come from `aws-actions/configure-aws-credentials`, so the aws CLI is not needed |
 
 `install_args` is part of the mise cache key, so jobs with different tool sets never clobber
 each other's cache.
