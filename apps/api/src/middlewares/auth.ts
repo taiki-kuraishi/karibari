@@ -32,6 +32,8 @@ export const authMiddleware: MiddlewareHandler<HonoEnv> = async (c, next) => {
     }
 
     c.set("userId", result.value.sub);
+    // Bearer tokens are issued only to MCP clients, so this marks AI-authored comments.
+    c.set("commentSource", "mcp");
 
     return next();
   }
@@ -64,6 +66,7 @@ export const authMiddleware: MiddlewareHandler<HonoEnv> = async (c, next) => {
   }
 
   c.set("userId", data.user.id);
+  c.set("commentSource", "viewer");
 
   return next();
 };

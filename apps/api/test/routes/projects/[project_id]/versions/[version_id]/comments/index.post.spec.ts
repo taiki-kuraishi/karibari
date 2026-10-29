@@ -1,11 +1,12 @@
 import type { FactoryReturn } from "@karibari/db-factory";
 
+import { apiAudience } from "@karibari/better-auth";
 import { createMetaDb } from "@karibari/db";
 import { createFactories } from "@karibari/db-factory";
 import { env, exports } from "cloudflare:workers";
-import { describe, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { authTest } from "../../../../../../helpers/auth-test";
+import { authTest, createBearerHeaders, stubAuthFetch } from "../../../../../../helpers/auth-test";
 
 describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
   const db = createMetaDb(env.DB);
@@ -57,10 +58,43 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       id: body.commentId,
       project_id: project.id,
       version_id: version.id,
+      parent_id: null,
+      author: auth.userId,
+      source: "viewer",
       target: "#hero",
       body: "Nice!",
       created_at: expect.any(Number),
+      updated_at: null,
+      resolved_at: null,
     } satisfies Comment);
+  });
+
+  test("201: records a Bearer (MCP) comment as source mcp", async () => {
+    // Arrange
+    stubAuthFetch();
+    const userId = crypto.randomUUID();
+    const headers = await createBearerHeaders({ audience: apiAudience, userId });
+    headers.set("content-type", "application/json");
+    const project = await factories.projects.props({ owner: () => userId }).create();
+    const version = await factories.versions.props({ project_id: () => project.id }).create();
+
+    // Act
+    const response = await exports.default.fetch(
+      new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ target: "#hero", body: "From AI" }),
+      }),
+    );
+    const body = await response.json<{ commentId: string }>();
+    const comment = await db.query.comments.findFirst({
+      columns: { author: true, source: true },
+      where: (table, { eq }) => eq(table.id, body.commentId),
+    });
+
+    // Assert
+    expect(response.status).toBe(201);
+    expect(comment).toStrictEqual({ author: userId, source: "mcp" });
   });
 
   commentsTest("404: hides a foreign owner's project without writing", async ({ auth }) => {

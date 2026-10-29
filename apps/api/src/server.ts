@@ -1,4 +1,4 @@
-import type { MetaDb } from "@karibari/db";
+import type { CommentSource, MetaDb } from "@karibari/db";
 
 import { Hono } from "hono";
 
@@ -40,7 +40,7 @@ export interface HonoEnv {
     screenFactory: ScreenFactory;
     versionFactory: VersionFactory;
   };
-  Variables: { userId: string };
+  Variables: { commentSource: CommentSource; userId: string };
 }
 
 // Single method chain: breaking it loses Hono's RPC type inference.

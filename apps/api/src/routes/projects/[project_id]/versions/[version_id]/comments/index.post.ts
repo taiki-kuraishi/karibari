@@ -45,6 +45,8 @@ export const postProjectVersionCommentsRoute = new Hono<HonoEnv>().post(
     const comment = c.env.commentFactory.create({
       projectId,
       versionId,
+      author: owner,
+      source: c.get("commentSource"),
       target,
       body,
     });
