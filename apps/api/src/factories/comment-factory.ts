@@ -6,6 +6,7 @@ export class CommentFactory {
   public create(args: {
     author: string;
     body: string;
+    parentId?: string;
     projectId: string;
     source: CommentSource;
     target: string;
@@ -14,6 +15,7 @@ export class CommentFactory {
     return {
       id: crypto.randomUUID(),
       project_id: args.projectId,
+      parent_id: args.parentId ?? null,
       author: args.author,
       source: args.source,
       version_id: args.versionId,
