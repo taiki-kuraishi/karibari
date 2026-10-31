@@ -54,7 +54,7 @@ describe("save_comment tool", () => {
 
     // Act
     const res = await client.callTool({
-      arguments: { body: "nice", projectId: "p1", target: "#a", versionId: "v1" },
+      arguments: { body: "nice", projectId: "p1", screenId: "s1", target: "#a", versionId: "v1" },
       name: "save_comment",
     });
 
@@ -63,7 +63,7 @@ describe("save_comment tool", () => {
     expect(seen).toStrictEqual([
       {
         authorization: "Bearer test-token",
-        body: { body: "nice", target: "#a" },
+        body: { body: "nice", screen_id: "s1", target: "#a" },
         method: "POST",
         url: "http://api/api/projects/p1/versions/v1/comments",
       },
@@ -80,7 +80,13 @@ describe("save_comment tool", () => {
 
     // Act
     const res = await client.callTool({
-      arguments: { body: "nice", projectId: "missing", target: "#a", versionId: "v1" },
+      arguments: {
+        body: "nice",
+        projectId: "missing",
+        screenId: "s1",
+        target: "#a",
+        versionId: "v1",
+      },
       name: "save_comment",
     });
 

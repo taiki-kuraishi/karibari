@@ -1,0 +1,1 @@
+ALTER TABLE `comments` ADD `screen_id` text REFERENCES screens(id);

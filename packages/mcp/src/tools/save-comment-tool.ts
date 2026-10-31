@@ -8,7 +8,10 @@ import { AbstractTool } from "./abstract-tool";
 const inputSchema = {
   body: z.string().describe("The comment text."),
   projectId: z.string().describe("The target project id."),
-  target: z.string().describe("An opaque element selector within the version."),
+  screenId: z
+    .string()
+    .describe("The screen id returned by list_screens; target is resolved in it."),
+  target: z.string().describe("An element selector within that screen's HTML."),
   versionId: z.string().describe("The version id returned by list_versions."),
 };
 
@@ -31,7 +34,7 @@ export class SaveCommentTool extends AbstractTool {
     const versionComments = client.api.projects[":project_id"].versions[":version_id"].comments;
     const response = await versionComments.$post(
       {
-        json: { body: args.body, target: args.target },
+        json: { body: args.body, screen_id: args.screenId, target: args.target },
         param: { project_id: args.projectId, version_id: args.versionId },
       },
       { headers: { authorization: `Bearer ${this.context.token}` } },

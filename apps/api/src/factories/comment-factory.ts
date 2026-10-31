@@ -8,6 +8,7 @@ export class CommentFactory {
     body: string;
     parentId?: string;
     projectId: string;
+    screenId: string | null;
     source: CommentSource;
     target: string;
     versionId: string;
@@ -16,6 +17,7 @@ export class CommentFactory {
       id: crypto.randomUUID(),
       project_id: args.projectId,
       parent_id: args.parentId ?? null,
+      screen_id: args.screenId,
       author: args.author,
       source: args.source,
       version_id: args.versionId,

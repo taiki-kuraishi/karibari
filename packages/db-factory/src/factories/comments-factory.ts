@@ -17,6 +17,7 @@ export const createCommentsFactory = (db: MetaDb) =>
           project_id: later<string>(),
           version_id: later<string>(),
           parent_id: () => null,
+          screen_id: () => null,
           author: () => fk.string.uuid(),
           source: () => "mcp" as const,
           target: () => `#${fk.string.alpha(8)}`,

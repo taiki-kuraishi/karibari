@@ -38,7 +38,7 @@ export const postProjectVersionCommentRepliesRoute = new Hono<HonoEnv>().post(
     }
 
     const parent = await c.env.db.query.comments.findFirst({
-      columns: { parent_id: true, target: true },
+      columns: { parent_id: true, screen_id: true, target: true },
       where: (table, { and, eq }) =>
         and(
           eq(table.id, commentId),
@@ -60,6 +60,7 @@ export const postProjectVersionCommentRepliesRoute = new Hono<HonoEnv>().post(
       projectId,
       versionId,
       parentId: commentId,
+      screenId: parent.screen_id,
       author: owner,
       source: c.get("commentSource"),
       target: parent.target,

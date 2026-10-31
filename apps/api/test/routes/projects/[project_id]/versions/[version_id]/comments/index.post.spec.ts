@@ -16,7 +16,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
     init: {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ target: "#a", body: "protected" }),
+      body: JSON.stringify({ screen_id: "dummy-sid", target: "#a", body: "protected" }),
     },
   });
 
@@ -35,6 +35,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
         project_id: () => project.id,
       })
       .create();
+    const screen = await factories.screens.props({ version_id: () => version.id }).create();
     const headers = new Headers(auth.headers);
     headers.set("content-type", "application/json");
 
@@ -43,7 +44,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Nice!" }),
+        body: JSON.stringify({ screen_id: screen.id, target: "#hero", body: "Nice!" }),
       }),
     );
     const body = await response.json<{ commentId: string }>();
@@ -59,6 +60,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       project_id: project.id,
       version_id: version.id,
       parent_id: null,
+      screen_id: screen.id,
       author: auth.userId,
       source: "viewer",
       target: "#hero",
@@ -77,13 +79,14 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
     headers.set("content-type", "application/json");
     const project = await factories.projects.props({ owner: () => userId }).create();
     const version = await factories.versions.props({ project_id: () => project.id }).create();
+    const screen = await factories.screens.props({ version_id: () => version.id }).create();
 
     // Act
     const response = await exports.default.fetch(
       new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "From AI" }),
+        body: JSON.stringify({ screen_id: screen.id, target: "#hero", body: "From AI" }),
       }),
     );
     const body = await response.json<{ commentId: string }>();
@@ -117,7 +120,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${foreign.id}/versions/${version.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ screen_id: "missing-screen", target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();
@@ -143,7 +146,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${missingId}/versions/${missingVersionId}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ screen_id: "missing-screen", target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();
@@ -175,7 +178,31 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${project.id}/versions/${otherVersion.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ screen_id: "missing-screen", target: "#hero", body: "Hi" }),
+      }),
+    );
+    const body = await response.json();
+
+    // Assert
+    expect(response.status).toBe(404);
+    expect(body).toStrictEqual({ error: "not_found" });
+  });
+
+  commentsTest("404: rejects a screen from another version", async ({ auth }) => {
+    // Arrange
+    const project = await factories.projects.props({ owner: () => auth.userId }).create();
+    const version = await factories.versions.props({ project_id: () => project.id }).create();
+    const other = await factories.versions.props({ project_id: () => project.id }).create();
+    const screen = await factories.screens.props({ version_id: () => other.id }).create();
+    const headers = new Headers(auth.headers);
+    headers.set("content-type", "application/json");
+
+    // Act
+    const response = await exports.default.fetch(
+      new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ screen_id: screen.id, target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();

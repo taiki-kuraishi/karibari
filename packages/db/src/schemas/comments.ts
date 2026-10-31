@@ -3,6 +3,7 @@ import type { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { projects } from "./projects";
+import { screens } from "./screens";
 import { versions } from "./versions";
 
 export type CommentSource = "mcp" | "viewer";
@@ -18,6 +19,10 @@ export const comments = sqliteTable(
       .notNull()
       .references(() => versions.id, { onDelete: "cascade" }),
     parent_id: text().references((): AnySQLiteColumn => comments.id, { onDelete: "cascade" }),
+    // Null for comments written before screens were tracked. No `onDelete`: screens only go away with
+    // Their version, whose cascade already removes the comment, and SQLite's ALTER TABLE ADD would
+    // Drop an `ON DELETE` clause anyway.
+    screen_id: text().references(() => screens.id),
     author: text().notNull(),
     source: text().$type<CommentSource>().notNull(),
     target: text().notNull(),

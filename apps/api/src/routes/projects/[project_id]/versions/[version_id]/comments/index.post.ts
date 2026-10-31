@@ -12,6 +12,7 @@ const paramSchema = v.object({
 });
 
 const bodySchema = v.object({
+  screen_id: v.pipe(v.string(), v.nonEmpty()),
   target: v.pipe(v.string(), v.nonEmpty()),
   body: v.pipe(v.string(), v.nonEmpty()),
 });
@@ -22,7 +23,7 @@ export const postProjectVersionCommentsRoute = new Hono<HonoEnv>().post(
   validator("json", bodySchema),
   async (c) => {
     const { project_id: projectId, version_id: versionId } = c.req.valid("param");
-    const { target, body } = c.req.valid("json");
+    const { screen_id: screenId, target, body } = c.req.valid("json");
     const owner = c.get("userId");
     const project = await c.env.db.query.projects.findFirst({
       columns: { id: true },
@@ -42,9 +43,20 @@ export const postProjectVersionCommentsRoute = new Hono<HonoEnv>().post(
       return c.json({ error: "not_found" }, 404);
     }
 
+    // A target selector only means something inside one screen's HTML.
+    const screen = await c.env.db.query.screens.findFirst({
+      columns: { id: true },
+      where: (table, { and, eq }) => and(eq(table.id, screenId), eq(table.version_id, versionId)),
+    });
+
+    if (!screen) {
+      return c.json({ error: "not_found" }, 404);
+    }
+
     const comment = c.env.commentFactory.create({
       projectId,
       versionId,
+      screenId,
       author: owner,
       source: c.get("commentSource"),
       target,
