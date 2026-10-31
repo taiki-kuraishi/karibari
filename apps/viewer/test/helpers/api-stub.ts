@@ -136,7 +136,15 @@ export async function stubApi({
   await page.route(
     /\/api\/projects\/[^/]+\/versions\/[^/]+\/screens\/[^/]+\/content$/,
     async (route) => {
-      await route.fulfill({ body: screenContent, contentType: "text/html" });
+      // Fetched with credentials for the iframe's `srcdoc`, so it needs the CORS headers too.
+      await route.fulfill({
+        body: screenContent,
+        contentType: "text/html",
+        headers: {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": route.request().headers().origin ?? "*",
+        },
+      });
     },
   );
 }

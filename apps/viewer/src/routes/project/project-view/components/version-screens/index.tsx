@@ -20,8 +20,22 @@ export function VersionScreens({
   }
 
   if (view.status === "full") {
-    return <HtmlFrame contentUrl={view.contentUrl} title={title} />;
+    return (
+      <HtmlFrame
+        projectId={projectId}
+        screenId={view.screenId}
+        title={title}
+        versionId={versionId}
+      />
+    );
   }
   // Keyed by version so switching versions fits the new row instead of keeping the old view.
-  return <ScreenCanvas key={versionId} screens={view.screens} />;
+  return (
+    <ScreenCanvas
+      key={versionId}
+      projectId={projectId}
+      screens={view.screens}
+      versionId={versionId}
+    />
+  );
 }

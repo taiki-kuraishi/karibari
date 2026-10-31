@@ -1,8 +1,6 @@
 import { useVersionScreensQuery } from "@karibari/api-query";
 import { notFound } from "@tanstack/react-router";
 
-import { apiClient } from "@/lib/api-client";
-
 export function useVersionScreens({
   projectId,
   type,
@@ -22,17 +20,7 @@ export function useVersionScreens({
   if (data === null) {
     throw notFound();
   }
-  const screens = data.screens.map(({ height, id, name, width }) => ({
-    contentUrl: apiClient.api.projects[":project_id"].versions[":version_id"].screens[
-      ":screen_id"
-    ].content
-      .$url({ param: { project_id: projectId, screen_id: id, version_id: versionId } })
-      .toString(),
-    height,
-    id,
-    name,
-    width,
-  }));
+  const { screens } = data;
 
   if (type === "canvas") {
     return { screens, status: "canvas" } as const;
@@ -43,5 +31,5 @@ export function useVersionScreens({
   if (screen === undefined) {
     throw notFound();
   }
-  return { contentUrl: screen.contentUrl, status: "full" } as const;
+  return { screenId: screen.id, status: "full" } as const;
 }
