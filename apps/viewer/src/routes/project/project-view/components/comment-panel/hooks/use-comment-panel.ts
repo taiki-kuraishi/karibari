@@ -1,29 +1,22 @@
 import {
   useCreateCommentMutation,
+  useDeleteCommentMutation,
+  useEditCommentMutation,
   useReplyCommentMutation,
-  useVersionCommentsQuery,
-  useVersionScreensQuery,
+  useResolveCommentMutation,
 } from "@karibari/api-query";
-import { useSessionQuery } from "@karibari/auth-query";
-import { notFound } from "@tanstack/react-router";
 import { useQueryStates } from "nuqs";
 
 import { projectParams } from "@/routes/project/params";
 
 import { useCommentModeStore } from "../../../hooks/use-comment-mode-store";
-
-// The picked element's tag, read off the last `tag:nth-of-type(n)` step of the selector.
-function tagOf(target: string) {
-  return target.split(" > ").at(-1)?.split(":")[0] ?? target;
-}
+import { tagOf, useCommentThreads } from "../../../hooks/use-comment-threads";
 
 /**
- * Group a version's comments into threads for the side panel.
- * 1. Wait for comments, screens and the session.
- * 2. Reject a missing version.
- * 3. Attach replies to their thread and label each thread with its screen.
- * 4. Order threads by screen, then by creation, and filter by the tab.
- * 5. Label the picked element, only when it belongs to this version.
+ * Prepare the side panel's threads and the writes it offers.
+ * 1. Wait for the threads.
+ * 2. Filter threads by the tab.
+ * 3. Label the picked element, only when it belongs to this version.
  */
 export function useCommentPanel({
   projectId,
@@ -32,67 +25,27 @@ export function useCommentPanel({
   projectId: string;
   versionId: string;
 }) {
-  const { data: commentsData } = useVersionCommentsQuery(projectId, versionId);
-  const { data: screensData } = useVersionScreensQuery(projectId, versionId);
-  const { data: session } = useSessionQuery();
+  const data = useCommentThreads({ projectId, versionId });
   const selection = useCommentModeStore((store) => store.selection);
   const createComment = useCreateCommentMutation();
   const replyComment = useReplyCommentMutation();
+  const editComment = useEditCommentMutation();
+  const resolveComment = useResolveCommentMutation();
+  const deleteComment = useDeleteCommentMutation();
   const [{ c: tab }, setParams] = useQueryStates(projectParams);
+  const param = { project_id: projectId, version_id: versionId };
 
-  // Step 1: Wait for comments, screens and the session.
-  if (commentsData === undefined || screensData === undefined || session === undefined) {
+  // Step 1: Wait for the threads.
+  if (data === undefined) {
     return { status: "loading" } as const;
   }
 
-  // Step 2: Reject a missing version.
-  // Thrown at render, not in a `queryFn`, where react-query would retry it.
-  if (commentsData === null || screensData === null) {
-    throw notFound();
-  }
-
-  // Step 3: Attach replies to their thread and label each thread with its screen.
-  const screens = new Map(
-    screensData.screens.map(({ id, name }, index) => [
-      id,
-      { index, label: name ?? `画面 ${index + 1}` },
-    ]),
-  );
-  const authorOf = (source: "mcp" | "viewer") => {
-    if (source === "mcp") {
-      return { isMcp: true, name: "AI" };
-    }
-    return { isMcp: false, name: session?.user.name ?? "あなた" };
-  };
-  const toEntry = ({ body, created_at, id, source }: (typeof commentsData.comments)[number]) => ({
-    author: authorOf(source),
-    body,
-    createdAt: created_at,
-    id,
-  });
-  const threads = commentsData.comments
-    .filter(({ parent_id }) => parent_id === null)
-    .map((root) => {
-      const screen = screens.get(root.screen_id ?? "");
-
-      return Object.assign(toEntry(root), {
-        replies: commentsData.comments
-          .filter(({ parent_id }) => parent_id === root.id)
-          .map(toEntry),
-        resolved: root.resolved_at !== null,
-        screenIndex: screen?.index ?? screens.size,
-        targetLabel: `${screen?.label ?? "画面不明"} / ${tagOf(root.target)}`,
-      });
-    });
-
-  // Step 4: Order threads by screen, then by creation, and filter by the tab.
-  const visible = threads
-    .toSorted((a, b) => a.screenIndex - b.screenIndex || a.createdAt - b.createdAt)
-    .filter(({ resolved }) => tab === "all" || !resolved);
-  // Step 5: Label the picked element, only when it belongs to this version.
+  // Step 2: Filter threads by the tab.
+  const visible = data.threads.filter(({ resolved }) => tab === "all" || !resolved);
+  // Step 3: Label the picked element, only when it belongs to this version.
   // A selection outlives a version switch; posting it here would 404 on its foreign screen.
   let selectionLabel: string | null = null;
-  const selectedScreen = screens.get(selection?.screenId ?? "");
+  const selectedScreen = data.screens.get(selection?.screenId ?? "");
 
   if (selection !== null && selectedScreen !== undefined) {
     selectionLabel = `${selectedScreen.label} / ${tagOf(selection.target)}`;
@@ -105,13 +58,25 @@ export function useCommentPanel({
       }
       await createComment.mutateAsync({
         json: { body, screen_id: selection.screenId, target: selection.target },
-        param: { project_id: projectId, version_id: versionId },
+        param,
       });
+    },
+    onDelete: async (commentId: string) => {
+      await deleteComment.mutateAsync({ param: { ...param, comment_id: commentId } });
+    },
+    onEdit: async (commentId: string, body: string) => {
+      await editComment.mutateAsync({ json: { body }, param: { ...param, comment_id: commentId } });
     },
     onReply: async (commentId: string, body: string) => {
       await replyComment.mutateAsync({
         json: { body },
-        param: { comment_id: commentId, project_id: projectId, version_id: versionId },
+        param: { ...param, comment_id: commentId },
+      });
+    },
+    onResolve: async (commentId: string, resolved: boolean) => {
+      await resolveComment.mutateAsync({
+        json: { resolved },
+        param: { ...param, comment_id: commentId },
       });
     },
     onTabChange: async (value: unknown) => {

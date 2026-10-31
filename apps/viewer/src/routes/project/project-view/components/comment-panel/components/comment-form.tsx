@@ -7,16 +7,21 @@ import { useState } from "react";
 // One form for new threads and replies: both send a body and clear on success.
 export function CommentForm({
   disabled = false,
+  initialBody = "",
   label,
+  onCancel,
   onSubmit,
   submitLabel,
 }: {
   disabled?: boolean;
+  // Editing starts from the current text; new comments and replies start empty.
+  initialBody?: string;
   label: string;
+  onCancel?: () => void;
   onSubmit: (body: string) => Promise<void>;
   submitLabel: string;
 }) {
-  const [body, setBody] = useState("");
+  const [body, setBody] = useState(initialBody);
   const [failed, setFailed] = useState(false);
   const blocked = disabled || body.trim() === "";
   const submit = async () => {
@@ -61,9 +66,16 @@ export function CommentForm({
       {failed && (
         <p className="text-destructive text-xs">送信できませんでした。もう一度お試しください。</p>
       )}
-      <Button className="self-end" disabled={blocked} size="sm" type="submit">
-        {submitLabel}
-      </Button>
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+          <Button onClick={onCancel} size="sm" type="button" variant="ghost">
+            キャンセル
+          </Button>
+        )}
+        <Button disabled={blocked} size="sm" type="submit">
+          {submitLabel}
+        </Button>
+      </div>
     </form>
   );
 }

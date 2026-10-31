@@ -1,6 +1,7 @@
 import { cn } from "@karibari/shadcn/lib/utils";
 
 import { useSelectionFrame } from "../../../hooks/use-selection-frame";
+import { ScreenPins } from "../../screen-pins";
 import { ScreenFigure } from "./screen-figure";
 
 export function ScreenFrame({
@@ -35,16 +36,19 @@ export function ScreenFrame({
           alone would not. In comment mode the screen takes clicks and forwards wheels to the canvas.
           `scrolling="no"` is deprecated, yet the only way to drop the screen's scrollbar.
           Left visible, it would eat into the declared width. */}
-      <iframe
-        className={cn("bg-white shadow-md", !frame.selecting && "pointer-events-none")}
-        inert={!frame.selecting}
-        ref={frame.ref}
-        sandbox="allow-scripts"
-        scrolling="no"
-        srcDoc={frame.srcdoc}
-        style={{ height, width }}
-        title={label}
-      />
+      <div className="relative" style={{ height, width }}>
+        <iframe
+          className={cn("bg-white shadow-md", !frame.selecting && "pointer-events-none")}
+          inert={!frame.selecting}
+          ref={frame.ref}
+          sandbox="allow-scripts"
+          scrolling="no"
+          srcDoc={frame.srcdoc}
+          style={{ height, width }}
+          title={label}
+        />
+        <ScreenPins projectId={projectId} screenId={screenId} versionId={versionId} />
+      </div>
     </ScreenFigure>
   );
 }

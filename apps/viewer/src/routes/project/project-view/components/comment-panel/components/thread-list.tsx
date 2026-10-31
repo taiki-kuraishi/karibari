@@ -10,10 +10,10 @@ import {
 import { CommentThread } from "./comment-thread";
 
 export function ThreadList({
-  onReply,
+  actions,
   threads,
 }: {
-  onReply: ComponentProps<typeof CommentThread>["onReply"];
+  actions: ComponentProps<typeof CommentThread>["actions"];
   threads: ComponentProps<typeof CommentThread>["thread"][];
 }) {
   if (threads.length === 0) {
@@ -32,7 +32,7 @@ export function ThreadList({
   return (
     <ul className="flex flex-col gap-3">
       {threads.map((thread) => (
-        <CommentThread key={thread.id} onReply={onReply} thread={thread} />
+        <CommentThread actions={actions} key={thread.id} thread={thread} />
       ))}
     </ul>
   );

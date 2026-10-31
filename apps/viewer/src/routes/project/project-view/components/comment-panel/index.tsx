@@ -21,7 +21,7 @@ export function CommentPanel({ projectId, versionId }: { projectId: string; vers
         </TabsList>
       </Tabs>
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
-        <ThreadList onReply={panel.onReply} threads={panel.threads} />
+        <ThreadList actions={panel} threads={panel.threads} />
       </div>
       <div className="flex flex-col gap-2 border-t p-3">
         <SelectionChip label={panel.selectionLabel} />

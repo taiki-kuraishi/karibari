@@ -1,9 +1,12 @@
 export { DetailedError } from "hono/client";
 export { ApiQueryProvider } from "./provider";
 export { useCreateCommentMutation } from "./mutation/use-create-comment-mutation";
+export { useDeleteCommentMutation } from "./mutation/use-delete-comment-mutation";
 export { useDeleteProjectMutation } from "./mutation/use-delete-project-mutation";
+export { useEditCommentMutation } from "./mutation/use-edit-comment-mutation";
 export { useRenameProjectMutation } from "./mutation/use-rename-project-mutation";
 export { useReplyCommentMutation } from "./mutation/use-reply-comment-mutation";
+export { useResolveCommentMutation } from "./mutation/use-resolve-comment-mutation";
 export { useCommentsQuery } from "./query/use-comments-query";
 export { useProjectQuery } from "./query/use-project-query";
 export { useProjectVersionsQuery } from "./query/use-project-versions-query";

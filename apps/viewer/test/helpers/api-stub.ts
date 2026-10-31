@@ -195,6 +195,42 @@ export async function stubApi({
     },
   );
   await page.route(
+    /\/api\/projects\/[^/]+\/versions\/[^/]+\/comments\/[^/]+(?:\/resolution)?$/,
+    async (route) => {
+      const request = route.request();
+      const match = /comments\/(?<id>[^/]+)(?<resolution>\/resolution)?$/u.exec(request.url());
+      const id = match?.groups?.id ?? "";
+      const index = comments.findIndex((comment) => comment.id === id);
+      const comment = comments[index];
+
+      if (comment === undefined) {
+        await fulfill({ json: { error: "not_found" }, route, status: 404 });
+        return;
+      }
+
+      if (request.method() === "DELETE") {
+        // Mirrors the self-referencing cascade: a thread takes its replies with it.
+        comments.splice(
+          0,
+          comments.length,
+          ...comments.filter((row) => row.id !== id && row.parent_id !== id),
+        );
+        await fulfill({ json: { deleted: true }, route });
+        return;
+      }
+      const json: Record<string, unknown> = request.postDataJSON();
+      const now = Math.floor(Date.now() / 1000);
+
+      if (match?.groups?.resolution === undefined) {
+        comment.body = String(json.body);
+        comment.updated_at = now;
+      } else {
+        comment.resolved_at = json.resolved === true ? now : null;
+      }
+      await fulfill({ json: { comment }, route });
+    },
+  );
+  await page.route(
     /\/api\/projects\/[^/]+\/versions\/[^/]+\/screens\/[^/]+\/content$/,
     async (route) => {
       // Fetched with credentials for the iframe's `srcdoc`, so it needs the CORS headers too.

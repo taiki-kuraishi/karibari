@@ -1,6 +1,7 @@
 import { notFound } from "@tanstack/react-router";
 
 import { useSelectionFrame } from "../hooks/use-selection-frame";
+import { ScreenPins } from "./screen-pins";
 
 export function HtmlFrame({
   projectId,
@@ -25,12 +26,15 @@ export function HtmlFrame({
   }
 
   return (
-    <iframe
-      className="w-full flex-1"
-      ref={frame.ref}
-      sandbox="allow-scripts"
-      srcDoc={frame.srcdoc}
-      title={title}
-    />
+    <div className="relative flex flex-1">
+      <iframe
+        className="w-full flex-1"
+        ref={frame.ref}
+        sandbox="allow-scripts"
+        srcDoc={frame.srcdoc}
+        title={title}
+      />
+      <ScreenPins projectId={projectId} screenId={screenId} versionId={versionId} />
+    </div>
   );
 }

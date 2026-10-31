@@ -1,15 +1,17 @@
-import { useVersionScreenContentQuery } from "@karibari/api-query";
+import { useVersionCommentsQuery, useVersionScreenContentQuery } from "@karibari/api-query";
 import { useCallback } from "react";
 
 import { apiClient } from "@/lib/api-client";
 
-import { useCommentModeStore } from "./use-comment-mode-store";
+import { type TargetPoint, useCommentModeStore } from "./use-comment-mode-store";
 
 // Parent → frame: the whole selection state, re-sent on every change and on load.
 interface FrameState {
   forwardWheel: boolean;
   selected: string | null;
   selecting: boolean;
+  // Comment targets in this screen whose positions the parent needs for pins.
+  targets: string[];
   type: "karibari:state";
 }
 
@@ -17,6 +19,7 @@ interface FrameState {
 type FrameMessage =
   | { type: "karibari:ready" }
   | { target: string; type: "karibari:pick" }
+  | { points: Record<string, TargetPoint>; type: "karibari:points" }
   | {
       clientX: number;
       clientY: number;
@@ -33,7 +36,12 @@ type FrameMessage =
 function selectionScript() {
   const HOVER = "data-karibari-hover";
   const SELECTED = "data-karibari-selected";
-  let state = { forwardWheel: false, selected: null as string | null, selecting: false };
+  let state = {
+    forwardWheel: false,
+    selected: null as string | null,
+    selecting: false,
+    targets: [] as string[],
+  };
 
   const style = document.createElement("style");
   style.textContent = `[${HOVER}]{outline:2px dashed #4f46e5!important;outline-offset:2px}[${SELECTED}]{outline:2px solid #4f46e5!important;outline-offset:2px}`;
@@ -79,13 +87,42 @@ function selectionScript() {
     }
   };
 
+  // Viewport coordinates: a full screen scrolls itself, so its pins follow the scroll; a canvas
+  // Screen never scrolls, so these equal page coordinates there.
+  const reportPoints = () => {
+    const points: Record<string, { x: number; y: number }> = {};
+
+    // Targets written through MCP are free text; one invalid selector must not drop every pin.
+    const find = (target: string) => {
+      try {
+        return document.querySelector(target);
+      } catch {
+        return null;
+      }
+    };
+
+    for (const target of state.targets) {
+      const rect = find(target)?.getBoundingClientRect();
+
+      if (rect !== undefined) {
+        points[target] = { x: rect.left, y: rect.top };
+      }
+    }
+    window.parent.postMessage({ points, type: "karibari:points" }, "*");
+  };
+
   window.addEventListener("message", (event) => {
     if (event.source !== window.parent || event.data?.type !== "karibari:state") {
       return;
     }
     state = event.data;
     render();
+    reportPoints();
   });
+  window.addEventListener("scroll", reportPoints, { passive: true });
+  window.addEventListener("resize", reportPoints);
+  // Images and fonts move elements after the first report.
+  window.addEventListener("load", reportPoints);
 
   document.addEventListener(
     "mouseover",
@@ -179,7 +216,13 @@ export function useSelectionFrame({
   versionId: string;
 }) {
   const { data } = useVersionScreenContentQuery(projectId, versionId, screenId);
+  const { data: commentsData } = useVersionCommentsQuery(projectId, versionId);
   const selecting = useCommentModeStore((store) => store.commentMode);
+  // A string, so the ref callback below re-runs only when the set of targets really changes.
+  const targetsKey = (commentsData?.comments ?? [])
+    .filter(({ parent_id, screen_id }) => parent_id === null && screen_id === screenId)
+    .map(({ target }) => target)
+    .join("\n");
 
   // A ref callback, not an effect: it owns the listeners for exactly the iframe's lifetime.
   const ref = useCallback(
@@ -195,6 +238,8 @@ export function useSelectionFrame({
           forwardWheel: forwardWheel && commentMode,
           selected,
           selecting: commentMode,
+          // Outside comment mode no pin shows, so the frame need not measure on every scroll.
+          targets: targetsKey.split("\n").filter((target) => commentMode && target !== ""),
           type: "karibari:state",
         };
         iframe.contentWindow?.postMessage(message, "*");
@@ -213,6 +258,11 @@ export function useSelectionFrame({
 
         if (event.data.type === "karibari:pick") {
           useCommentModeStore.getState().select({ screenId, target: event.data.target });
+          return;
+        }
+
+        if (event.data.type === "karibari:points") {
+          useCommentModeStore.getState().setPoints(screenId, event.data.points);
           return;
         }
 
@@ -238,14 +288,22 @@ export function useSelectionFrame({
       };
 
       window.addEventListener("message", onMessage);
-      const unsubscribe = useCommentModeStore.subscribe(send);
+      // Points are written back into the same store; re-sending on them would loop.
+      const unsubscribe = useCommentModeStore.subscribe((state, previous) => {
+        if (state.commentMode !== previous.commentMode || state.selection !== previous.selection) {
+          send();
+        }
+      });
+      // A changed target set re-runs this callback on an already loaded frame, which will not
+      // Send `ready` again.
+      send();
 
       return () => {
         window.removeEventListener("message", onMessage);
         unsubscribe();
       };
     },
-    [forwardWheel, screenId],
+    [forwardWheel, screenId, targetsKey],
   );
 
   if (data === undefined) {
