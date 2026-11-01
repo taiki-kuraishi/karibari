@@ -13,7 +13,8 @@ const inputSchema = {
 export class ListCommentsTool extends AbstractTool {
   public readonly name = "list_comments";
   public readonly title = "List comments";
-  public readonly description = "List a version's comments. Use this forコメント取得.";
+  public readonly description =
+    "List a version's comments. Use this forコメント取得. screen_id names the screen whose HTML target selects in. Replies carry parent_id pointing at their thread's first comment; a thread is resolved when its first comment has resolved_at. source is mcp for AI-written comments and viewer for the owner's.";
   public readonly inputSchema = inputSchema;
 
   private readonly context: McpContext;

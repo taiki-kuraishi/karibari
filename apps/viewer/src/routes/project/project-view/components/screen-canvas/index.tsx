@@ -4,9 +4,13 @@ import { ScreenFrame } from "./components/screen-frame";
 import { useScreenCanvas } from "./hooks/use-screen-canvas";
 
 export function ScreenCanvas({
+  projectId,
   screens,
+  versionId,
 }: {
-  screens: { contentUrl: string; height: number; id: string; name: string | null; width: number }[];
+  projectId: string;
+  screens: { height: number; id: string; name: string | null; width: number }[];
+  versionId: string;
 }) {
   const canvas = useScreenCanvas(screens);
 
@@ -27,12 +31,14 @@ export function ScreenCanvas({
         )}
         style={{ gap: canvas.gap, transform: canvas.transform }}
       >
-        {canvas.frames.map(({ contentUrl, height, id, label, width }) => (
+        {canvas.frames.map(({ height, id, label, width }) => (
           <ScreenFrame
-            contentUrl={contentUrl}
             height={height}
             key={id}
             label={label}
+            projectId={projectId}
+            screenId={id}
+            versionId={versionId}
             width={width}
           />
         ))}

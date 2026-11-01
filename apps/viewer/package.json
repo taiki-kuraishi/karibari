@@ -19,7 +19,8 @@
     "better-auth": "catalog:",
     "nuqs": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",

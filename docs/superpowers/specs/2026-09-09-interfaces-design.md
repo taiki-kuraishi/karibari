@@ -22,6 +22,13 @@
 - `401/403/404` → 同一404画面（区別しない）。例外はセッションが無いとき（未ログイン）で、`/`と`/p/:projectId`のどちらでもAuthのサインイン（`<authのorigin>/sign-in?callbackURL=<encodeURIComponent(今のページのURL)>`）へ移動し、サインインの後は開いたURLへ戻る。セッションの有無はAuthの`GET /api/auth/get-session`で確かめる（Viewerがbetter-authのclientで直接呼ぶ。Authの「信頼オリジン」参照）。セッションが無いことはprojectの有無と関係ないので、存在は漏れない
 - セッション・招待・署名の併用時は、いずれか一つでも有効なら表示（OR判定）
 
+### Viewerの画面表示（合意済み）
+- 案件の画面（`/p/:projectId`）は、contentを`credentials: "include"`でfetchし、`<base href>`（contentのURL。相対URLを以前と同じ場所から読むため）と要素選択のscriptを足して、iframeの`srcDoc`に渡す。`srcDoc`ではcontentのresponseのCSPは効かないので、隔離はiframeの`sandbox="allow-scripts"`（`allow-same-origin`なし）だけが担う。この属性は外さない。一覧（`/`）のサムネイルは今もiframeの`src`でcontentを読むので、そこでは属性とCSPの両方が効く
+- iframeとViewerは`postMessage`でやりとりする。iframeのoriginはopaqueで確かめられないため、Viewerは`event.source`が自分のiframeのwindowかで受け付け、既知の`type`だけを処理する（画面のHTMLのscriptも任意のmessageを送れる。各`type`の中身の形は照合していない）
+  - iframe → Viewer：`karibari:ready`（listenerの準備ができた）、`karibari:pick`（クリックした要素のセレクタ）、`karibari:points`（コメント対象の要素の位置）、`karibari:wheel`（canvasでのpan/zoomを親に渡す）
+  - Viewer → iframe：`karibari:state`（コメントモードか、wheelを親に渡すか、選択中のセレクタ、位置を測る対象のセレクタ一覧）
+- セレクタは`body`からの`tag:nth-of-type(n)`の並び。正しくないセレクタ（MCPから書かれたもの）は位置を測らず、ピンを出さない
+
 ## Api
 
 ### 公開APIの資源分割（合意済み）
@@ -56,25 +63,34 @@
 - 版は表示の種類`type`（`"canvas"` | `"full"`）を持つ。入稿のたびにLLMが申告する（任意、既定`canvas`）
 - `canvas`：画面を1〜20個持ち、Viewerはpan/zoomできる無限キャンバスに、画面ごとに申告した幅×高さの枠で並べる（機能名 canvas）。枠からはみ出した中身は切れる
 - `full`：画面をちょうど1個持ち、Viewerはその画面をブラウザの窓いっぱいに出して操作できるようにする。幅・高さも申告か既定値で保存するが、Viewerは使わない
-- 高さはLLMの申告で決める。画面の中身を測って親に知らせる仕組み（script）は持たない
+- 高さはLLMの申告で決める。画面の中身を測って高さを決める仕組みは持たない（コメントのピンのために、要素の位置だけはiframeのscriptが測って親に知らせる。「Viewerの画面表示」）
 
 ### 公開API screens（合意済み）
 - 1つの版の画面は、`canvas`なら1〜20個、`full`ならちょうど1個（「版の表示の種類」）
 - `GET /api/projects/:id/versions/:vid/screens`（画面一覧）
   - 出力：`200 { screens: [{ id, name, width, height }] }`（`name`は`null`可。入稿した順）
 - `GET /api/projects/:id/versions/:vid/screens/:sid/content`（画面のHTML実体取得、R2経由）
-  - 出力：`200` R2のHTMLをそのまま返す。`Content-Security-Policy: sandbox allow-scripts`と`X-Content-Type-Options: nosniff`を付ける。LLMが書いたHTMLのスクリプトをopaque originで動かし、cookieもApiへの認証付きrequestも持たせないため。Viewerのiframeの`sandbox`属性も`allow-scripts`にする
+  - 出力：`200` R2のHTMLをそのまま返す。`Content-Security-Policy: sandbox allow-scripts`と`X-Content-Type-Options: nosniff`を付ける。URLを直接開いたときも、LLMが書いたHTMLのスクリプトをopaque originで動かし、cookieもApiへの認証付きrequestも持たせないため
 - いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）。版が案件に、画面が版に属さないときも`404`
 - `screens`の並び：同じ`version_id`の行を挿入した順（SQLiteの暗黙の`rowid`順。カラムは足さない）。入稿した順に1回のinsertで入れる
 - 移行：画面に分ける前の版は、migrationの後に本番のmeta用D1へSQLを一度だけ流して移す（migrationには含めない）。順番は (1) 画面をまだ持たない版の`type`を`full`にする（`UPDATE versions SET type = 'full' WHERE id NOT IN (SELECT version_id FROM screens)`）、(2) 画面をまだ持たない版ごとに画面を1つ作る（画面のidは版のidと同じ、名前は`null`、幅は1440、高さは900、`rowid`順）、(3) R2の`projects/{id}/versions/{v}/index.html`を`projects/{id}/versions/{v}/screens/{v}.html`へcopyする。(1)は(2)より先に流す（(2)の後では対象の版を見分けられない）
 
 ### 公開API comments（合意済み）
 - `GET /api/projects/:id/versions/:vid/comments`（指定版のコメント一覧）
-  - 出力：`200 { comments }`。並びは`created_at`→`id`の順
+  - 出力：`200 { comments }`。並びは`created_at`→`id`の順。返信も1行として含む（`parent_id`で先頭に紐づく）
 - `POST /api/projects/:id/versions/:vid/comments`（要素単位コメントの保存）
-  - 入力：`{ target, body }`
+  - 入力：`{ screen_id, target, body }`。`target`は`screen_id`の画面のHTMLの中の要素を指す
   - 出力：`201 { commentId }`
-- いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）。案件・版が無い、見られない、版が案件に属さないときは`404`
+  - `author`は本人、`source`は認証の手段で決める（Bearer＝MCPなら`mcp`、Cookie＝Viewerなら`viewer`）
+- `POST /api/projects/:id/versions/:vid/comments/:cid/replies`（返信）
+  - 入力：`{ body }`。出力：`201 { commentId }`。返信はスレッドの先頭にだけ付け（1段）、`screen_id`と`target`は先頭から引き継ぐ。返信への返信は`400 { error: "not_thread_root" }`
+- `PATCH /api/projects/:id/versions/:vid/comments/:cid`（本文の編集）
+  - 入力：`{ body }`。出力：`200 { comment }`。`updated_at`を入れる。`author`が本人で`source`がrequestと同じ行だけ（Viewerから、MCPが書いたコメントは編集できない）。それ以外は`404`
+- `PATCH /api/projects/:id/versions/:vid/comments/:cid/resolution`（解決・再開）
+  - 入力：`{ resolved }`。出力：`200 { comment }`。`resolved_at`を入れるか`null`に戻す。スレッドの先頭だけ。返信は`400 { error: "not_thread_root" }`
+- `DELETE /api/projects/:id/versions/:vid/comments/:cid`（削除）
+  - 出力：`200 { deleted: true }`。先頭を消すと返信もDBのcascadeで消える
+- いずれも公開範囲判定あり（セッション/招待/署名のOR。招待・署名・ORは未実装で、今は所有者のみ）。案件・版・画面・コメントが無い、見られない、互いに属さないときは`404`
 
 ### 公開API shares（合意済み）
 - `GET /api/projects/:id/shares`（公開設定一覧、要セッション・所有者のみ）
@@ -87,7 +103,7 @@
 - 一覧画面が案件ごとの件数・最新版・先頭画面を出すため、案件（版）のidを複数受け取ってその行をまとめて返すrouteをテーブルごとに置く。1つのrouteは1つのテーブルの行だけを返し、件数や最新版の組み立てはViewerが行う（集計をApiの1つのrouteに持たせない）
 - `GET /api/versions?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { versions: [{ id, project_id, type, created_at }] }`。並びは全案件を通した挿入順（`rowid`順）で、案件ごとにまとめない
 - `GET /api/screens?version_id=:vid&version_id=:vid…`（要セッション。未ログインは`404`）：`200 { screens: [{ id, version_id, name, width, height }] }`。並びは全版を通した挿入順（`rowid`順）。所有は版が属する案件の`owner`で判定する
-- `GET /api/comments?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { comments: [{ id, project_id, version_id, target, body, created_at }] }`。全版のコメントを返す。並びは全案件を通した`created_at`→`id`の順（`GET /api/projects/:id/versions/:vid/comments`と同じ）
+- `GET /api/comments?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { comments: [{ id, project_id, version_id, screen_id, parent_id, author, source, target, body, created_at, updated_at, resolved_at }] }`。全版のコメントを返す。並びは全案件を通した`created_at`→`id`の順（`GET /api/projects/:id/versions/:vid/comments`と同じ）
 - `GET /api/shares?project_id=:id&project_id=:id…`（要セッション。未ログインは`404`）：`200 { shares: [{ id, project_id, kind, token, key_id }] }`。並びは全案件を通した`id`の順（`GET /api/projects/:id/shares`と同じ）
 - idは1〜50個。0個・51個以上は`400`。上限は所有者＋idの bind をD1の上限100に収めるため。所有していない・存在しないidは`404`にせず結果から除く（他人の案件の有無を見せない）
 
@@ -106,8 +122,10 @@
 - 入稿 → `POST /api/projects`（＋初期版。入力`{ name?, type?, screens: [{ name?, width?, height?, html }] }`）
 - 編集 → `POST /api/projects/:id/versions`（新version追加、不変版維持。入力`{ projectId, type?, screens }`。版は前の版と画面を共有しないので、見せたい画面をすべて送る）
 - 入稿・編集のdescriptionには、LLMが`type`を選べるように、`canvas`は複数の画面を申告した幅×高さの枠で並べて見せる（はみ出しは切れる）、`full`は1画面をブラウザの窓いっぱいに出して操作できる、と書く
-- コメント保存 → `save_comment`。入力`{ projectId, versionId, target, body }`。`POST /api/projects/:id/versions/:vid/comments`を呼ぶ
-- コメント取得 → `list_comments`。入力`{ projectId, versionId }`（両方必須）。`GET /api/projects/:id/versions/:vid/comments`を呼ぶ。対象版は先に`list_versions`で選ぶ
+- コメント保存 → `save_comment`。入力`{ projectId, versionId, screenId, target, body }`。`POST /api/projects/:id/versions/:vid/comments`を呼ぶ
+- コメント取得 → `list_comments`。入力`{ projectId, versionId }`（両方必須）。`GET /api/projects/:id/versions/:vid/comments`を呼ぶ。対象版は先に`list_versions`で選ぶ。descriptionに、返信は`parent_id`で先頭に紐づき、スレッドの解決は先頭の`resolved_at`、`source`はAI（`mcp`）か所有者（`viewer`）かを書く
+- 返信 → `reply_comment`。入力`{ projectId, versionId, commentId, body }`。`POST …/comments/:cid/replies`を呼ぶ
+- 解決・再開 → `resolve_comment`。入力`{ projectId, versionId, commentId, resolved }`。`PATCH …/comments/:cid/resolution`を呼ぶ。編集・削除のtoolは持たない（人がViewerで行う）
 - 公開URL取得 → `GET /api/projects/:id`の`url`（絶対の表示URL）に、versionを指定されたら`?v=`を足す（MCPはViewerのoriginを持たない）。`?invite=`/`?exp=&sig=`の組み立ては未実装（今はsharesの件数`shareCount`を返すだけ）
 - 一覧 → `GET /api/projects`（`list_projects`）
 - 版一覧 → `list_versions`。入力`{ projectId }`。`GET /api/projects/:id/versions`の出力`{ versions }`をそのまま返す。agentがこの一覧から対象版を選ぶ
@@ -156,7 +174,7 @@
 - 不透明なランダム文字列（推測不可、sharesに保存、失効・再発行可）
 
 ### エラーレスポンス形状（合意済み）
-- HTTPは一律`404`、ボディは`{ "error": "not_found" }`固定（理由の区別なし）
+- HTTPは一律`404`、ボディは`{ "error": "not_found" }`固定（理由の区別なし）。見られるかどうかの判定の話で、入力や状態が不正なときの`400`（`not_thread_root`など）は各routeに書く
 - 内訳（`not_found`／`forbidden`／`expired`／`invalid_sig`／`r2_missing`／`auth_unavailable`）はサーバログのみに残す（未実装。今は認証のmiddlewareが`auth_unavailable`をログに出すだけ）
 
 ### D1/R2バインド（合意済み）

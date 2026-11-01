@@ -1,11 +1,12 @@
 import type { FactoryReturn } from "@karibari/db-factory";
 
+import { apiAudience } from "@karibari/better-auth";
 import { createMetaDb } from "@karibari/db";
 import { createFactories } from "@karibari/db-factory";
 import { env, exports } from "cloudflare:workers";
-import { describe, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { authTest } from "../../../../../../helpers/auth-test";
+import { authTest, createBearerHeaders, stubAuthFetch } from "../../../../../../helpers/auth-test";
 
 describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
   const db = createMetaDb(env.DB);
@@ -15,7 +16,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
     init: {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ target: "#a", body: "protected" }),
+      body: JSON.stringify({ screen_id: "dummy-sid", target: "#a", body: "protected" }),
     },
   });
 
@@ -34,6 +35,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
         project_id: () => project.id,
       })
       .create();
+    const screen = await factories.screens.props({ version_id: () => version.id }).create();
     const headers = new Headers(auth.headers);
     headers.set("content-type", "application/json");
 
@@ -42,7 +44,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Nice!" }),
+        body: JSON.stringify({ screen_id: screen.id, target: "#hero", body: "Nice!" }),
       }),
     );
     const body = await response.json<{ commentId: string }>();
@@ -57,10 +59,45 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       id: body.commentId,
       project_id: project.id,
       version_id: version.id,
+      parent_id: null,
+      screen_id: screen.id,
+      author: auth.userId,
+      source: "viewer",
       target: "#hero",
       body: "Nice!",
       created_at: expect.any(Number),
+      updated_at: null,
+      resolved_at: null,
     } satisfies Comment);
+  });
+
+  test("201: records a Bearer (MCP) comment as source mcp", async () => {
+    // Arrange
+    stubAuthFetch();
+    const userId = crypto.randomUUID();
+    const headers = await createBearerHeaders({ audience: apiAudience, userId });
+    headers.set("content-type", "application/json");
+    const project = await factories.projects.props({ owner: () => userId }).create();
+    const version = await factories.versions.props({ project_id: () => project.id }).create();
+    const screen = await factories.screens.props({ version_id: () => version.id }).create();
+
+    // Act
+    const response = await exports.default.fetch(
+      new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ screen_id: screen.id, target: "#hero", body: "From AI" }),
+      }),
+    );
+    const body = await response.json<{ commentId: string }>();
+    const comment = await db.query.comments.findFirst({
+      columns: { author: true, source: true },
+      where: (table, { eq }) => eq(table.id, body.commentId),
+    });
+
+    // Assert
+    expect(response.status).toBe(201);
+    expect(comment).toStrictEqual({ author: userId, source: "mcp" });
   });
 
   commentsTest("404: hides a foreign owner's project without writing", async ({ auth }) => {
@@ -83,7 +120,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${foreign.id}/versions/${version.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ screen_id: "missing-screen", target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();
@@ -109,7 +146,7 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${missingId}/versions/${missingVersionId}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ screen_id: "missing-screen", target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();
@@ -141,7 +178,31 @@ describe("POST /api/projects/:project_id/versions/:version_id/comments", () => {
       new Request(`http://api/api/projects/${project.id}/versions/${otherVersion.id}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ target: "#hero", body: "Hi" }),
+        body: JSON.stringify({ screen_id: "missing-screen", target: "#hero", body: "Hi" }),
+      }),
+    );
+    const body = await response.json();
+
+    // Assert
+    expect(response.status).toBe(404);
+    expect(body).toStrictEqual({ error: "not_found" });
+  });
+
+  commentsTest("404: rejects a screen from another version", async ({ auth }) => {
+    // Arrange
+    const project = await factories.projects.props({ owner: () => auth.userId }).create();
+    const version = await factories.versions.props({ project_id: () => project.id }).create();
+    const other = await factories.versions.props({ project_id: () => project.id }).create();
+    const screen = await factories.screens.props({ version_id: () => other.id }).create();
+    const headers = new Headers(auth.headers);
+    headers.set("content-type", "application/json");
+
+    // Act
+    const response = await exports.default.fetch(
+      new Request(`http://api/api/projects/${project.id}/versions/${version.id}/comments`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ screen_id: screen.id, target: "#hero", body: "Hi" }),
       }),
     );
     const body = await response.json();

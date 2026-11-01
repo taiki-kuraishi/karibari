@@ -1,4 +1,4 @@
-import type { MetaDb } from "@karibari/db";
+import type { CommentSource, MetaDb } from "@karibari/db";
 
 import { Hono } from "hono";
 
@@ -18,6 +18,10 @@ import { getProjectRoute } from "./routes/projects/[project_id]/index.get";
 import { patchProjectRoute } from "./routes/projects/[project_id]/index.patch";
 import { deleteProjectShareRoute } from "./routes/projects/[project_id]/shares/[share_id]/index.delete";
 import { getProjectSharesRoute } from "./routes/projects/[project_id]/shares/index.get";
+import { deleteProjectVersionCommentRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/[comment_id]/index.delete";
+import { patchProjectVersionCommentRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/[comment_id]/index.patch";
+import { postProjectVersionCommentRepliesRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/[comment_id]/replies.post";
+import { patchProjectVersionCommentResolutionRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/[comment_id]/resolution.patch";
 import { getProjectVersionCommentsRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/index.get";
 import { postProjectVersionCommentsRoute } from "./routes/projects/[project_id]/versions/[version_id]/comments/index.post";
 import { getProjectVersionRoute } from "./routes/projects/[project_id]/versions/[version_id]/index.get";
@@ -40,7 +44,7 @@ export interface HonoEnv {
     screenFactory: ScreenFactory;
     versionFactory: VersionFactory;
   };
-  Variables: { userId: string };
+  Variables: { commentSource: CommentSource; userId: string };
 }
 
 // Single method chain: breaking it loses Hono's RPC type inference.
@@ -59,6 +63,22 @@ export const app = new Hono<HonoEnv>()
   .route("/api/projects/:project_id/versions/:version_id", getProjectVersionRoute)
   .route("/api/projects/:project_id/versions/:version_id/comments", postProjectVersionCommentsRoute)
   .route("/api/projects/:project_id/versions/:version_id/comments", getProjectVersionCommentsRoute)
+  .route(
+    "/api/projects/:project_id/versions/:version_id/comments/:comment_id",
+    patchProjectVersionCommentRoute,
+  )
+  .route(
+    "/api/projects/:project_id/versions/:version_id/comments/:comment_id",
+    deleteProjectVersionCommentRoute,
+  )
+  .route(
+    "/api/projects/:project_id/versions/:version_id/comments/:comment_id/replies",
+    postProjectVersionCommentRepliesRoute,
+  )
+  .route(
+    "/api/projects/:project_id/versions/:version_id/comments/:comment_id/resolution",
+    patchProjectVersionCommentResolutionRoute,
+  )
   .route("/api/projects/:project_id/versions/:version_id/screens", getProjectVersionScreensRoute)
   .route(
     "/api/projects/:project_id/versions/:version_id/screens/:screen_id/content",

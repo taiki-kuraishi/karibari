@@ -1,17 +1,25 @@
-import type { comments } from "@karibari/db";
+import type { CommentSource, comments } from "@karibari/db";
 
 import { nowSeconds } from "./now-seconds";
 
 export class CommentFactory {
   public create(args: {
+    author: string;
     body: string;
+    parentId?: string;
     projectId: string;
+    screenId: string | null;
+    source: CommentSource;
     target: string;
     versionId: string;
   }): typeof comments.$inferInsert {
     return {
       id: crypto.randomUUID(),
       project_id: args.projectId,
+      parent_id: args.parentId ?? null,
+      screen_id: args.screenId,
+      author: args.author,
+      source: args.source,
       version_id: args.versionId,
       target: args.target,
       body: args.body,

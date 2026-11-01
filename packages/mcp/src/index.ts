@@ -12,6 +12,8 @@ import {
   ListProjectsTool,
   ListScreensTool,
   ListVersionsTool,
+  ReplyCommentTool,
+  ResolveCommentTool,
   SaveCommentTool,
 } from "./tools";
 
@@ -27,6 +29,8 @@ export const createMcpServer = (context: McpContext): McpServer => {
   new AddVersionTool(context).register(server);
   new SaveCommentTool(context).register(server);
   new ListCommentsTool(context).register(server);
+  new ReplyCommentTool(context).register(server);
+  new ResolveCommentTool(context).register(server);
   new GetProjectUrlTool(context).register(server);
   new ListProjectsTool(context).register(server);
   new ListVersionsTool(context).register(server);

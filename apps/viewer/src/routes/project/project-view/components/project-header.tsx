@@ -1,13 +1,17 @@
+import type { ReactNode } from "react";
+
 import { NativeSelect, NativeSelectOption } from "@karibari/shadcn/components/native-select";
 import { Link } from "@tanstack/react-router";
 
 /** Render the project heading and version selector. */
 export function ProjectHeader({
+  children,
   displayName,
   onSelect,
   options,
   versionId,
 }: {
+  children: ReactNode;
   displayName: string;
   onSelect: (versionId: string) => void;
   options: { id: string; label: string }[];
@@ -33,6 +37,7 @@ export function ProjectHeader({
           </NativeSelectOption>
         ))}
       </NativeSelect>
+      {children}
     </header>
   );
 }

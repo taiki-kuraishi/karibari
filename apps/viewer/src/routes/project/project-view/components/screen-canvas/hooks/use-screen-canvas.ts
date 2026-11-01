@@ -16,7 +16,7 @@ const MAX_ZOOM_DELTA = 50;
 const LINE_HEIGHT = 16;
 
 export function useScreenCanvas(
-  screens: { contentUrl: string; height: number; id: string; name: string | null; width: number }[],
+  screens: { height: number; id: string; name: string | null; width: number }[],
 ) {
   const [transform, setTransform] = useState<{ scale: number; x: number; y: number }>();
   const dragPoint = useRef<{ x: number; y: number }>(undefined);
@@ -86,8 +86,7 @@ export function useScreenCanvas(
   );
 
   return {
-    frames: screens.map(({ contentUrl, height, id, name, width }, index) => ({
-      contentUrl,
+    frames: screens.map(({ height, id, name, width }, index) => ({
       height,
       id,
       label: name ?? `画面 ${index + 1}`,

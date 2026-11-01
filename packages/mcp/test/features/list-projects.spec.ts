@@ -83,6 +83,8 @@ describe("list_projects tool", () => {
       "add_version",
       "save_comment",
       "list_comments",
+      "reply_comment",
+      "resolve_comment",
       "get_project_url",
       "list_projects",
       "list_versions",

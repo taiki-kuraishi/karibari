@@ -6,4 +6,6 @@ export { ListCommentsTool } from "./list-comments-tool";
 export { ListProjectsTool } from "./list-projects-tool";
 export { ListScreensTool } from "./list-screens-tool";
 export { ListVersionsTool } from "./list-versions-tool";
+export { ReplyCommentTool } from "./reply-comment-tool";
+export { ResolveCommentTool } from "./resolve-comment-tool";
 export { SaveCommentTool } from "./save-comment-tool";
