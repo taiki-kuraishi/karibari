@@ -25,10 +25,11 @@
 - `projects`: `id` TEXT PK、`name` TEXT NULL 可、`owner` TEXT NOT NULL（auth-D1 user id。DB 跨ぎのため FK なし）、`created_at` / `updated_at` INTEGER epoch 秒 NOT NULL。
 - `versions`: `id` TEXT PK（R2 の `{v}` セグメントに再利用。独立した version 番号列は持たない）、`project_id` TEXT NOT NULL → `projects.id`、`type` TEXT NOT NULL 既定 `canvas`（`canvas` / `full`。表示の種類）、`created_at` INTEGER NOT NULL。HTML 本体は R2 に置き列にしない。不変性は運用ルール。
 - `screens`: `id` TEXT PK（R2 の `{s}` セグメントに再利用）、`version_id` TEXT NOT NULL → `versions.id`、`name` TEXT NULL 可、`width` INTEGER NOT NULL（px、320〜3840 は Api が検証）、`height` INTEGER NOT NULL（px、200〜20000 は Api が検証）。時刻列は持たない。並びは挿入順の暗黙の `rowid`（順番の列は持たない）。HTML 本体は R2 に置き列にしない。
-- `comments`: `id` TEXT PK、`project_id` TEXT NOT NULL → `projects.id`、`version_id` TEXT NOT NULL → `versions.id`、`target` TEXT NOT NULL（要素指定の opaque セレクタ）、`body` TEXT NOT NULL、`created_at` INTEGER NOT NULL。
+- `comments`: `id` TEXT PK、`project_id` TEXT NOT NULL → `projects.id`、`version_id` TEXT NOT NULL → `versions.id`、`parent_id` TEXT NULL 可 → `comments.id`（返信先。NULL ならスレッドの先頭）、`screen_id` TEXT NULL 可 → `screens.id`（`target` を探す画面。画面を持つ前のコメントは NULL）、`author` TEXT NOT NULL（auth-D1 user id。FK なし）、`source` TEXT NOT NULL（`mcp` / `viewer`。書いた経路）、`target` TEXT NOT NULL（その画面の中の要素のセレクタ）、`body` TEXT NOT NULL、`created_at` INTEGER NOT NULL、`updated_at` / `resolved_at` INTEGER NULL 可（編集・解決の時刻）。
 - `shares`: `id` TEXT PK、`project_id` TEXT NOT NULL → `projects.id`、`kind` TEXT NOT NULL（`private` / `invite` / `signed`）、`token` TEXT NULL 可 UNIQUE（invite 用）、`key_id` TEXT NULL 可（signed 用。鍵本体は Secrets）、失効は行削除（DELETE＝失効）。`exp` は URL に載せ保存しない。`target` の版スコープ指定は持たない（署名対象の version は URL の `?v=` で運ぶ）。
 - index: `versions(project_id)`、`screens(version_id)`、`comments(project_id, version_id)`、`shares(project_id)`、`shares(token)` UNIQUE。
-- 外部キーはすべて `ON DELETE cascade`。案件の削除は `projects` の行を消すだけで、版・画面・コメント・共有の行も消える。
+- 外部キーは `comments.screen_id` を除いてすべて `ON DELETE cascade`。案件の削除は `projects` の行を消すだけで、版・画面・コメント・共有の行も消える。`comments.screen_id` は cascade を持たない（画面は版の削除でしか消えず、そのときコメントも版の cascade で消える。drizzle-kit が出力する `ALTER TABLE ADD` は `ON DELETE` を落とす）。
+- `comments` の migration のうち、テーブルを作り直して既存行を移すもの（`author` = 案件の `owner`、`source` = `mcp`）は手で書いた。drizzle-kit の `ALTER TABLE ADD` では、自己参照の `parent_id` の cascade が落ち、行のあるテーブルに NOT NULL の列を足せないため。
 
 ## 設計
 

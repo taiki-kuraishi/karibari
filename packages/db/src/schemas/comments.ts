@@ -20,8 +20,8 @@ export const comments = sqliteTable(
       .references(() => versions.id, { onDelete: "cascade" }),
     parent_id: text().references((): AnySQLiteColumn => comments.id, { onDelete: "cascade" }),
     // Null for comments written before screens were tracked. No `onDelete`: screens only go away with
-    // Their version, whose cascade already removes the comment, and SQLite's ALTER TABLE ADD would
-    // Drop an `ON DELETE` clause anyway.
+    // Their version, whose cascade already removes the comment, and drizzle-kit's generated
+    // ALTER TABLE ADD drops an `ON DELETE` clause anyway.
     screen_id: text().references(() => screens.id),
     author: text().notNull(),
     source: text().$type<CommentSource>().notNull(),
