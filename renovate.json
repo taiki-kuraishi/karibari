@@ -9,8 +9,10 @@
   "reviewers": ["taiki-kuraishi"],
   "assignAutomerge": true,
   "vulnerabilityAlerts": { "enabled": true },
+  "osvVulnerabilityAlerts": true,
   "lockFileMaintenance": { "enabled": true, "automerge": true },
   "constraints": { "bun": "1.4.0" },
+  "ignorePaths": ["**/node_modules/**"],
   "packageRules": [
     {
       "description": "Routine patch PRs would spend GitHub Actions minutes; vulnerabilityAlerts force-enables security patches, which this rule then automerges",
@@ -44,10 +46,10 @@
       "groupName": "typescript"
     },
     {
-      "description": "worker-configuration.d.ts records the workerd version bundled with wrangler, so CI's cf-typegen --check fails until it is regenerated. The regeneration runs wrangler through node_modules, so this installs instead of only locking",
+      "description": "worker-configuration.d.ts records the workerd version bundled with wrangler, so CI's cf-typegen --check fails until it is regenerated. The regeneration runs wrangler from node_modules, so a full bun install comes first: bun dedupe only installs when it removes a duplicate",
       "matchPackageNames": ["wrangler"],
       "postUpgradeTasks": {
-        "commands": ["bun install --lockfile-only", "bun dedupe", "bun x vp run -r cf-typegen"],
+        "commands": ["bun install", "bun dedupe", "bun x vp run -r cf-typegen"],
         "fileFilters": ["bun.lock", "apps/*/worker-configuration.d.ts"],
         "executionMode": "branch",
         "installTools": { "bun": {}, "node": {} }
@@ -68,14 +70,16 @@
     },
     {
       "customType": "regex",
-      "description": "Playwright versions in CI that no manager extracts: the VRT server command and the browser cache key",
+      "description": "Playwright versions that no manager extracts: the VRT server command and browser cache key in CI, and the local test:vrt task. config:recommended ignores every test/ directory, so ignorePaths drops that to reach .mise-tasks/test/vrt",
       "managerFilePatterns": [
         "/^\\.github/workflows/ci\\.yml$/",
-        "/^\\.github/actions/setup-playwright/action\\.yml$/"
+        "/^\\.github/actions/setup-playwright/action\\.yml$/",
+        "/^\\.mise-tasks/test/vrt$/"
       ],
       "matchStrings": [
         "playwright@(?<currentValue>\\d+\\.\\d+\\.\\d+)",
-        "playwright-browser-\\$\\{\\{ runner\\.os \\}\\}-(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+        "playwright-browser-\\$\\{\\{ runner\\.os \\}\\}-(?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "PW_VERSION=\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "depNameTemplate": "@playwright/test",
       "datasourceTemplate": "npm"
