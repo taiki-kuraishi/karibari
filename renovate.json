@@ -1,34 +1,34 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":dependencyDashboardApproval"],
+  "extends": ["config:recommended"],
   "timezone": "Asia/Tokyo",
+  "schedule": ["* * * * 1"],
   "prHourlyLimit": 0,
-  "prConcurrentLimit": 3,
-  "minimumReleaseAge": "1 day",
+  "prConcurrentLimit": 1,
   "platformAutomerge": false,
   "reviewers": ["taiki-kuraishi"],
   "assignAutomerge": true,
-  "vulnerabilityAlerts": { "enabled": true },
   "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": { "enabled": true },
   "lockFileMaintenance": { "enabled": true, "automerge": true },
   "constraints": { "bun": "1.4.0" },
   "ignorePaths": ["**/node_modules/**"],
   "packageRules": [
     {
-      "description": "Routine patch PRs would spend GitHub Actions minutes; vulnerabilityAlerts force-enables security patches, which this rule then automerges",
-      "matchUpdateTypes": ["patch"],
-      "enabled": false,
+      "description": "Merge everything except major automatically once CI passes. Patch is listed for the security fixes that still open; the patch rule below skips the rest. Branches are only created on Mondays (top-level schedule); vulnerability alerts keep their own immediate schedule.",
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true
     },
     {
-      "description": "Minor and digest updates rarely contain breaking changes",
-      "matchUpdateTypes": ["minor", "digest"],
-      "automerge": true
-    },
-    {
-      "description": "Major updates can break APIs",
+      "description": "Major updates may break things, so always merge them by hand, and only open one after approval on the Dependency Dashboard: an open major takes the single open-PR slot and holds up every other update.",
       "matchUpdateTypes": ["major"],
-      "automerge": false
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Skip patch updates to keep PRs and GitHub Actions usage low. Security fixes still get PRs because vulnerabilityAlerts.enabled=true is forced onto alert updates and re-enables them. Dependabot alerts are off in this repo, so OSV (osvVulnerabilityAlerts) is the alert source.",
+      "matchUpdateTypes": ["patch"],
+      "enabled": false
     },
     {
       "description": "bun is pinned in mise.toml (CI), packageManager, and constraints.bun (the bun Renovate installs for bun.lock; the renovate-config manager bumps it). A bun.lock written by a newer bun than CI's can fail --frozen-lockfile",
