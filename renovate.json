@@ -1,0 +1,90 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":dependencyDashboardApproval"],
+  "timezone": "Asia/Tokyo",
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 3,
+  "minimumReleaseAge": "1 day",
+  "platformAutomerge": false,
+  "reviewers": ["taiki-kuraishi"],
+  "assignAutomerge": true,
+  "vulnerabilityAlerts": { "enabled": true },
+  "lockFileMaintenance": { "enabled": true, "automerge": true },
+  "constraints": { "bun": "1.4.0" },
+  "packageRules": [
+    {
+      "description": "Routine patch PRs would spend GitHub Actions minutes; vulnerabilityAlerts force-enables security patches, which this rule then automerges",
+      "matchUpdateTypes": ["patch"],
+      "enabled": false,
+      "automerge": true
+    },
+    {
+      "description": "Minor and digest updates rarely contain breaking changes",
+      "matchUpdateTypes": ["minor", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Major updates can break APIs",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "bun is pinned in mise.toml (CI), packageManager, and constraints.bun (the bun Renovate installs for bun.lock; the renovate-config manager bumps it). A bun.lock written by a newer bun than CI's can fail --frozen-lockfile",
+      "matchDepNames": ["bun"],
+      "groupName": "bun"
+    },
+    {
+      "description": "The VRT job runs the Playwright server image against the catalog's client, which refuses a different version, and the browser cache key must name the version the client downloads",
+      "matchPackageNames": ["@playwright/test", "mcr.microsoft.com/playwright"],
+      "groupName": "playwright"
+    },
+    {
+      "description": "oxlint-tsgolint's version tracks TypeScript's (7.0.2xxx = TS 7.0.2)",
+      "matchPackageNames": ["typescript", "oxlint-tsgolint"],
+      "groupName": "typescript"
+    },
+    {
+      "description": "worker-configuration.d.ts records the workerd version bundled with wrangler, so CI's cf-typegen --check fails until it is regenerated. The regeneration runs wrangler through node_modules, so this installs instead of only locking",
+      "matchPackageNames": ["wrangler"],
+      "postUpgradeTasks": {
+        "commands": ["bun install --lockfile-only", "bun dedupe", "bun x vp run -r cf-typegen"],
+        "fileFilters": ["bun.lock", "apps/*/worker-configuration.d.ts"],
+        "executionMode": "branch",
+        "installTools": { "bun": {}, "node": {} }
+      }
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update versions in bun workspaces.catalog in package.json",
+      "managerFilePatterns": ["/(^|/)package\\.json$/"],
+      "matchStringsStrategy": "recursive",
+      "matchStrings": [
+        "\"catalog\"\\s*:\\s*\\{(.|\\n)*?\\}",
+        "\"(?<depName>[^\"]+)\"\\s*:\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "Playwright versions in CI that no manager extracts: the VRT server command and the browser cache key",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/ci\\.yml$/",
+        "/^\\.github/actions/setup-playwright/action\\.yml$/"
+      ],
+      "matchStrings": [
+        "playwright@(?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "playwright-browser-\\$\\{\\{ runner\\.os \\}\\}-(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "@playwright/test",
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "postUpgradeTasks": {
+    "commands": ["bun install --lockfile-only", "bun dedupe --lockfile-only"],
+    "fileFilters": ["bun.lock"],
+    "executionMode": "branch",
+    "installTools": { "bun": {} }
+  }
+}
