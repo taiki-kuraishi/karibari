@@ -44,6 +44,11 @@
       "groupName": "typescript"
     },
     {
+      "description": "The @better-auth/* packages pin @better-auth/core and @better-auth/utils to their own release, so bumping one alone mixes two copies and breaks type-check",
+      "matchPackageNames": ["better-auth", "@better-auth/**"],
+      "groupName": "better-auth"
+    },
+    {
       "description": "worker-configuration.d.ts records the workerd version bundled with wrangler, so CI's cf-typegen --check fails until it is regenerated. The regeneration runs wrangler from node_modules, so a full bun install comes first: bun dedupe only installs when it removes a duplicate",
       "matchPackageNames": ["wrangler"],
       "postUpgradeTasks": {
