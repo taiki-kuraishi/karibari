@@ -31,19 +31,105 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
+      lint: ${{ steps.filter.outputs.lint }}
+      test: ${{ steps.filter.outputs.test }}
+      vrt: ${{ steps.filter.outputs.vrt }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+      knip: ${{ steps.filter.outputs.knip }}
+      terraform: ${{ steps.filter.outputs.terraform }}
       db: ${{ steps.filter.outputs.db }}
     steps:
-      - uses: actions/checkout@v7
+      # pull_request reads the changed files through the API; push and workflow_dispatch diff
+      # against git history, so only they need the checkout.
+      - if: github.event_name != 'pull_request'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       # Inclusion-only filters: negation is OR-ed, not subtraction, under the default
       # `predicate-quantifier: some`.
       - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
+            lint:
+              - "**/*.{ts,tsx,js,mjs,cjs,json,jsonc,yml,yaml,toml,css,html}"
+              - "package.json"
+              - "bun.lock"
+              - "bunfig.toml"
+              - "tsconfig*.json"
+              - "mise.toml"
+              - "mise.lock"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/**"
+            test:
+              - "apps/**"
+              - "packages/**"
+              - "vite.config.ts"
+              - "package.json"
+              - "bun.lock"
+              - "bunfig.toml"
+              - "tsconfig*.json"
+              - "mise.toml"
+              - "mise.lock"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/**"
+            vrt:
+              - "apps/auth/**"
+              - "packages/**"
+              - "package.json"
+              - "bun.lock"
+              - "bunfig.toml"
+              - "tsconfig*.json"
+              - "mise.toml"
+              - "mise.lock"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/**"
+            e2e:
+              - "apps/auth/**"
+              - "apps/viewer/**"
+              - "packages/**"
+              - "package.json"
+              - "bun.lock"
+              - "bunfig.toml"
+              - "tsconfig*.json"
+              - "mise.toml"
+              - "mise.lock"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/**"
+            knip:
+              - "apps/**"
+              - "packages/**"
+              - "knip.config.ts"
+              - "package.json"
+              - "bun.lock"
+              - "bunfig.toml"
+              - "tsconfig*.json"
+              - "mise.toml"
+              - "mise.lock"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/**"
+            terraform:
+              - "infra/**"
+              - "fnox.toml"
+              - "mise.toml"
+              - "mise.lock"
+              - "mise.ci.toml"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/setup-mise/**"
             db:
-              - 'packages/db/**'
+              - "packages/db/**"
+              - "package.json"
+              - "bun.lock"
+              - "bunfig.toml"
+              - "tsconfig*.json"
+              - "mise.toml"
+              - "mise.lock"
+              - ".github/workflows/ci.yml"
+              - ".github/actions/**"
 
   lint:
+    needs: changes
+    if: needs.changes.outputs.lint == 'true'
     runs-on: ubuntu-slim
     timeout-minutes: 10
     steps:
@@ -74,11 +160,9 @@ jobs:
   #
   # No cache-vp-tasks step: every step here runs a package script directly and never
   # goes through `vp run`, so there is no task cache to restore.
-  #
-  # `test-ok` exists because an expanded matrix job is a bad required status check: when
-  # the matrix is empty the job never reports and the PR is blocked forever. Register
-  # only `test-ok` as required.
   test:
+    needs: changes
+    if: needs.changes.outputs.test == 'true'
     runs-on: ubuntu-slim
     timeout-minutes: 15
     strategy:
@@ -115,15 +199,6 @@ jobs:
       - if: matrix.worker
         run: bun run --cwd ${{ matrix.path }} wrangler deploy --dry-run --outdir "$RUNNER_TEMP/${{ matrix.name }}-dist"
 
-  test-ok:
-    needs: [test, vrt, e2e]
-    if: always()
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: exit 1
-
   # Visual regression for the auth client (octo-parity: remote browser over
   # WebSocket, real `vite preview` bundle under test). Raw commands, not
   # `mise run test:vrt`: per-step timing, same reason as every other job.
@@ -131,6 +206,8 @@ jobs:
   # `mise run test:vrt -- --update-snapshots` (never `--update-snapshots` here).
   # Not in lefthook: browsers are too heavy for a commit hook.
   vrt:
+    needs: changes
+    if: needs.changes.outputs.vrt == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     services:
@@ -167,6 +244,8 @@ jobs:
   # Raw commands, not `mise run test:e2e`: per-step timing, same reason as every other job.
   # Not in lefthook: browsers are too heavy for a commit hook.
   e2e:
+    needs: changes
+    if: needs.changes.outputs.e2e == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -192,6 +271,8 @@ jobs:
   # No cache-vp-tasks step: knip is never run through `vp run`, because it rewrites its
   # own inputs while scanning and therefore never caches.
   knip:
+    needs: changes
+    if: needs.changes.outputs.knip == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -202,11 +283,12 @@ jobs:
       - uses: ./.github/actions/setup-bun
       - run: bun run knip
 
-  # Terraform for infra/ (see infra/AGENTS.md). Not path-gated: plan also catches drift made
-  # outside a PR. Credentials come from GitHub OIDC through the plan role the
+  # Terraform for infra/ (see infra/AGENTS.md). Credentials come from GitHub OIDC through the plan role the
   # taiki-kuraishi/personal repo trusts for this repo, so fork PRs (no id-token) fail here.
   # MISE_ENV=ci loads mise.ci.toml, which unsets the local-only AWS_PROFILE.
   terraform:
+    needs: changes
+    if: needs.changes.outputs.terraform == 'true'
     runs-on: ubuntu-slim
     timeout-minutes: 15
     permissions:
@@ -239,12 +321,12 @@ jobs:
       # The state-read role cannot write the lockfile, so plan runs without a lock.
       - run: fnox --non-interactive exec -- terraform plan -input=false -lock=false -detailed-exitcode
 
-  # Path-gated: the drift gate only matters when `packages/db` changed, so it stays out of
+  # The drift gate only matters when `packages/db` changed, so it stays out of
   # `lint`. Regenerating and diffing is how a committed generator output is checked when the
   # generator has no `--check` flag — same shape as the `mise.lock` step. The last step also
   # catches a new, still-untracked migration file that `git diff` cannot see.
   db-drift:
-    needs: [changes]
+    needs: changes
     if: needs.changes.outputs.db == 'true'
     runs-on: ubuntu-slim
     timeout-minutes: 10
@@ -257,3 +339,22 @@ jobs:
       - run: bun run --cwd packages/db generate:migration
       - run: git diff --exit-code -- packages/db/src/migrations
       - run: test -z "$(git status --porcelain -- packages/db/src/migrations)"
+
+  # The only required status check. A skipped job (no matching change) counts as passing;
+  # a failed `changes` job must not, or every gated job would skip into a green run.
+  check:
+    needs:
+      - changes
+      - lint
+      - test
+      - vrt
+      - e2e
+      - knip
+      - terraform
+      - db-drift
+    if: always()
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - if: needs.changes.result != 'success' || contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
