@@ -4,11 +4,10 @@ Conventions for `.github/workflows/` and `.github/actions/`.
 
 ## Layout
 
-- `ci.yml` — the JS/TS quality gate: `changes`, `lint`, `db-drift` (path-gated),
-  `knip`, and the `test` matrix with its `test-ok` aggregate. Add a matrix entry
-  per workspace; see `.claude/rules/workspace-packages.md`.
-- The `terraform` job in `ci.yml` is not path-gated: its plan also catches drift made
-  outside a PR. It needs OIDC (`id-token: write`), so fork PRs fail it.
+- `ci.yml` — the whole PR gate: `changes` decides which of `lint`, `test` (matrix),
+  `vrt`, `e2e`, `knip`, `terraform`, and `db-drift` run, and `check` aggregates them.
+  Add a matrix entry per workspace; see `.claude/rules/workspace-packages.md`.
+- The `terraform` job needs OIDC (`id-token: write`), so fork PRs fail it.
 - `migrate.yml` — applies D1 migrations to production on push to main (`changes` gate per
   migrations directory) or `workflow_dispatch` (both DBs). One job per DB.
 
@@ -45,12 +44,14 @@ concurrency:
   workflow level.
 - Pin third-party actions to a major tag (`actions/checkout@v7`).
 
-## Path gating (when you add it)
+## Path gating and the `check` aggregate
 
-CI runs every job on every PR today. If you gate jobs by path, use a leading `changes` job
-(`dorny/paths-filter`) — **never `on.pull_request.paths:` / `on.push.paths:`**, because a
-path that doesn't match means no Check Run is created at all and the job can't be a
-required status check.
+Every job in `ci.yml` is gated by the leading `changes` job (`dorny/paths-filter`):
+`needs: changes` plus `if: needs.changes.outputs.<job> == 'true'`. **Never
+`on.pull_request.paths:` / `on.push.paths:`**, because a path that doesn't match means no
+Check Run is created at all and the job can't be a required status check. A new job gets
+its own filter listing every path it reads, including `ci.yml`, the composite actions,
+and the lockfiles, and is added to `check.needs`.
 
 Two traps to carry forward:
 
@@ -64,24 +65,12 @@ Two traps to carry forward:
 Generator drift checks that only need to run when their package changes go in a dedicated
 job gated by the `changes` job (precedent: `db-drift` for `packages/db/**`), not in `lint`.
 
-## Matrix jobs need an aggregate job
+## `check` is the only required status check
 
-A matrix job's expanded check names make a bad required status check: when the matrix is
-empty the job never reports, and the PR is blocked forever. Give every matrix family a
-sibling aggregate:
-
-```yaml
-test-ok:
-  needs: [test]
-  if: always()
-  runs-on: ubuntu-latest
-  timeout-minutes: 5
-  steps:
-    - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-      run: exit 1
-```
-
-Register **only the aggregate name** as a required status check.
+A matrix job's expanded check names, and a skipped gated job, make bad required status
+checks: they never report, and the PR is blocked forever. `check` needs every job, runs
+with `if: always()`, and fails when `changes` did not succeed or any job failed or was
+cancelled. Skipped jobs count as passing. Register **only `check`** as required.
 
 Matrix entries are per workspace, and each job runs
 `bun run --cwd ${{ matrix.path }} ...`. Set `worker: true` for deploy units and
