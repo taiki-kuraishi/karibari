@@ -64,6 +64,8 @@ referenced as `"catalog:"`.
   `@cloudflare/vitest-plugin` ↔ `vitest` is cataloged as a unit, so one bump lands in one
   reviewable diff. (The two reference repos disagree: migiwa catalogs the pair, ax pins
   `@cloudflare/vitest-pool-workers` in the consuming package. karibari follows migiwa.)
+  `vite-plus` sits in root `devDependencies`, not the catalog, but pins an exact `vitest`, so
+  the `vitest` group in `renovate.json` bumps all three together.
 - `typescript` is declared by every workspace as `"typescript": "catalog:"` in
   `peerDependencies`, and by the root in `devDependencies`.
 - `bun` itself is never in the catalog: it is pinned in `packageManager` and `mise.toml`.

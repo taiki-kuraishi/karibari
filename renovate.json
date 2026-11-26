@@ -49,6 +49,11 @@
       "groupName": "better-auth"
     },
     {
+      "description": "vite-plus pins an exact vitest, and test runs crash on start-up when the catalog's vitest is a different major; @cloudflare/vitest-plugin declares which vitest majors it supports. Security updates are not grouped (vulnerabilityAlerts sets groupName: null), so a vite-plus security PR still needs vitest bumped by hand",
+      "matchPackageNames": ["vite-plus", "vitest", "@cloudflare/vitest-plugin"],
+      "groupName": "vitest"
+    },
+    {
       "description": "worker-configuration.d.ts records the workerd version bundled with wrangler, so CI's cf-typegen --check fails until it is regenerated. The regeneration runs wrangler from node_modules, so a full bun install comes first: bun dedupe only installs when it removes a duplicate",
       "matchPackageNames": ["wrangler"],
       "postUpgradeTasks": {
